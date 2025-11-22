@@ -1,11 +1,49 @@
-const html = "<!-- Header -->\n  <header class=\"max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-6 flex items-center justify-between\">\n    <a href=\"/\" class=\"text-sm font-semibold hover:opacity-80\">\u2190 Home</a>\n    <nav class=\"text-sm flex items-center gap-4 sm:gap-5\">\n      <a class=\"hover:opacity-80\" href=\"/#customers\">Customers</a>\n      <a class=\"hover:opacity-80\" href=\"/#lenders\">Lenders</a>\n    </nav>\n  </header>\n\n  <!-- Body -->\n  <main class=\"max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16 md:py-20\">\n    <div class=\"max-w-3xl\">\n      <h1 class=\"text-4xl sm:text-5xl md:text-6xl font-black leading-tight\">Thanks \u2728</h1>\n\n      <div class=\"mt-6 sm:mt-8 bw-card p-4 sm:p-6 md:p-8\">\n        <h2 class=\"text-lg sm:text-xl font-semibold mb-3\">What happens next</h2>\n        <ul class=\"space-y-2 sm:space-y-3 list-disc list-inside text-neutral-700 dotpoints\">\n          <li>You will receive an email with a link to our privacy and consent form which you will need to esign (check your spam folder).</li>\n          <li>Once signed, we'll go through a digital fact find of your preferences and short list currently available lender options that might suit.</li>\n          <li>After this and if you're feeling comfy, we'll ask you to connect via Open Banking so we can verify numbers quickly.</li>\n        </ul>\n        <p class=\"mt-4 text-xs text-neutral-600\">\n          Open Banking - is the only way to share your data (please never share login / password info). \n        </p>\n      </div>\n\n      <div class=\"mt-8 flex flex-wrap gap-3 sm:gap-4\">\n        <a class=\"btn btn-primary\" href=\"/\">Back to Home</a>\n        <a class=\"btn btn-ghost\" href=\"/refinance\">Refinance</a>\n        <a class=\"btn btn-ghost\" href=\"/first-home-buyer\">First Home Buyer</a>\n        <a class=\"btn btn-ghost\" href=\"/purchase\">Purchase</a>\n        <a class=\"btn btn-ghost\" href=\"/investment\">Investment</a>\n      </div>\n    </div>\n  </main>\n\n  <!-- Footer -->\n  <footer class=\"max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16 text-sm text-neutral-400\">\n    <div class=\"flex flex-col gap-4\">\n      <div class=\"flex flex-col md:flex-row items-start md:items-center justify-between gap-4\">\n        <p>\u00a9 <span id=\"y\"></span> Sold. All rights reserved.</p>\n        <div class=\"flex gap-6\">\n          <a class=\"hover:opacity-80\" href=\"/#customers\">Customers</a>\n          <a class=\"hover:opacity-80\" href=\"/#lenders\">Lenders</a>\n          <a class=\"hover:opacity-80\" href=\"/terms\">Terms</a>\n          <a class=\"hover:opacity-80\" href=\"/privacy\">Privacy Policy</a>\n        </div>\n      </div>\n\n      <div class=\"text-xs leading-6 text-neutral-600\">\n        <p>\n          <strong>Sold Financial</strong> is a trading name of <strong>Homei Fi Pty Ltd</strong> (ABN 26 691 328 499).<br>\n          Homei Fi Pty Ltd (Credit Representative Number <strong>573517</strong>) is authorised under\n          Australian Credit Licence Number <strong>486112</strong> (Purple Circle Financial Services Pty Ltd).\n        </p>\n      </div>\n    </div>\n  </footer>\n\n  <script>\n    document.getElementById('y').textContent = new Date().getFullYear();\n\n    // Optional: basic client-side event for analytics tools\n    try {\n      window.dispatchEvent(new Event('sold_success_view'));\n    } catch(e) {}\n  </script>";
+"use client";
 
-export default function SuccessPage() {
+import { ButtonPill } from "@/components/ButtonPill";
+
+export default function RefinanceSuccess() {
   return (
-    <main className="min-h-screen bg-white">
-      <div
-        dangerouslySetInnerHTML={{ __html: html }}
-      />
+    <main className="max-w-5xl mx-auto px-6 pt-24 pb-24">
+      <section className="space-y-8">
+        <h1 className="text-5xl sm:text-6xl font-semibold tracking-tight text-[#0B0F1B]">
+          Thanks<span className="inline-block ml-2">✨</span>
+        </h1>
+
+        <div className="mt-6 space-y-4 text-[17px] leading-relaxed text-[#111827]">
+          <h2 className="text-2xl font-semibold">What happens next</h2>
+
+          <p>
+            💌 You will receive an email with a link to our Privacy &amp; Consent
+            form which you will need to esign (it&apos;ll take a hot minute to
+            arrive, please check your spam folder too).
+          </p>
+
+          <p>
+            🖊️ Once signed, we&apos;ll go through a digital fact find of your
+            preferences and short list currently available lender options that
+            might suit.
+          </p>
+
+          <p>
+            💰 After this and if you&apos;re feeling comfy, we&apos;ll ask you
+            to connect via Open Banking so we can verify data safely.
+          </p>
+
+          <p className="pt-2 text-sm text-[#6B7280]">
+            Open Banking is the only way to share your data (please never share
+            your banking login / passwords).
+          </p>
+        </div>
+
+        <div className="mt-10 flex flex-wrap gap-4">
+          <ButtonPill href="/">Back to Home</ButtonPill>
+          <ButtonPill href="/refinance">Refinance</ButtonPill>
+          <ButtonPill href="/first-home-buyer">First Home Buyer</ButtonPill>
+          <ButtonPill href="/purchase">Purchase</ButtonPill>
+          <ButtonPill href="/investment">Investment</ButtonPill>
+        </div>
+      </section>
     </main>
   );
 }
