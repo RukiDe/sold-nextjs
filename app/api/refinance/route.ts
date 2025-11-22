@@ -4,16 +4,18 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
 
+    // These names MUST match what the form sends
     const {
       email,
+      preferredName,
       currentLender,
-      refinancingFor,
-      loanType,
+      refinancingFor, // string[]
+      loanType,       // string[]
+      termRemaining,
       rate,
+      propertyValue,
       balance,
       repayments,
-      termRemaining,
-      propertyValue,
     } = body;
 
     if (!email) {
@@ -25,18 +27,17 @@ export async function POST(req: Request) {
 
     // Map form values → Brevo attributes
     const attributes: Record<string, any> = {
-      // Make sure these attribute names exist in Brevo exactly as written
+      // Make sure these names match your Brevo contact attributes exactly
+      FIRSTNAME: preferredName || "",
       CURRENTLENDER: currentLender || "",
-      OWNERORINVESTOR: Array.isArray(refinancingFor)
-        ? refinancingFor.join(", ")
-        : refinancingFor || "",
-      LOANTYPE: Array.isArray(loanType) ? loanType.join(", ") : loanType || "",
+      OWNERORINVESTOR: refinancingFor?.join(", ") || "",
+      LOANTYPE: loanType?.join(", ") || "",
+      YEARSREMAININGONLOAN: termRemaining || "",
       CURRENTRATE: rate || "",
+      PROPERTYVALUE: propertyValue || "",
       CURRENTLOANBALANCE: balance || "",
       MONTHLYREPAYMENTS: repayments || "",
-      YEARSREMAININGONLOAN: termRemaining || "",
-      PROPERTYVALUE: propertyValue || "",
-      FACT_FIND_COMPLETE: true, // or "Yes" if your Brevo attribute is text
+      FACT_FIND_COMPLETE: true, // or "Yes" if you set it up as text
     };
 
     const res = await fetch("https://api.brevo.com/v3/contacts", {
@@ -48,7 +49,7 @@ export async function POST(req: Request) {
       body: JSON.stringify({
         email,
         attributes,
-        updateEnabled: true, // updates existing contact
+        updateEnabled: true, // update existing contact rather than erroring
       }),
     });
 
