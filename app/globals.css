@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-white text-neutral-900 antialiased;
+}
+
+.btn {
+  @apply inline-flex items-center justify-center rounded-xl border border-neutral-900 px-4 py-2 text-sm font-medium leading-none text-neutral-900;
+}
+
+.btn-primary {
+  @apply bg-neutral-900 text-white hover:bg-neutral-800;
+}
+
+.btn-ghost {
+  @apply bg-white text-neutral-900 hover:bg-neutral-100;
+}
+
+.link {
+  @apply text-sm text-neutral-700 hover:text-neutral-900 hover:opacity-80 cursor-pointer;
+}

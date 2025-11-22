@@ -1,0 +1,11 @@
+const html = "<header class=\"max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-6 flex items-center justify-between\">\n    <a href=\"/\" class=\"text-sm font-semibold hover:opacity-80\">\u2190 Home</a>\n    <nav class=\"text-sm flex items-center gap-4 sm:gap-5\">\n      <a class=\"hover:opacity-80\" href=\"/#customers\">Customers</a>\n      <a class=\"hover:opacity-80\" href=\"/#lenders\">Lenders</a>\n    </nav>\n  </header>\n\n  <main class=\"max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16 md:py-20\">\n    <div class=\"max-w-3xl\">\n      <h1 class=\"text-4xl sm:text-5xl md:text-6xl font-black leading-tight\">Thanks, we have your details</h1>\n      <div class=\"mt-6 bw-card p-4 sm:p-6 md:p-8\">\n        <h2 class=\"text-lg sm:text-xl font-semibold mb-3\">What happens next</h2>\n        <p class=\"text-base sm:text-lg text-neutral-700\">\n          You'll receive a follow up email with a unique code inviting you to connect via Open Banking.\n        </p>\n        <p class=\"mt-3 text-sm text-neutral-700\">\n          Open Banking is the fastest and most secure way to verify your income / expense data so we can present your tailored lender matches \u2764\ufe0f\n        </p>\n      </div>\n      <div class=\"mt-8 flex flex-wrap gap-3 sm:gap-4\">\n        <a class=\"btn btn-primary\" href=\"/\">Back to Home</a>\n        <a class=\"btn btn-ghost\" href=\"/purchase\">Purchase</a>\n        <a class=\"btn btn-ghost\" href=\"/refinance\">Refinance</a>\n        <a class=\"btn btn-ghost\" href=\"/first-home-buyer\">First Home Buyer</a>\n        <a class=\"btn btn-ghost\" href=\"/investment\">Investment</a>\n      </div>\n    </div>\n  </main>\n\n  <footer class=\"max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16 text-sm text-neutral-400\">\n    <div class=\"flex flex-col gap-4\"><div class=\"flex flex-col md:flex-row items-start md:items-center justify-between gap-4\"><p>\u00a9 <span id=\"y\"></span> Sold. All rights reserved.</p></div></div>\n  </footer>\n  <script>document.getElementById('y').textContent = new Date().getFullYear();</script>";
+
+export default function Purchase2SuccessPage() {
+  return (
+    <main className="min-h-screen bg-white">
+      <div
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
+    </main>
+  );
+}
