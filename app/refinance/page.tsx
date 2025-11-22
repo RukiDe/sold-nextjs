@@ -137,7 +137,7 @@ function RefiInner() {
             { id: "balance", label: "What is your approximate loan balance?", placeholder: "e.g. $500,000" },
             { id: "repayments", label: "What are your current monthly repayments?", placeholder: "e.g. $2,450" },
             { id: "termRemaining", label: "How many years are left on your loan term?", placeholder: "e.g. 25" },
-            { id: "propertyValue", label: "What is your property's estimated value?", placeholder: "e.g. $850,000" },
+            { id: "propertyValue", label: "What is your property's estimated value.?", placeholder: "e.g. $850,000" },
           ].map((f) => (
             <div key={f.id}>
               <label className="block font-semibold text-lg mb-2">

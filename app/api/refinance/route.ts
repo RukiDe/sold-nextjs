@@ -6,15 +6,14 @@ export async function POST(req: Request) {
 
     const {
       email,
-      preferredName,
       currentLender,
       refinancingFor,
-      currentLoanTypes,
-      howManyYearsLeft,
-      currentRate,
+      loanType,
+      rate,
+      balance,
+      repayments,
+      termRemaining,
       propertyValue,
-      loanBalance,
-      monthlyRepayments,
     } = body;
 
     if (!email) {
@@ -24,18 +23,20 @@ export async function POST(req: Request) {
       );
     }
 
-    // Map form values → Brevo attributes  
+    // Map form values → Brevo attributes
     const attributes: Record<string, any> = {
-      FIRSTNAME: preferredName || "",
-      CURRENT_LENDER: currentLender || "",
-      REFINANCING_FOR: refinancingFor?.join(", ") || "",
-      CURRENT_LOAN_TYPES: currentLoanTypes?.join(", ") || "",
-      YEARS_LEFT: howManyYearsLeft || "",
-      CURRENT_RATE: currentRate || "",
-      PROPERTY_VALUE: propertyValue || "",
-      LOAN_BALANCE: loanBalance || "",
-      MONTHLY_REPAYMENTS: monthlyRepayments || "",
-      FACT_FIND_COMPLETE: false, // You can later flip this to true
+      // Make sure these attribute names exist in Brevo exactly as written
+      CURRENTLENDER: currentLender || "",
+      OWNERORINVESTOR: Array.isArray(refinancingFor)
+        ? refinancingFor.join(", ")
+        : refinancingFor || "",
+      LOANTYPE: Array.isArray(loanType) ? loanType.join(", ") : loanType || "",
+      CURRENTRATE: rate || "",
+      CURRENTLOANBALANCE: balance || "",
+      MONTHLYREPAYMENTS: repayments || "",
+      YEARSREMAININGONLOAN: termRemaining || "",
+      PROPERTYVALUE: propertyValue || "",
+      FACT_FIND_COMPLETE: true, // or "Yes" if your Brevo attribute is text
     };
 
     const res = await fetch("https://api.brevo.com/v3/contacts", {
@@ -47,7 +48,7 @@ export async function POST(req: Request) {
       body: JSON.stringify({
         email,
         attributes,
-        updateEnabled: true, // VERY IMPORTANT — updates existing contacts
+        updateEnabled: true, // updates existing contact
       }),
     });
 
