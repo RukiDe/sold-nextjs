@@ -1,16 +1,11 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
-import { useState } from "react";
-import { ButtonPill } from "@/components/ButtonPill";
+import React, { useEffect, useState } from "react";
 
-export default function Refinance() {
-  const searchParams = useSearchParams();
-  const email = searchParams.get("email") || ""; // passed in from Brevo email link
+export default function RefinancePage() {
+  const [email, setEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // -------------------------
-  // FORM STATE
-  // -------------------------
   const [form, setForm] = useState({
     currentLender: "",
     refinancingFor: [] as string[],
@@ -20,67 +15,92 @@ export default function Refinance() {
     repayments: "",
     termRemaining: "",
     propertyValue: "",
-    email, // auto-filled
   });
 
-  const updateField = (field: string, value: any) => {
-    setForm((f) => ({ ...f, [field]: value }));
+  // Read ?email= from the URL on the client
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const emailFromUrl = params.get("email") || "";
+      setEmail(emailFromUrl);
+    }
+  }, []);
+
+  const updateField = (field: keyof typeof form, value: any) => {
+    setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const toggleMultiselect = (field: string, value: string) => {
-    setForm((f) => {
-      const exists = f[field as keyof typeof f] as string[];
+  const toggleMultiselect = (field: "refinancingFor" | "loanType", value: string) => {
+    setForm((prev) => {
+      const list = prev[field];
+      const exists = list.includes(value);
       return {
-        ...f,
-        [field]: exists.includes(value)
-          ? exists.filter((v) => v !== value)
-          : [...exists, value],
+        ...prev,
+        [field]: exists ? list.filter((v) => v !== value) : [...list, value],
       };
     });
   };
 
-  // -------------------------
-  // SUBMIT
-  // -------------------------
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
 
-    await fetch("/api/refinance", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
+    setIsSubmitting(true);
 
-    window.location.href = "/refinance2-success";
+    try {
+      await fetch("/api/refinance", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...form, email }),
+      });
+
+      window.location.href = "/refinance2-success";
+    } catch (err) {
+      console.error("Error submitting refinance fact find", err);
+      setIsSubmitting(false);
+      alert("Something went wrong submitting your details. Please try again.");
+    }
   };
 
   return (
     <main className="max-w-5xl mx-auto px-4 sm:px-6 py-12">
-      <h1 className="text-4xl sm:text-5xl font-black mb-6">Refinance your loan</h1>
+      {/* Header copy */}
+      <h1 className="text-4xl sm:text-5xl font-black mb-6">
+        Refinance your loan, properly.
+      </h1>
 
       <p className="text-lg text-neutral-700 max-w-3xl leading-relaxed">
-        This is your digital fact find — a quick way for us to sense-check your
-        current rate, repayments and loan position against what’s available on
-        the market today.
+        This is the first step in giving your home loan a health check
+        without the pressure of sitting in a branch or being sold to. We'll
+        sense-check your current rate and repayments against what's available
+        on the market today.
       </p>
 
       <ul className="list-disc ml-6 mt-4 text-neutral-700 space-y-2">
         <li>No credit check at this stage.</li>
-        <li>Honest advice — we work for you, not lenders.</li>
-        <li>We only recommend a move if it puts you ahead and you feel comfy.</li>
+        <li>Honest advice, we work for you not lenders.</li>
+        <li>
+          We only recommend a move if it actually puts you ahead and you're
+          feeling comfy.
+        </li>
       </ul>
 
+      {/* Fact find form */}
       <form
         onSubmit={handleSubmit}
         className="mt-12 space-y-8 bg-white border border-neutral-200 rounded-3xl p-8"
       >
-        {/* Email is NOT shown, but kept in state */}
-        <input type="hidden" value={email} />
+        {/* Hidden email just for debugging / clarity */}
+        {email && (
+          <p className="text-sm text-neutral-500 mb-2">
+            Continuing for: <span className="font-medium">{email}</span>
+          </p>
+        )}
 
-        {/* ---------------- CURRENT LENDER ---------------- */}
+        {/* CURRENT LENDER */}
         <div>
           <label className="block font-semibold text-lg mb-2">
-            Who is your current lender *
+            Who is your current lender? *
           </label>
           <input
             type="text"
@@ -92,10 +112,10 @@ export default function Refinance() {
           />
         </div>
 
-        {/* ---------------- PURPOSE ---------------- */}
+        {/* PURPOSE */}
         <div>
           <label className="block font-semibold text-lg mb-3">
-            Are you refinancing for an *
+            Are you refinancing for an * 
           </label>
 
           <div className="space-y-3">
@@ -113,10 +133,10 @@ export default function Refinance() {
           </div>
         </div>
 
-        {/* ---------------- LOAN TYPE ---------------- */}
+        {/* LOAN TYPE */}
         <div>
           <label className="block font-semibold text-lg mb-3">
-            What type of loan do you currently have *
+            What type of loan do you currently have? *
           </label>
 
           <div className="space-y-3">
@@ -134,7 +154,7 @@ export default function Refinance() {
           </div>
         </div>
 
-        {/* ---------------- NUMERIC FIELDS ---------------- */}
+        {/* NUMERIC / TEXT FIELDS */}
         <div className="space-y-6">
           {[
             {
@@ -162,16 +182,18 @@ export default function Refinance() {
               label: "What is your property's estimated value?",
               placeholder: "e.g. $850,000",
             },
-          ].map((f) => (
-            <div key={f.id}>
+          ].map((field) => (
+            <div key={field.id}>
               <label className="block font-semibold text-lg mb-2">
-                {f.label}
+                {field.label}
               </label>
               <input
                 type="text"
-                placeholder={f.placeholder}
-                value={(form as any)[f.id]}
-                onChange={(e) => updateField(f.id, e.target.value)}
+                placeholder={field.placeholder}
+                value={(form as any)[field.id]}
+                onChange={(e) =>
+                  updateField(field.id as keyof typeof form, e.target.value)
+                }
                 required
                 className="w-full px-4 py-3 rounded-full border border-neutral-300 focus:ring-2 focus:ring-black/20"
               />
@@ -179,10 +201,18 @@ export default function Refinance() {
           ))}
         </div>
 
+        {/* SUBMIT CTA – styled like ButtonPill */}
         <div className="pt-4">
-          <ButtonPill href="#" onClick={handleSubmit as any}>
-            I'm ready for the next steps
-          </ButtonPill>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="inline-block bg-[#0B0F1B] text-white font-semibold text-[17px]
+                       rounded-full px-8 py-3.5 transition-all border border-[#0B0F1B]
+                       hover:bg-white hover:text-black hover:border-black text-center
+                       disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {isSubmitting ? "Sending your details..." : "I'm ready for the next steps"}
+          </button>
         </div>
       </form>
     </main>
