@@ -1,11 +1,16 @@
-export const metadata = {
-  title: "✨ Sold — Make Loans Easy",
-  description: "Smarter, simpler home loans. Compare lenders, refinance, or buy — the easy way.",
+// app/layout.tsx
+import type { Metadata } from "next";
+import React from "react";
+
+export const metadata: Metadata = {
+  title: "✨ Sold - Make Loans Easy",
+  description:
+    "Smarter, simpler home loans. Compare lenders, refinance, or buy - the easy way.",
   icons: {
     icon: "/favicon.ico",
   },
   openGraph: {
-    title: "✨ Sold — Make Loans Easy",
+    title: "✨ Sold - Make Loans Easy",
     description: "Smarter, simpler home loans.",
     url: "https://sold.financial",
     siteName: "Sold",
@@ -14,7 +19,7 @@ export const metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Sold — Make Loans Easy",
+        alt: "Sold - Make Loans Easy",
       },
     ],
     locale: "en_AU",
@@ -22,8 +27,22 @@ export const metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "✨ Sold — Make Loans Easy",
+    title: "✨ Sold - Make Loans Easy",
     description: "Smarter, simpler home loans.",
     images: ["/og-image.png"],
   },
 };
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en">
+      <body className="bg-[#F7F5EE] text-black">
+        {children}
+      </body>
+    </html>
+  );
+}
