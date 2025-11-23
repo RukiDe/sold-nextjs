@@ -4,6 +4,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://sold.financial"),
   title: "✨ Sold — Make Loans Easy",
   description:
     "Sold connects homeowners to better mortgage offers after analysing your mortgage via Open Banking.",
@@ -15,7 +16,7 @@ export const metadata: Metadata = {
     siteName: "Sold",
     images: [
       {
-        url: "/og-image.png", // 👈 this must exist in /public
+        url: "/og-image.png",
         width: 1200,
         height: 630,
         alt: "Sold — Make Loans Easy"
@@ -28,7 +29,7 @@ export const metadata: Metadata = {
     title: "✨ Sold — Make Loans Easy",
     description:
       "Sold connects homeowners to better mortgage offers after analysing your mortgage via Open Banking.",
-    images: ["/og-image.png"] // 👈 same image used for Twitter
+    images: ["/og-image.png"]
   }
 };
 
