@@ -5,11 +5,11 @@ import Footer from "../components/Footer";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://sold.financial"),
-  title: "✨ V3Sold — Make Loans Easy",
+  title: "✨ Sold — Make Loans Easy",
   description:
     "Sold connects homeowners to better mortgage offers after analysing your mortgage via Open Banking.",
   openGraph: {
-    title: "✨ V3Sold — Make Loans Easy",
+    title: "✨ Sold — Make Loans Easy",
     description:
       "Sold connects homeowners to better mortgage offers after analysing your mortgage via Open Banking.",
     url: "https://sold.financial",
