@@ -15,7 +15,8 @@ export async function POST(req: Request) {
       repayments,
       termRemaining,
       propertyValue,
-      // keep future-proofed fields here as you add them:
+
+      // Future-proof fields:
       buyingTimeframe,
       combinedAnnualIncome,
       desiredLoanFeature,
@@ -40,30 +41,24 @@ export async function POST(req: Request) {
       );
     }
 
-    // Helper to normalise multi-selects → comma-separated strings
-    const toMultiString = (value: unknown): string => {
-      if (Array.isArray(value)) return value.join(", ");
-      if (typeof value === "string") return value;
-      return "";
-    };
-
     const attributes: Record<string, any> = {
-      // Core refinance fields
       FIRSTNAME: preferredName || "",
       CURRENTLENDER: currentLender || "",
-      OWNERORINVESTOR: toMultiString(refinancingFor),
-      LOANTYPE: toMultiString(loanType),
+
+      // Multi-choice MUST be arrays for Brevo to accept them
+      OWNERORINVESTOR: Array.isArray(refinancingFor) ? refinancingFor : [],
+      LOANTYPE: Array.isArray(loanType) ? loanType : [],
+
       CURRENTRATE: rate || "",
       CURRENTLOANBALANCE: balance || "",
       MONTHLYREPAYMENTS: repayments || "",
       YEARSREMAININGONLOAN: termRemaining || "",
       PROPERTYVALUE: propertyValue || "",
 
-      // Flags – use "Yes" to match how REFI_CONSENT_SIGNED is stored
+      // Flags — MUST be strings Brevo accepts
       FACT_FIND_COMPLETE: "Yes",
       DIGITAL_FACT_FIND_SENT: "Yes",
 
-      // Future-proofed refinance attributes
       BUYINGTIMEFRAME: buyingTimeframe || "",
       COMBINEDANNUALINCOME: combinedAnnualIncome || "",
       DESIREDLOANFEATURE: desiredLoanFeature || "",
@@ -90,7 +85,7 @@ export async function POST(req: Request) {
       body: JSON.stringify({
         email,
         attributes,
-        updateEnabled: true, // update existing contact rather than erroring
+        updateEnabled: true,
       }),
     });
 
@@ -105,6 +100,7 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ success: true, data });
+
   } catch (err: any) {
     console.error("Route error:", err);
     return NextResponse.json(
