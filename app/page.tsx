@@ -18,7 +18,7 @@ export default function HomePage() {
           </p>
 
           <p className="mt-3 text-sm sm:text-base text-neutral-700 max-w-xl">
-            Ready to startX? Select what you&apos;re looking for below, answer
+            Ready to start? Select what you&apos;re looking for below, answer
             some quick questions and we&apos;ll give you a sense of where you
             stand with a range of offers currently available on the market –
             no credit checks.
