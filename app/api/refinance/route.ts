@@ -1,67 +1,5 @@
 import { NextResponse } from "next/server";
 
-/**
- * All Brevo contact attribute keys you shared.
- * We’ll use this type so we can’t accidentally mistype a key.
- */
-type BrevoAttributeKey =
-  | "FIRSTNAME"
-  | "SMS"
-  | "EXT_ID"
-  | "LANDLINE_NUMBER"
-  | "CONTACT_TIMEZONE"
-  | "JOB_TITLE"
-  | "LINKEDIN"
-  | "DOUBLE_OPT-IN"
-  | "OPT_IN"
-  | "NUMBEROFDEPENDENTS"
-  | "CURRENTLENDER"
-  | "CURRENTLOANBALANCE"
-  | "PROPERTYVALUE"
-  | "CURRENTRATE"
-  | "MONTHLYREPAYMENTS"
-  | "YEARSREMAININGONLOAN"
-  | "MISSEDANYREPAYMENTSLAST6MONTHS"
-  | "DEPOSITSAVED"
-  | "PREFERREDSUBURBS"
-  | "CURRENTLYOWNAPROPERTY"
-  | "ESTIMATEDEQUITY"
-  | "PORTFOLIOVALUE"
-  | "TOTALLOANSOUTSTANDING"
-  | "GROSSANNUALRENTALINCOME"
-  | "TARGETYIELDRETURN"
-  | "UTMSOURCE"
-  | "UTMMEDIUM"
-  | "UTMCAMPAIGN"
-  | "UTMTERM"
-  | "UTMCONTENT"
-  | "GOOGLECLICKID"
-  | "PAGEURL"
-  | "REFI_CONSENT_SIGNED"
-  | "DIGITAL_FACT_FIND_SENT"
-  | "FACT_FIND_COMPLETE"
-  | "BUYINGTIMEFRAME"
-  | "COMBINEDANNUALINCOME"
-  | "DESIREDLOANFEATURE"
-  | "ELIGIBLEFIRSTHOMESCHEME"
-  | "EMPLOYMENTTYPE"
-  | "EXISTINGDEBTS"
-  | "INVESTORPLAN"
-  | "LOANRANGE"
-  | "LOANTYPE"
-  | "MAININVESTMENTGOAL"
-  | "MONTHLYLIVINGEXPENSES"
-  | "NUMBEROFPROPERTIESOWNED"
-  | "OWNERORINVESTOR"
-  | "OWNERSHIPSTRUCTURE"
-  | "PLANFORCURRENTPROPERTY"
-  | "PURPOSEOFREFINANCE"
-  | "REASONFORMOVING";
-
-/**
- * POST /api/refinance
- * Called from app/refinance/page.tsx
- */
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -70,14 +8,29 @@ export async function POST(req: Request) {
       email,
       preferredName,
       currentLender,
-      refinancingFor, // string[]
-      loanType,       // string[]
+      refinancingFor,
+      loanType,
       rate,
       balance,
       repayments,
       termRemaining,
       propertyValue,
-      // future-you: you can pull UTMs etc from body here too
+      // keep future-proofed fields here as you add them:
+      buyingTimeframe,
+      combinedAnnualIncome,
+      desiredLoanFeature,
+      eligibleFirstHomeScheme,
+      employmentType,
+      existingDebts,
+      investorPlan,
+      loanRange,
+      mainInvestmentGoal,
+      monthlyLivingExpenses,
+      numberOfPropertiesOwned,
+      ownershipStructure,
+      planForCurrentProperty,
+      purposeOfRefinance,
+      reasonForMoving,
     } = body;
 
     if (!email) {
@@ -87,23 +40,45 @@ export async function POST(req: Request) {
       );
     }
 
-    // Build attributes object – only set what we actually have.
-    const attributes: Partial<Record<BrevoAttributeKey, any>> = {
-      // We *can* send FIRSTNAME, but you already collected it on the consent step
-      // so it’s optional here. Uncomment if you decide to send it again:
-      // FIRSTNAME: preferredName || "",
+    // Helper to normalise multi-selects → comma-separated strings
+    const toMultiString = (value: unknown): string => {
+      if (Array.isArray(value)) return value.join(", ");
+      if (typeof value === "string") return value;
+      return "";
+    };
 
+    const attributes: Record<string, any> = {
+      // Core refinance fields
+      FIRSTNAME: preferredName || "",
       CURRENTLENDER: currentLender || "",
-      OWNERORINVESTOR: (refinancingFor || []).join(", "), // supports multi-select
-      LOANTYPE: (loanType || []).join(", "),
+      OWNERORINVESTOR: toMultiString(refinancingFor),
+      LOANTYPE: toMultiString(loanType),
       CURRENTRATE: rate || "",
       CURRENTLOANBALANCE: balance || "",
       MONTHLYREPAYMENTS: repayments || "",
       YEARSREMAININGONLOAN: termRemaining || "",
       PROPERTYVALUE: propertyValue || "",
 
-      // This is your “they finished the digital fact find” flag
-      FACT_FIND_COMPLETE: true,
+      // Flags – use "Yes" to match how REFI_CONSENT_SIGNED is stored
+      FACT_FIND_COMPLETE: "Yes",
+      DIGITAL_FACT_FIND_SENT: "Yes",
+
+      // Future-proofed refinance attributes
+      BUYINGTIMEFRAME: buyingTimeframe || "",
+      COMBINEDANNUALINCOME: combinedAnnualIncome || "",
+      DESIREDLOANFEATURE: desiredLoanFeature || "",
+      ELIGIBLEFIRSTHOMESCHEME: eligibleFirstHomeScheme || "",
+      EMPLOYMENTTYPE: employmentType || "",
+      EXISTINGDEBTS: existingDebts || "",
+      INVESTORPLAN: investorPlan || "",
+      LOANRANGE: loanRange || "",
+      MAININVESTMENTGOAL: mainInvestmentGoal || "",
+      MONTHLYLIVINGEXPENSES: monthlyLivingExpenses || "",
+      NUMBEROFPROPERTIESOWNED: numberOfPropertiesOwned || "",
+      OWNERSHIPSTRUCTURE: ownershipStructure || "",
+      PLANFORCURRENTPROPERTY: planForCurrentProperty || "",
+      PURPOSEOFREFINANCE: purposeOfRefinance || "",
+      REASONFORMOVING: reasonForMoving || "",
     };
 
     const res = await fetch("https://api.brevo.com/v3/contacts", {
@@ -115,7 +90,7 @@ export async function POST(req: Request) {
       body: JSON.stringify({
         email,
         attributes,
-        updateEnabled: true, // critical: updates existing contacts
+        updateEnabled: true, // update existing contact rather than erroring
       }),
     });
 
@@ -131,7 +106,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true, data });
   } catch (err: any) {
-    console.error("Refinance API error:", err);
+    console.error("Route error:", err);
     return NextResponse.json(
       { error: "Server error", details: err?.message },
       { status: 500 }
