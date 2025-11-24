@@ -233,7 +233,7 @@ function RefiInner() {
 
           <div>
             <label className="block font-semibold text-lg mb-2">
-              What is your property's estimated value?
+              What is your property&apos;s estimated value?
             </label>
             <input
               type="text"
