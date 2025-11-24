@@ -1,6 +1,8 @@
 // app/api/refinance-consent/route.ts
 import { NextResponse } from "next/server";
 
+const REFI_LIST_ID = Number(process.env.BREVO_REFI_LIST_ID || "8");
+
 export async function POST(req: Request) {
   try {
     const { preferredName, email } = await req.json();
@@ -12,11 +14,21 @@ export async function POST(req: Request) {
       );
     }
 
-    // Minimal safe attributes for consent step
     const attributes: Record<string, any> = {
       FIRSTNAME: preferredName || "",
-      REFI_CONSENT_STARTED: "Yes",
+      REFI_CONSENT_STARTED: "Yes", // optional debug flag
     };
+
+    const payload: Record<string, any> = {
+      email,
+      attributes,
+      updateEnabled: true,
+    };
+
+    // 👇 THIS is what makes the automation fire
+    if (!Number.isNaN(REFI_LIST_ID) && REFI_LIST_ID > 0) {
+      payload.listIds = [REFI_LIST_ID];
+    }
 
     const res = await fetch("https://api.brevo.com/v3/contacts", {
       method: "POST",
@@ -24,11 +36,7 @@ export async function POST(req: Request) {
         "Content-Type": "application/json",
         "api-key": process.env.BREVO_API_KEY || "",
       },
-      body: JSON.stringify({
-        email,
-        attributes,
-        updateEnabled: true,
-      }),
+      body: JSON.stringify(payload),
     });
 
     const data = await res.json();
@@ -41,9 +49,9 @@ export async function POST(req: Request) {
       );
     }
 
-    // Everything worked
-    return NextResponse.json({ success: true });
+    console.log("Refi consent contact synced to Brevo:", { email, preferredName });
 
+    return NextResponse.json({ success: true });
   } catch (err: any) {
     console.error("Consent route error:", err);
     return NextResponse.json(
