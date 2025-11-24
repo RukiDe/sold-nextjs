@@ -22,10 +22,10 @@ function RefiInner() {
   const searchParams = useSearchParams();
   const emailFromUrl = searchParams.get("email") || "";
 
-  // 👉 ensure we only hit Brevo once per visit
+  // Prevent double-fires
   const hasUpdatedBrevoRef = useRef(false);
 
-  // 🔒 Mark DIGITAL_FACT_FIND_SENT = "Yes" in Brevo when they land here
+  // 🔒 Mark DIGITAL_FACT_FIND_SENT = true in Brevo
   useEffect(() => {
     if (hasUpdatedBrevoRef.current) return;
     if (!emailFromUrl || !emailFromUrl.includes("@")) return;
@@ -38,7 +38,7 @@ function RefiInner() {
       body: JSON.stringify({
         email: emailFromUrl,
         attributes: {
-          DIGITAL_FACT_FIND_SENT: "Yes",
+          DIGITAL_FACT_FIND_SENT: true,   // <-- IMPORTANT FIX
         },
       }),
     }).catch((err) => {
@@ -83,14 +83,12 @@ function RefiInner() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    // Send to our API, which then updates Brevo with detailed fact find data
     await fetch("/api/refinance", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
     });
 
-    // Then redirect to success page
     window.location.href = "/refinance2-success";
   };
 
@@ -109,16 +107,13 @@ function RefiInner() {
       <ul className="list-disc ml-6 mt-4 text-neutral-700 space-y-2">
         <li>No credit check at this stage.</li>
         <li>Honest advice &mdash; we work for you, not lenders.</li>
-        <li>
-          We only recommend a move if it puts you ahead and you feel comfy.
-        </li>
+        <li>We only recommend a move if it puts you ahead and you feel comfy.</li>
       </ul>
 
       <form
         onSubmit={handleSubmit}
         className="mt-12 space-y-8 bg-white border border-neutral-200 rounded-3xl p-8"
       >
-        {/* Hidden email (from URL) */}
         <input type="hidden" value={form.email} />
 
         {/* CURRENT LENDER */}
@@ -180,7 +175,6 @@ function RefiInner() {
 
         {/* NUMERIC / TEXT FIELDS */}
         <div className="space-y-6">
-          {/* Current rate */}
           <div>
             <label className="block font-semibold text-lg mb-2">
               What is your current interest rate?
@@ -195,7 +189,6 @@ function RefiInner() {
             />
           </div>
 
-          {/* Balance */}
           <div>
             <label className="block font-semibold text-lg mb-2">
               What is your approximate loan balance?
@@ -210,7 +203,6 @@ function RefiInner() {
             />
           </div>
 
-          {/* Repayments */}
           <div>
             <label className="block font-semibold text-lg mb-2">
               What are your current monthly repayments?
@@ -225,7 +217,6 @@ function RefiInner() {
             />
           </div>
 
-          {/* Term remaining */}
           <div>
             <label className="block font-semibold text-lg mb-2">
               How many years are left on your loan term?
@@ -240,10 +231,9 @@ function RefiInner() {
             />
           </div>
 
-          {/* Property value */}
           <div>
             <label className="block font-semibold text-lg mb-2">
-              What is your property&#39;s estimated value?
+              What is your property's estimated value?
             </label>
             <input
               type="text"
@@ -256,15 +246,14 @@ function RefiInner() {
           </div>
         </div>
 
-        {/* SUBMIT BUTTON */}
         <div className="pt-4">
           <button
             type="submit"
             className="inline-block bg-[#0B0F1B] text-white font-semibold text-[17px]
-            rounded-full px-8 py-3.5 transition-all border border-[#0B0F1B]
-            hover:bg:white hover:text-black hover:border-black text-center w-full sm:w-auto"
+              rounded-full px-8 py-3.5 transition-all border border-[#0B0F1B]
+              hover:bg:white hover:text-black hover:border-black text-center w-full sm:w-auto"
           >
-            I&#39;m ready for the next steps
+            I&apos;m ready for the next steps
           </button>
         </div>
       </form>
@@ -274,7 +263,7 @@ function RefiInner() {
 
 export default function RefinancePage() {
   return (
-    <Suspense fallback={<div className="p-8 text-neutral-500">Loading&hellip;</div>}>
+    <Suspense fallback={<div className="p-8 text-neutral-500">Loading…</div>}>
       <RefiInner />
     </Suspense>
   );

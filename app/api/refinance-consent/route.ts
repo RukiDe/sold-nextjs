@@ -16,19 +16,16 @@ export async function POST(req: Request) {
 
     const attributes: Record<string, any> = {
       FIRSTNAME: preferredName || "",
-      REFI_CONSENT_STARTED: "Yes", // optional debug flag
+      REFI_CONSENT_STARTED: "Yes", // optional tracking
     };
 
+    // 👉 Important: this is the missing piece!
     const payload: Record<string, any> = {
       email,
       attributes,
       updateEnabled: true,
+      listIds: [REFI_LIST_ID], // <-- 🔥 HERE 🔥
     };
-
-    // 👇 THIS is what makes the automation fire
-    if (!Number.isNaN(REFI_LIST_ID) && REFI_LIST_ID > 0) {
-      payload.listIds = [REFI_LIST_ID];
-    }
 
     const res = await fetch("https://api.brevo.com/v3/contacts", {
       method: "POST",
@@ -49,8 +46,7 @@ export async function POST(req: Request) {
       );
     }
 
-    console.log("Refi consent contact synced to Brevo:", { email, preferredName });
-
+    console.log("Refi consent contact synced to Brevo:", { email });
     return NextResponse.json({ success: true });
   } catch (err: any) {
     console.error("Consent route error:", err);

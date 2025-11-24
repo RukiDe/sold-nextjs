@@ -1,58 +1,85 @@
+// app/api/brevo/update-contact/route.ts
 import { NextResponse } from "next/server";
-
-const BREVO_API_KEY = process.env.BREVO_API_KEY;
-
-type BrevoUpdateRequest = {
-  email: string;
-  attributes: Record<string, string | number | boolean | null>;
-};
 
 export async function POST(req: Request) {
   try {
-    const body = (await req.json()) as BrevoUpdateRequest;
-    const { email, attributes } = body;
+    const body = await req.json();
 
-    if (!email || !attributes || Object.keys(attributes).length === 0) {
+    const email = body?.email as string | undefined;
+    const rawAttributes = (body?.attributes || {}) as Record<string, any>;
+
+    if (!email || typeof email !== "string" || !email.includes("@")) {
       return NextResponse.json(
-        { error: "Missing email or attributes" },
+        { error: "Valid email is required" },
         { status: 400 }
       );
     }
 
-    if (!BREVO_API_KEY) {
-      console.error("BREVO_API_KEY not set");
-      return NextResponse.json(
-        { error: "Brevo API key not configured" },
-        { status: 500 }
-      );
+    // Clone so we can safely mutate
+    const attributes: Record<string, any> = { ...rawAttributes };
+
+    // ✅ Coerce DIGITAL_FACT_FIND_SENT to a real boolean if present
+    if (attributes.DIGITAL_FACT_FIND_SENT !== undefined) {
+      const v = attributes.DIGITAL_FACT_FIND_SENT;
+      attributes.DIGITAL_FACT_FIND_SENT =
+        v === true ||
+        v === "true" ||
+        v === "True" ||
+        v === "TRUE" ||
+        v === "YES" ||
+        v === "Yes" ||
+        v === "yes" ||
+        v === 1;
     }
 
-    const res = await fetch(
-      `https://api.brevo.com/v3/contacts/${encodeURIComponent(email)}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "api-key": BREVO_API_KEY,
-        },
-        body: JSON.stringify({ attributes }),
-      }
-    );
+    const apiKey = process.env.BREVO_API_KEY;
+
+    // 🧪 DX nicety: don’t hard-fail in local dev if the key isn’t set
+    if (!apiKey) {
+      console.warn(
+        "[/api/brevo/update-contact] BREVO_API_KEY is missing. " +
+          "Skipping Brevo call (this is common in local dev)."
+      );
+
+      // Still return 200 so the front-end flow continues
+      return NextResponse.json({
+        success: true,
+        skipped: true,
+        reason: "BREVO_API_KEY missing – Brevo not called",
+      });
+    }
+
+    const res = await fetch("https://api.brevo.com/v3/contacts", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "api-key": apiKey,
+      },
+      body: JSON.stringify({
+        email,
+        attributes,
+        updateEnabled: true,
+      }),
+    });
+
+    const data = await res.json();
 
     if (!res.ok) {
-      const text = await res.text();
-      console.error("Brevo update error:", res.status, text);
+      console.error("Brevo update-contact error:", data);
       return NextResponse.json(
-        { error: "Failed to update contact in Brevo" },
+        {
+          error: "Failed to update Brevo contact",
+          details: data,
+        },
         { status: 500 }
       );
     }
 
-    return NextResponse.json({ success: true });
-  } catch (err) {
-    console.error("Brevo update route error:", err);
+    return NextResponse.json({ success: true, data });
+  } catch (err: any) {
+    console.error("update-contact route error:", err);
     return NextResponse.json(
-      { error: "Unexpected error updating contact" },
+      { error: "Server error", details: err?.message },
       { status: 500 }
     );
   }
