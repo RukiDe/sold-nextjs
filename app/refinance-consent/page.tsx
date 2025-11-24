@@ -14,7 +14,7 @@ export default function RefinanceConsent() {
     e.preventDefault();
     setError(null);
 
-    if (!email) {
+    if (!email.trim()) {
       setError("Please add your email so we know where to send the form.");
       return;
     }
@@ -22,12 +22,23 @@ export default function RefinanceConsent() {
     try {
       setSubmitting(true);
 
-      // ⬇️ TODO: Wire this to Brevo (Zapier or /api endpoint)
-      // For now this just logs locally so the UI works.
-      console.log("Refi consent submit", { preferredName, email });
+      // 🔥 send to your backend → Brevo or Zapier or both
+      const res = await fetch("/api/refinance-consent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          preferredName,
+          email,
+        }),
+      });
 
-      // After wiring to Brevo, you might redirect to the “thanks” page:
-      // window.location.href = "/success";
+      if (!res.ok) {
+        console.error(await res.text());
+        throw new Error("Request failed");
+      }
+
+      // 👉 after your backend handles syncing & triggering DocuSign
+      window.location.href = "/success";
     } catch (err) {
       console.error(err);
       setError("Something went wrong. Please try again.");
@@ -37,7 +48,6 @@ export default function RefinanceConsent() {
   };
 
   return (
-    // Header & Footer come from the layout – don’t repeat them here.
     <main className="max-w-5xl mx-auto px-4 sm:px-6 py-12">
       <section className="mb-10">
         <h1 className="text-4xl sm:text-5xl font-black mb-6">
@@ -75,6 +85,7 @@ export default function RefinanceConsent() {
               className="w-full px-4 py-3 rounded-full border border-neutral-300 focus:ring-2 focus:ring-black/20 focus:outline-none"
             />
           </div>
+
           {/* Email */}
           <div>
             <input
@@ -86,8 +97,7 @@ export default function RefinanceConsent() {
               className="w-full px-4 py-3 rounded-full border border-neutral-300 focus:ring-2 focus:ring-black/20 focus:outline-none"
             />
             <p className="mt-2 text-sm text-neutral-500">
-              We’ll send your privacy and consent form here (check your spam
-              folder too).
+              We’ll send your privacy and consent form here (check your spam folder).
             </p>
           </div>
 
@@ -97,16 +107,10 @@ export default function RefinanceConsent() {
             </p>
           )}
 
-          {/* CTA button using ButtonPill styling */}
+          {/* CTA button */}
           <div className="pt-4">
-            <ButtonPill href="#" onClick={(e: React.MouseEvent) => e.preventDefault()}>
-              <button
-                type="submit"
-                disabled={submitting}
-                className="w-full sm:w-auto"
-              >
-                {submitting ? "Sending…" : "I'm ready for the next steps"}
-              </button>
+            <ButtonPill as="button" type="submit" disabled={submitting}>
+              {submitting ? "Sending…" : "I'm ready for the next steps"}
             </ButtonPill>
           </div>
         </form>
