@@ -7,6 +7,11 @@ export default function RefinanceConsent() {
   const [preferredName, setPreferredName] = useState("");
   const [email, setEmail] = useState("");
 
+  // Single vs joint application
+  const [isJoint, setIsJoint] = useState<"single" | "joint">("single");
+  const [partnerName, setPartnerName] = useState("");
+  const [partnerEmail, setPartnerEmail] = useState("");
+
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -19,16 +24,25 @@ export default function RefinanceConsent() {
       return;
     }
 
+    if (isJoint === "joint") {
+      if (!partnerName.trim() || !partnerEmail.trim()) {
+        setError("Please add your co-applicant’s name and email.");
+        return;
+      }
+    }
+
     try {
       setSubmitting(true);
 
-      // 🔥 send to your backend → Brevo or Zapier or both
       const res = await fetch("/api/refinance-consent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           preferredName,
           email,
+          applicationType: isJoint, // "single" | "joint"
+          partnerName: isJoint === "joint" ? partnerName : null,
+          partnerEmail: isJoint === "joint" ? partnerEmail : null,
         }),
       });
 
@@ -37,7 +51,7 @@ export default function RefinanceConsent() {
         throw new Error("Request failed");
       }
 
-      // 👉 after your backend handles syncing & triggering DocuSign
+      // After backend handles syncing & triggering DocuSign
       window.location.href = "/success";
     } catch (err) {
       console.error(err);
@@ -55,10 +69,10 @@ export default function RefinanceConsent() {
         </h1>
 
         <p className="text-lg text-neutral-700 max-w-3xl leading-relaxed">
-          This is the first step in giving your home loan a health check — without
-          the pressure of sitting in a branch or being sold to. We’ll sense-check
-          your current rate and repayments against what’s available on the market
-          today.
+          This is the first step in giving your home loan a health check —
+          without the pressure of sitting in a branch or being sold to. We’ll
+          sense-check your current rate and repayments against what’s available
+          on the market today.
         </p>
 
         <ul className="list-disc ml-6 mt-4 text-neutral-700 space-y-2">
@@ -97,9 +111,71 @@ export default function RefinanceConsent() {
               className="w-full px-4 py-3 rounded-full border border-neutral-300 focus:ring-2 focus:ring-black/20 focus:outline-none"
             />
             <p className="mt-2 text-sm text-neutral-500">
-              We’ll send your privacy and consent form here (check your spam folder).
+              We’ll send your privacy and consent form here (check your spam
+              folder).
             </p>
           </div>
+
+          {/* Single vs joint toggle */}
+          <div>
+            <p className="text-sm font-medium text-neutral-800 mb-2">
+              Are you applying by yourself or with someone else?
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                type="button"
+                onClick={() => setIsJoint("single")}
+                className={`flex-1 rounded-full border px-4 py-2 text-sm font-medium ${
+                  isJoint === "single"
+                    ? "border-black bg-black text-white"
+                    : "border-neutral-300 text-neutral-700 hover:border-neutral-500"
+                }`}
+              >
+                Just me
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsJoint("joint")}
+                className={`flex-1 rounded-full border px-4 py-2 text-sm font-medium ${
+                  isJoint === "joint"
+                    ? "border-black bg-black text-white"
+                    : "border-neutral-300 text-neutral-700 hover:border-neutral-500"
+                }`}
+              >
+                Me + a co-applicant
+              </button>
+            </div>
+            <p className="mt-2 text-xs text-neutral-500">
+              If you have someone else on the loan, choose “Me + a co-applicant”
+              so we can include them.
+            </p>
+          </div>
+
+          {/* Co-applicant fields (clean, no extra box) */}
+          {isJoint === "joint" && (
+            <div className="space-y-4 mt-4">
+              <p className="text-sm font-medium text-neutral-800">
+                Co-applicant details
+              </p>
+              <input
+                type="text"
+                placeholder="Co-applicant’s preferred name"
+                value={partnerName}
+                onChange={(e) => setPartnerName(e.target.value)}
+                className="w-full px-4 py-3 rounded-full border border-neutral-300 focus:ring-2 focus:ring-black/20 focus:outline-none"
+              />
+              <input
+                type="email"
+                placeholder="coapplicant@example.com"
+                value={partnerEmail}
+                onChange={(e) => setPartnerEmail(e.target.value)}
+                className="w-full px-4 py-3 rounded-full border border-neutral-300 focus:ring-2 focus:ring-black/20 focus:outline-none"
+              />
+              <p className="mt-1 text-xs text-neutral-500">
+                We’ll send them the same consent pack to review and sign.
+              </p>
+            </div>
+          )}
 
           {error && (
             <p className="text-sm text-red-600 pt-2">
