@@ -17,22 +17,13 @@ export default function Refinance2SuccessPage() {
 
             <p>
               Open Banking is the fastest and most secure way to verify your
-              income / expense data so we can present your tailored lender
+              financial data so we can discuss your tailored lender
               matches ❤️
             </p>
           </section>
 
-          <p className="mt-6 text-sm text-[#7B8794]">
-            Open Banking is the only way to share your data (please never share
-            your banking login / password info).
-          </p>
-
           <div className="mt-10 flex flex-wrap gap-4">
             <ButtonPill href="/">Back to Home</ButtonPill>
-            <ButtonPill href="/refinance">Refinance</ButtonPill>
-            <ButtonPill href="/first-home-buyer">First Home Buyer</ButtonPill>
-            <ButtonPill href="/purchase">Purchase</ButtonPill>
-            <ButtonPill href="/investment">Investment</ButtonPill>
           </div>
         </div>
       </main>
