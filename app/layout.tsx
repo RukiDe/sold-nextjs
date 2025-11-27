@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     siteName: "Sold",
     images: [
       {
-        url: "/og-image.png",
+        url: "/og_1200x630.png",
         width: 1200,
         height: 630,
         alt: "Sold — Make Loans Easy"
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     title: "✨ Sold — Make Loans Easy",
     description:
       "Sold connects homeowners to better mortgage offers after analysing your mortgage via Open Banking.",
-    images: ["/og-image.png"]
+    images: ["/og_1200x630.png"]
   }
 };
 
