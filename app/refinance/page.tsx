@@ -26,6 +26,7 @@ function RefiInner() {
   const hasUpdatedBrevoRef = useRef(false);
 
   // 🔒 Mark DIGITAL_FACT_FIND_SENT = true in Brevo
+  // This only runs when we have an email in the URL (i.e. from Brevo email links)
   useEffect(() => {
     if (hasUpdatedBrevoRef.current) return;
     if (!emailFromUrl || !emailFromUrl.includes("@")) return;
@@ -38,7 +39,7 @@ function RefiInner() {
       body: JSON.stringify({
         email: emailFromUrl,
         attributes: {
-          DIGITAL_FACT_FIND_SENT: true,   // <-- IMPORTANT FIX
+          DIGITAL_FACT_FIND_SENT: true,
         },
       }),
     }).catch((err) => {
@@ -99,14 +100,14 @@ function RefiInner() {
       </h1>
 
       <p className="text-lg text-neutral-700 max-w-3xl leading-relaxed">
-        This is your digital fact find &mdash; a quick way for us to sense-check
-        your current rate, repayments and loan position against what&#39;s
+        This is your digital fact find — a quick way for us to sense-check
+        your current rate, repayments and loan position against what&apos;s
         available on the market today.
       </p>
 
       <ul className="list-disc ml-6 mt-4 text-neutral-700 space-y-2">
         <li>No credit check at this stage.</li>
-        <li>Honest advice &mdash; we work for you, not lenders.</li>
+        <li>Honest advice — we work for you, not lenders.</li>
         <li>We only recommend a move if it puts you ahead and you feel comfy.</li>
       </ul>
 
@@ -114,7 +115,35 @@ function RefiInner() {
         onSubmit={handleSubmit}
         className="mt-12 space-y-8 bg-white border border-neutral-200 rounded-3xl p-8"
       >
-        <input type="hidden" value={form.email} />
+        {/* EMAIL + PREFERRED NAME */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block font-semibold text-lg mb-2">
+              Preferred name *
+            </label>
+            <input
+              type="text"
+              placeholder="e.g. Ruki"
+              value={form.preferredName}
+              onChange={(e) => updateField("preferredName", e.target.value)}
+              required
+              className="w-full px-4 py-3 rounded-full border border-neutral-300 focus:ring-2 focus:ring-black/20 focus:outline-none"
+            />
+          </div>
+          <div>
+            <label className="block font-semibold text-lg mb-2">
+              Email *
+            </label>
+            <input
+              type="email"
+              placeholder="you@example.com"
+              value={form.email}
+              onChange={(e) => updateField("email", e.target.value)}
+              required
+              className="w-full px-4 py-3 rounded-full border border-neutral-300 focus:ring-2 focus:ring-black/20 focus:outline-none"
+            />
+          </div>
+        </div>
 
         {/* CURRENT LENDER */}
         <div>
@@ -127,7 +156,7 @@ function RefiInner() {
             value={form.currentLender}
             onChange={(e) => updateField("currentLender", e.target.value)}
             required
-            className="w-full px-4 py-3 rounded-full border border-neutral-300 focus:ring-2 focus:ring-black/20"
+            className="w-full px-4 py-3 rounded-full border border-neutral-300 focus:ring-2 focus:ring-black/20 focus:outline-none"
           />
         </div>
 
@@ -185,7 +214,7 @@ function RefiInner() {
               value={form.rate}
               onChange={(e) => updateField("rate", e.target.value)}
               required
-              className="w-full px-4 py-3 rounded-full border border-neutral-300 focus:ring-2 focus:ring-black/20"
+              className="w-full px-4 py-3 rounded-full border border-neutral-300 focus:ring-2 focus:ring-black/20 focus:outline-none"
             />
           </div>
 
@@ -199,7 +228,7 @@ function RefiInner() {
               value={form.balance}
               onChange={(e) => updateField("balance", e.target.value)}
               required
-              className="w-full px-4 py-3 rounded-full border border-neutral-300 focus:ring-2 focus:ring-black/20"
+              className="w-full px-4 py-3 rounded-full border border-neutral-300 focus:ring-2 focus:ring-black/20 focus:outline-none"
             />
           </div>
 
@@ -213,7 +242,7 @@ function RefiInner() {
               value={form.repayments}
               onChange={(e) => updateField("repayments", e.target.value)}
               required
-              className="w-full px-4 py-3 rounded-full border border-neutral-300 focus:ring-2 focus:ring-black/20"
+              className="w-full px-4 py-3 rounded-full border border-neutral-300 focus:ring-2 focus:ring-black/20 focus:outline-none"
             />
           </div>
 
@@ -227,7 +256,7 @@ function RefiInner() {
               value={form.termRemaining}
               onChange={(e) => updateField("termRemaining", e.target.value)}
               required
-              className="w-full px-4 py-3 rounded-full border border-neutral-300 focus:ring-2 focus:ring-black/20"
+              className="w-full px-4 py-3 rounded-full border border-neutral-300 focus:ring-2 focus:ring-black/20 focus:outline-none"
             />
           </div>
 
@@ -241,7 +270,7 @@ function RefiInner() {
               value={form.propertyValue}
               onChange={(e) => updateField("propertyValue", e.target.value)}
               required
-              className="w-full px-4 py-3 rounded-full border border-neutral-300 focus:ring-2 focus:ring-black/20"
+              className="w-full px-4 py-3 rounded-full border border-neutral-300 focus:ring-2 focus:ring-black/20 focus:outline-none"
             />
           </div>
         </div>
@@ -251,7 +280,7 @@ function RefiInner() {
             type="submit"
             className="inline-block bg-[#0B0F1B] text-white font-semibold text-[17px]
               rounded-full px-8 py-3.5 transition-all border border-[#0B0F1B]
-              hover:bg:white hover:text-black hover:border-black text-center w-full sm:w-auto"
+              hover:bg-white hover:text-black hover:border-black text-center w-full sm:w-auto"
           >
             I&apos;m ready for the next steps
           </button>

@@ -6,20 +6,30 @@ export default function Refinance2SuccessPage() {
       <main className="flex-1">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <h1 className="text-4xl sm:text-5xl font-bold text-[#0B0F1B] mb-8">
-            Thanks ✨
+            Thanks — you're nearly there ✨
           </h1>
 
           <section className="space-y-6 text-[17px] leading-relaxed text-[#1F2933]">
             <p>
-              You&apos;ll receive an email with your unique code inviting you to
-              connect via Open Banking.
+              Your fact find has been submitted — thanks for taking the time to
+              do that. It gives me enough to understand your current setup and
+              what might suit you better.
             </p>
 
             <p>
-              Open Banking is the fastest and most secure way to verify your
-              financial data so we can discuss your tailored lender
-              matches ❤️
+              Before I can review your numbers or share lender options, I need
+              your formal <strong>Privacy & Credit Consent</strong>. This is a
+              legal requirement and takes less than 20 seconds to sign.
             </p>
+
+            <p>
+              You’ll receive an email shortly with your personalised consent
+              form. Once that’s signed, I’ll send your secure{" "}
+              <strong>Open Banking link</strong> so you can verify your data in
+              a fast, safe way — without uploading statements + some times to chat.
+            </p>
+
+            <p>Speak soon — keen to help you get clarity ❤️</p>
           </section>
 
           <div className="mt-10 flex flex-wrap gap-4">

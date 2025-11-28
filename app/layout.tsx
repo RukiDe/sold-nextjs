@@ -7,11 +7,11 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://sold.financial"),
   title: "✨ Sold — Make Loans Easy",
   description:
-    "Sold connects homeowners to better mortgage offers after analysing your mortgage via Open Banking.",
+    "Sold connects homeowners to mortgage offers after analysing your mortgage via Open Banking.",
   openGraph: {
     title: "✨ Sold — Make Loans Easy",
     description:
-      "Sold connects homeowners to better mortgage offers after analysing your mortgage via Open Banking.",
+      "Sold connects homeowners to mortgage offers after analysing your mortgage via Open Banking.",
     url: "https://sold.financial",
     siteName: "Sold",
     images: [
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "✨ Sold — Make Loans Easy",
     description:
-      "Sold connects homeowners to better mortgage offers after analysing your mortgage via Open Banking.",
+      "Sold connects homeowners to mortgage offers after analysing your mortgage via Open Banking.",
     images: ["/og_1200x630.png"]
   }
 };
