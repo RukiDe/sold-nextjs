@@ -17,7 +17,7 @@ export async function POST(req: Request) {
       termRemaining,
       propertyValue,
 
-      // future-proof extras
+      // Future-proof fields for later flows (safe if missing)
       buyingTimeframe,
       combinedAnnualIncome,
       desiredLoanFeature,
@@ -35,7 +35,7 @@ export async function POST(req: Request) {
       reasonForMoving,
     } = body;
 
-    if (!email || !email.includes("@")) {
+    if (!email || typeof email !== "string" || !email.includes("@")) {
       return NextResponse.json(
         { error: "Valid email is required" },
         { status: 400 }
@@ -46,18 +46,22 @@ export async function POST(req: Request) {
     const attributes: Record<string, any> = {
       FIRSTNAME: preferredName || "",
       CURRENTLENDER: currentLender || "",
+
+      // Multi-choice fields need to be arrays
       OWNERORINVESTOR: Array.isArray(refinancingFor) ? refinancingFor : [],
       LOANTYPE: Array.isArray(loanType) ? loanType : [],
+
       CURRENTRATE: rate || "",
       CURRENTLOANBALANCE: balance || "",
       MONTHLYREPAYMENTS: repayments || "",
       YEARSREMAININGONLOAN: termRemaining || "",
       PROPERTYVALUE: propertyValue || "",
 
-      // New: mark fact find as completed
-      FACT_FIND_COMPLETE: true,
+      // Fact-find flags
+      FACT_FIND_COMPLETE: true,          // boolean in Brevo
+      DIGITAL_FACT_FIND_SENT: false,     // for your other flows
 
-      // Future-proof fields
+      // Future-proof extras (OK if undefined)
       BUYINGTIMEFRAME: buyingTimeframe || "",
       COMBINEDANNUALINCOME: combinedAnnualIncome || "",
       DESIREDLOANFEATURE: desiredLoanFeature || "",
@@ -75,33 +79,63 @@ export async function POST(req: Request) {
       REASONFORMOVING: reasonForMoving || "",
     };
 
+    const apiKey = process.env.BREVO_API_KEY;
+    const listIdRaw = process.env.BREVO_REFI_LIST_ID;
+    const listId = listIdRaw ? Number(listIdRaw) : undefined;
+
+    if (!apiKey) {
+      console.warn(
+        "[/api/refinance] BREVO_API_KEY missing – skipping Brevo call (local dev?)"
+      );
+      return NextResponse.json({
+        success: true,
+        skipped: true,
+        reason: "BREVO_API_KEY missing",
+      });
+    }
+
+    const payload: any = {
+      email,
+      attributes,
+      updateEnabled: true,
+    };
+
+    if (listId && !Number.isNaN(listId)) {
+      payload.listIds = [listId];
+    } else {
+      console.warn(
+        "[/api/refinance] BREVO_REFI_LIST_ID missing or invalid – contact will NOT be added to list"
+      );
+    }
+
+    // Uncomment while debugging to see exactly what we send:
+    // console.log("Brevo /contacts payload:", JSON.stringify(payload, null, 2));
+
     const res = await fetch("https://api.brevo.com/v3/contacts", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "api-key": process.env.BREVO_API_KEY || "",
+        "api-key": apiKey,
       },
-      body: JSON.stringify({
-        email,
-        attributes,
-        updateEnabled: true,
-      }),
+      body: JSON.stringify(payload),
     });
 
     const data = await res.json();
 
     if (!res.ok) {
-      console.error("Brevo update error:", data);
+      console.error("Brevo /contacts error:", data);
       return NextResponse.json(
-        { error: "Failed to update Brevo contact", details: data },
+        {
+          error: "Failed to upsert Brevo contact",
+          details: data,
+        },
         { status: 500 }
       );
     }
 
-    return NextResponse.json({ success: true });
-
+    return NextResponse.json({ success: true, data });
   } catch (err: any) {
-    console.error("Refinance API route error:", err);
+    console.error("/api/refinance route error:", err);
     return NextResponse.json(
       { error: "Server error", details: err?.message },
       { status: 500 }
