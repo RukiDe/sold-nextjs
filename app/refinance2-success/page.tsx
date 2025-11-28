@@ -23,8 +23,8 @@ export default function Refinance2SuccessPage() {
             </p>
 
             <p>
-              You&aposll receive an email shortly with your personalised consent
-              form. Once that&aposs signed, I&aposll send your secure{" "}
+              You&apos;ll receive an email shortly with your personalised consent
+              form. Once that&apos;s signed, I&apos;ll send your secure{" "}
               <strong>Open Banking link</strong> so you can verify your data in
               a fast, safe way — without uploading statements + some times to chat.
             </p>
