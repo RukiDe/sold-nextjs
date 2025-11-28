@@ -6,7 +6,7 @@ export default function Refinance2SuccessPage() {
       <main className="flex-1">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <h1 className="text-4xl sm:text-5xl font-bold text-[#0B0F1B] mb-8">
-            Thanks — you're nearly there ✨
+            Thanks — you&apos;re nearly there ✨
           </h1>
 
           <section className="space-y-6 text-[17px] leading-relaxed text-[#1F2933]">
@@ -18,7 +18,7 @@ export default function Refinance2SuccessPage() {
 
             <p>
               Before I can review your numbers or share lender options, I need
-              your formal <strong>Privacy & Credit Consent</strong>. This is a
+              your formal <strong>Privacy &amp; Credit Consent</strong>. This is a
               legal requirement and takes less than 20 seconds to sign.
             </p>
 
@@ -26,7 +26,7 @@ export default function Refinance2SuccessPage() {
               You&apos;ll receive an email shortly with your personalised consent
               form. Once that&apos;s signed, I&apos;ll send your secure{" "}
               <strong>Open Banking link</strong> so you can verify your data in
-              a fast, safe way — without uploading statements + some times to chat.
+              a fast, safe way — without uploading statements + a link to have a chat.
             </p>
 
             <p>Speak soon — keen to help you get clarity ❤️</p>
