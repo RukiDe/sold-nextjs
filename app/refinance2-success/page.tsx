@@ -12,19 +12,19 @@ export default function Refinance2SuccessPage() {
           <section className="space-y-6 text-[17px] leading-relaxed text-[#1F2933]">
             <p>
               Your fact find has been submitted — thanks for taking the time to
-              do that. It gives me enough to understand your current setup and
+              do that. It gives us enough to understand your current setup and
               what might suit you better.
             </p>
 
             <p>
-              Before I can review your numbers or share lender options, I need
+              Before we can review your numbers or share lender options, we need
               your formal <strong>Privacy &amp; Credit Consent</strong>. This is a
               legal requirement and takes less than 20 seconds to sign.
             </p>
 
             <p>
               You&apos;ll receive an email shortly with your personalised consent
-              form. Once that&apos;s signed, I&apos;ll send your secure{" "}
+              form. Once that&apos;s signed, we&apos;ll send your secure{" "}
               <strong>Open Banking link</strong> so you can verify your data in
               a fast, safe way — without uploading statements + a link to have a chat.
             </p>

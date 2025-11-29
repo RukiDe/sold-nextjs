@@ -92,13 +92,20 @@ export default function RefinanceSuccessPage() {
         <li>The steps to switch if it makes sense for you</li>
       </ul>
 
+      <h2 className="text-2xl font-bold mb-4">Want to talk it through?</h2>
+
+      <p className="text-lg text-neutral-700 leading-relaxed mb-6">
+        If you would like to walk through your options or get a clearer picture
+        sooner, you can grab a quick chat below. No pressure, just a straight
+        explanation of what we can see.
+      </p>
+
       <a
-        href="https://calendly.com/rukid/sold-refi"
-        className="inline-block bg-[#0B0F1B] text-white font-semibold text-[17px]
-          rounded-full px-8 py-3.5 border border-[#0B0F1B]
-          hover:bg-white hover:text-black hover:border-black transition-all"
+        href="https://calendly.com/soldfinancial/intro"
+        target="_blank"
+        className="inline-block bg-black text-white font-semibold text-lg rounded-full px-6 py-3 hover:bg-white hover:text-black border border-black transition-all"
       >
-        Schedule a chat
+        👉 Book a quick chat
       </a>
     </main>
   );
