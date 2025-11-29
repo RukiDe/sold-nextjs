@@ -1,20 +1,27 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
-
-// Force this page to be rendered dynamically (no static prerender),
- // which avoids the Suspense requirement for useSearchParams.
-export const dynamic = "force-dynamic";
 
 type Status = "idle" | "loading" | "ok" | "error";
 
 export default function RefinanceSuccessPage() {
-  const searchParams = useSearchParams();
-  const emailFromUrl = searchParams.get("email") || "";
-
+  const [emailFromUrl, setEmailFromUrl] = useState("");
   const [status, setStatus] = useState<Status>("idle");
 
+  // 1) Grab email from the URL on the client
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    try {
+      const url = new URL(window.location.href);
+      const email = url.searchParams.get("email") || "";
+      setEmailFromUrl(email);
+    } catch (err) {
+      console.error("Failed to parse URL for email param", err);
+    }
+  }, []);
+
+  // 2) Once we have a valid email, ping Brevo update-contact
   useEffect(() => {
     if (!emailFromUrl || !emailFromUrl.includes("@")) return;
 
