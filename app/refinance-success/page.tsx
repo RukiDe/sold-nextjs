@@ -1,77 +1,110 @@
-// app/refinance-success/page.tsx
 "use client";
 
+import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useRef } from "react";
 
-export default function RefinanceSuccess() {
+// Force this page to be rendered dynamically (no static prerender),
+ // which avoids the Suspense requirement for useSearchParams.
+export const dynamic = "force-dynamic";
+
+type Status = "idle" | "loading" | "ok" | "error";
+
+export default function RefinanceSuccessPage() {
   const searchParams = useSearchParams();
   const emailFromUrl = searchParams.get("email") || "";
-  const hasUpdatedRef = useRef(false);
 
-  // 🔒 Mark REFI_CONSENT_SIGNED = true in Brevo when they land here
+  const [status, setStatus] = useState<Status>("idle");
+
   useEffect(() => {
-    if (hasUpdatedRef.current) return;
     if (!emailFromUrl || !emailFromUrl.includes("@")) return;
 
-    hasUpdatedRef.current = true;
+    let cancelled = false;
 
-    fetch("/api/brevo/update-contact", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: emailFromUrl,
-        attributes: {
-          REFI_CONSENT_SIGNED: true,
-        },
-      }),
-    }).catch((err) => {
-      console.error("Failed to mark REFI_CONSENT_SIGNED:", err);
-    });
+    const markConsentSigned = async () => {
+      try {
+        setStatus("loading");
+
+        const res = await fetch("/api/brevo/update-contact", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: emailFromUrl,
+            attributes: {
+              REFI_CONSENT_SIGNED: true,
+            },
+          }),
+        });
+
+        if (!res.ok) {
+          console.error(
+            "Failed to update Brevo contact from refinance-success"
+          );
+          if (!cancelled) setStatus("error");
+          return;
+        }
+
+        if (!cancelled) setStatus("ok");
+      } catch (err) {
+        console.error("Error calling /api/brevo/update-contact:", err);
+        if (!cancelled) setStatus("error");
+      }
+    };
+
+    markConsentSigned();
+
+    return () => {
+      cancelled = true;
+    };
   }, [emailFromUrl]);
 
   return (
-    <main className="max-w-3xl mx-auto px-6 py-16">
-      <h1 className="text-4xl font-black mb-6">
-        You&apos;re in ✨
+    <main className="max-w-3xl mx-auto px-4 sm:px-6 py-16">
+      <h1 className="text-4xl sm:text-5xl font-black mb-6">
+        Thanks for signing 🎉
       </h1>
 
-      <p className="text-lg text-neutral-700 leading-relaxed mb-6">
-        Thanks for signing your <strong>Credit Guide &amp; Privacy Consent</strong>.
-        That is the important legal step done, which means we can now properly
-        review your home loan and look for real savings.
+      <p className="text-lg text-neutral-700 leading-relaxed mb-4">
+        We have received your Privacy &amp; Credit Guide, which means we can now
+        properly review your situation and talk through options.
       </p>
 
-      <p className="text-lg text-neutral-700 leading-relaxed mb-6">
-        Next, we will start analysing your situation. You will get a secure{" "}
-        <strong>Open Banking</strong> link so you can verify your loan details in
-        a fast, safe way — without uploading bank statements or hunting through
-        your emails.
+      <p className="text-lg text-neutral-700 leading-relaxed mb-4">
+        Next up, we will send you a secure Open Banking link so you can quickly
+        verify your loan and account details in a fast, safe way — without
+        uploading bank statements or digging through paperwork.
       </p>
 
-      <hr className="my-10 border-neutral-200" />
-
-      <h2 className="text-2xl font-bold mb-4">Want to talk it through?</h2>
-
-      <p className="text-lg text-neutral-700 leading-relaxed mb-6">
-        If you would like to walk through your options or get a clearer picture
-        sooner, you can grab a quick chat below. No pressure, just a straight
-        explanation of what we can see.
+      <p className="text-lg text-neutral-700 leading-relaxed mb-8">
+        Once that is done, we will put together a personalised estimate that
+        shows:
       </p>
+
+      <ul className="list-disc ml-6 text-neutral-700 space-y-2 mb-8">
+        <li>Your current cost versus what you could be paying</li>
+        <li>Any potential savings based on your fact find</li>
+        <li>The steps to switch if it makes sense for you</li>
+      </ul>
 
       <a
-        href="https://calendly.com/soldfinancial/intro"
-        target="_blank"
-        className="inline-block bg-black text-white font-semibold text-lg rounded-full px-6 py-3 hover:bg-white hover:text-black border border-black transition-all"
+        href="https://calendly.com/rukid/sold-refi"
+        className="inline-block bg-[#0B0F1B] text-white font-semibold text-[17px]
+          rounded-full px-8 py-3.5 border border-[#0B0F1B]
+          hover:bg-white hover:text-black hover:border-black transition-all"
       >
-        👉 Book a quick chat
+        Schedule a chat
       </a>
 
-      <p className="mt-10 text-neutral-500 text-sm">
-        The Sold Team ✨
-        <br />
-        Making home loans easy.
-      </p>
+      {status === "loading" && (
+        <p className="mt-4 text-sm text-neutral-500">
+          Updating your consent status…
+        </p>
+      )}
+      {status === "error" && (
+        <p className="mt-4 text-sm text-red-600">
+          We had trouble updating your consent status. No stress — we can
+          confirm it manually on our side.
+        </p>
+      )}
     </main>
   );
 }
