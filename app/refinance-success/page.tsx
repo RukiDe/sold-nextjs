@@ -100,18 +100,6 @@ export default function RefinanceSuccessPage() {
       >
         Schedule a chat
       </a>
-
-      {status === "loading" && (
-        <p className="mt-4 text-sm text-neutral-500">
-          Updating your consent status…
-        </p>
-      )}
-      {status === "error" && (
-        <p className="mt-4 text-sm text-red-600">
-          We had trouble updating your consent status. No stress — we can
-          confirm it manually on our side.
-        </p>
-      )}
     </main>
   );
 }
