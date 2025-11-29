@@ -1,16 +1,17 @@
 // app/api/brevo/update-contact/route.ts
 import { NextResponse } from "next/server";
 
-function toBoolean(v: any): boolean {
+function coerceToBoolean(value: any): boolean {
   return (
-    v === true ||
-    v === "true" ||
-    v === "True" ||
-    v === "TRUE" ||
-    v === "YES" ||
-    v === "Yes" ||
-    v === "yes" ||
-    v === 1
+    value === true ||
+    value === "true" ||
+    value === "True" ||
+    value === "TRUE" ||
+    value === "yes" ||
+    value === "Yes" ||
+    value === "YES" ||
+    value === 1 ||
+    value === "1"
   );
 }
 
@@ -31,23 +32,22 @@ export async function POST(req: Request) {
     // Clone so we can safely mutate
     const attributes: Record<string, any> = { ...rawAttributes };
 
-    // Coerce known boolean attributes so Brevo doesn't choke
+    // ✅ Any boolean-style Brevo flags we want to coerce
     const booleanKeys = [
       "DIGITAL_FACT_FIND_SENT",
       "FACT_FIND_COMPLETE",
       "REFI_CONSENT_SIGNED",
-      "OPEN_BANKING_CONNECTED",
     ];
 
     for (const key of booleanKeys) {
       if (attributes[key] !== undefined) {
-        attributes[key] = toBoolean(attributes[key]);
+        attributes[key] = coerceToBoolean(attributes[key]);
       }
     }
 
     const apiKey = process.env.BREVO_API_KEY;
 
-    // DX nicety: don't hard-fail in local dev if the key isn’t set
+    // 🧪 DX nicety: do not hard-fail in local dev if the key is missing
     if (!apiKey) {
       console.warn(
         "[/api/brevo/update-contact] BREVO_API_KEY is missing. " +
