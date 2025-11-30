@@ -21,17 +21,18 @@ export default function RefinanceSuccessPage() {
     }
   }, []);
 
-  // 2) Once we have a valid email, ping Brevo update-contact
+  // 2) Once we have a valid email, update Brevo and send the booking email
   useEffect(() => {
     if (!emailFromUrl || !emailFromUrl.includes("@")) return;
 
     let cancelled = false;
 
-    const markConsentSigned = async () => {
+    const run = async () => {
       try {
         setStatus("loading");
 
-        const res = await fetch("/api/brevo/update-contact", {
+        // 2a) Flip REFI_CONSENT_SIGNED on the contact
+        const updateRes = await fetch("/api/brevo/update-contact", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -42,7 +43,7 @@ export default function RefinanceSuccessPage() {
           }),
         });
 
-        if (!res.ok) {
+        if (!updateRes.ok) {
           console.error(
             "Failed to update Brevo contact from refinance-success"
           );
@@ -50,14 +51,31 @@ export default function RefinanceSuccessPage() {
           return;
         }
 
+        // 2b) Fire the follow-up booking email immediately
+        const emailRes = await fetch("/api/brevo/send-refi-booking-email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: emailFromUrl,
+          }),
+        });
+
+        if (!emailRes.ok) {
+          console.error(
+            "Failed to send Brevo booking email from refinance-success"
+          );
+          if (!cancelled) setStatus("error");
+          return;
+        }
+
         if (!cancelled) setStatus("ok");
       } catch (err) {
-        console.error("Error calling /api/brevo/update-contact:", err);
+        console.error("Error in refinance-success Brevo flow:", err);
         if (!cancelled) setStatus("error");
       }
     };
 
-    markConsentSigned();
+    run();
 
     return () => {
       cancelled = true;
@@ -103,10 +121,12 @@ export default function RefinanceSuccessPage() {
       <a
         href="https://calendly.com/soldfinancial/intro"
         target="_blank"
+        rel="noreferrer"
         className="inline-block bg-black text-white font-semibold text-lg rounded-full px-6 py-3 hover:bg-white hover:text-black border border-black transition-all"
       >
         👉 Book a quick chat
       </a>
+      
     </main>
   );
 }
