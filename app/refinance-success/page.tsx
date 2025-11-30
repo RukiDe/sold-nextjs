@@ -109,23 +109,6 @@ export default function RefinanceSuccessPage() {
         <li>Any potential savings based on your fact find</li>
         <li>The steps to switch if it makes sense for you</li>
       </ul>
-
-      <h2 className="text-2xl font-bold mb-4">Want to talk it through?</h2>
-
-      <p className="text-lg text-neutral-700 leading-relaxed mb-6">
-        If you would like to walk through your options or get a clearer picture
-        sooner, you can grab a quick chat below. No pressure, just a straight
-        explanation of what we can see.
-      </p>
-
-      <a
-        href="https://calendly.com/soldfinancial/intro"
-        target="_blank"
-        rel="noreferrer"
-        className="inline-block bg-black text-white font-semibold text-lg rounded-full px-6 py-3 hover:bg-white hover:text-black border border-black transition-all"
-      >
-        👉 Book a quick chat
-      </a>
       
     </main>
   );
