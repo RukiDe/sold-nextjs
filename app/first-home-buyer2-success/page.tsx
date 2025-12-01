@@ -1,11 +1,42 @@
-const html = "<!-- Header -->\n  <header class=\"max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-6 flex items-center justify-between\">\n    <a href=\"/\" class=\"text-sm font-semibold hover:opacity-80\">\u2190 Home</a>\n    <nav class=\"text-sm flex items-center gap-4 sm:gap-5\">\n      <a class=\"hover:opacity-80\" href=\"/#customers\">Customers</a>\n      <a class=\"hover:opacity-80\" href=\"/#lenders\">Lenders</a>\n    </nav>\n  </header>\n\n  <!-- Body -->\n  <main class=\"max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16 md:py-20\">\n    <div class=\"max-w-3xl\">\n      <h1 class=\"text-4xl sm:text-5xl md:text-6xl font-black leading-tight\">Thanks!</h1>\n      <div class=\"mt-6 bw-card p-4 sm:p-6 md:p-8\">\n        <h2 class=\"text-lg sm:text-xl font-semibold mb-3\">What happens next?</h2>\n        <p class=\"text-base sm:text-lg text-neutral-700\">\n          You'll receive a follow up email with a unique code inviting you to connect via Open Banking.\n        </p>\n        <p class=\"mt-3 text-sm text-neutral-700\">\n          Open Banking is the fastest and most secure way to verify your income / expense data so we can present your tailored lender matches \u2764\ufe0f\n        </p>\n      </div>\n\n      <div class=\"mt-8 flex flex-wrap gap-3 sm:gap-4\">\n        <a class=\"btn btn-primary\" href=\"/\">Back to Home</a>\n        <a class=\"btn btn-ghost\" href=\"/first-home-buyer\">First Home Buyer</a>\n        <a class=\"btn btn-ghost\" href=\"/refinance\">Refinance</a>\n        <a class=\"btn btn-ghost\" href=\"/purchase\">Purchase</a>\n        <a class=\"btn btn-ghost\" href=\"/investment\">Investment</a>\n      </div>\n    </div>\n  </main>\n\n  <!-- Footer -->\n  <footer class=\"max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16 text-sm text-neutral-400\">\n    <div class=\"flex flex-col gap-4\">\n      <div class=\"flex flex-col md:flex-row items-start md:items-center justify-between gap-4\">\n        <p>\u00a9 <span id=\"y\"></span> Sold. All rights reserved.</p>\n        <div class=\"flex gap-6\">\n          <a class=\"hover:opacity-80\" href=\"/#customers\">Customers</a>\n          <a class=\"hover:opacity-80\" href=\"/#lenders\">Lenders</a>\n          <a class=\"hover:opacity-80\" href=\"/privacy\">Privacy Policy</a>\n        </div>\n      </div>\n    </div>\n  </footer>\n\n  <script>\n    document.getElementById('y').textContent = new Date().getFullYear();\n  </script>";
+import { ButtonPill } from "@/components/ButtonPill";
 
-export default function FirstHomeBuyer2SuccessPage() {
+export default function Refinance2SuccessPage() {
   return (
-    <main className="min-h-screen bg-white">
-      <div
-        dangerouslySetInnerHTML={{ __html: html }}
-      />
-    </main>
+    <div className="min-h-[70vh] flex flex-col">
+      <main className="flex-1">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <h1 className="text-4xl sm:text-5xl font-bold text-[#0B0F1B] mb-8">
+            Thanks — you&apos;re nearly there ✨
+          </h1>
+
+          <section className="space-y-6 text-[17px] leading-relaxed text-[#1F2933]">
+            <p>
+              Your fact find has been submitted — thanks for taking the time to
+              do that. It gives us enough to understand your current setup and
+              what might suit you better.
+            </p>
+
+            <p>
+              Before we can review your numbers or share lender options, we need
+              your formal <strong>Privacy &amp; Credit Consent</strong>. This is a
+              legal requirement and takes less than 20 seconds to sign.
+            </p>
+
+            <p>
+              You&apos;ll receive an email shortly with your personalised consent
+              form. Once that&apos;s signed, we&apos;ll send your secure{" "}
+              <strong>Open Banking link</strong> so you can verify your data in
+              a fast, safe way — without uploading statements + a link to have a chat.
+            </p>
+
+            <p>Speak soon — keen to help you get clarity ❤️</p>
+          </section>
+
+          <div className="mt-10 flex flex-wrap gap-4">
+            <ButtonPill href="/">Back to Home</ButtonPill>
+          </div>
+        </div>
+      </main>
+    </div>
   );
 }

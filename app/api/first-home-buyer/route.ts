@@ -53,8 +53,11 @@ export async function POST(req: Request) {
       FHB_PARTNER_NAME: partnerName || "",
       FHB_PARTNER_EMAIL: partnerEmail || "",
       FHB_DEPOSIT_SAVED: depositSaved || "",
-      FHB_HOUSEHOLD_INCOME: combinedIncome || "",
-      FACT_FIND_COMPLETE: true, // same flag pattern as refinance
+
+      // ✅ UPDATED FIELD NAME
+      COMBINEDANNUALINCOME: combinedIncome || "",
+
+      FACT_FIND_COMPLETE: true,
     };
 
     const primaryPayload: any = {
@@ -129,7 +132,7 @@ export async function POST(req: Request) {
           "[/api/first-home-buyer] Brevo partner error:",
           partnerData
         );
-        // Don’t hard-fail the whole request; you still have the main applicant.
+        // We allow the primary applicant to succeed even if partner fails
       }
     }
 
