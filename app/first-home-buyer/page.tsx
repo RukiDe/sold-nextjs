@@ -1,363 +1,300 @@
-import Link from "next/link";
-import Script from "next/script";
+// app/first-home-buyer/page.tsx
+"use client";
 
-const brevoFhbFormHtml = `
-<style>
-  /* --- ALIGNMENT + SOLD STYLING (same pattern as investor) --- */
-  .sib-form,
-  .sib-form-container,
-  #sib-container,
-  .sib-container--large,
-  .sib-input,
-  .sib-form-block,
-  .form__entry,
-  .entry__field {
-    margin: 0 !important;
-    padding: 0 !important;
-    text-align: left !important;
-    max-width: 100% !important;
-  }
+import { Suspense, useEffect, useRef, useState, FormEvent } from "react";
+import { useSearchParams } from "next/navigation";
 
-  /* Brevo wraps each field in <div style="padding: 8px 0"> — flatten it */
-  #sib-form > div[style] {
-    padding: 0 !important;
-  }
+type FhbFormState = {
+  email: string;
+  preferredName: string;
+  isJoint: "solo" | "joint";
+  partnerName: string;
+  partnerEmail: string;
+  depositSaved: string;
+  combinedIncome: string;
+};
 
-  /* Remove default blocky container look */
-  .sib-input,
-  .sib-form-block,
-  .entry__field {
-    border: none !important;
-    background: transparent !important;
-    box-shadow: none !important;
-  }
+function FirstHomeBuyerInner() {
+  const searchParams = useSearchParams();
+  const emailFromUrl = searchParams.get("email") || "";
 
-  /* Pill inputs */
-  #sib-container .input {
-    border-radius: 999px !important;
-    border: 1px solid #e2e8f0 !important;
-    background: #ffffff !important;
-    padding: 14px 20px !important;
-    font-size: 15px !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-  }
+  // Prevent double Brevo updates
+  const hasUpdatedBrevoRef = useRef(false);
 
-  /* Placeholder text */
-  #sib-container input::placeholder,
-  #sib-container textarea::placeholder {
-    color: #94a3b8 !important;
-  }
+  // When they land via a Brevo link with ?email=, mark DIGITAL_FACT_FIND_SENT in Brevo
+  useEffect(() => {
+    if (hasUpdatedBrevoRef.current) return;
+    if (!emailFromUrl || !emailFromUrl.includes("@")) return;
 
-  /* Checkbox spacing */
-  .checkbox__label span:last-child {
-    padding-left: 8px !important;
-  }
+    hasUpdatedBrevoRef.current = true;
 
-  /* Button */
-  #sib-container .sib-form-block__button {
-    border-radius: 999px !important;
-    padding: 14px 24px !important;
-    font-weight: 600 !important;
-    font-size: 15px !important;
-    background-color: #111827 !important;
-    border: 1px solid #111827 !important;
-    color: #ffffff !important;
-  }
+    fetch("/api/brevo/update-contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: emailFromUrl,
+        attributes: {
+          DIGITAL_FACT_FIND_SENT: true,
+        },
+      }),
+    }).catch((err) => {
+      console.error("[FHB] Failed to mark DIGITAL_FACT_FIND_SENT:", err);
+    });
+  }, [emailFromUrl]);
 
-  #sib-container .sib-form-block__button:hover {
-    background-color: #ffffff !important;
-    color: #111827 !important;
-  }
+  const [form, setForm] = useState<FhbFormState>({
+    email: emailFromUrl,
+    preferredName: "",
+    isJoint: "solo",
+    partnerName: "",
+    partnerEmail: "",
+    depositSaved: "",
+    combinedIncome: "",
+  });
 
-  /* Label + input spacing */
-  #sib-container .entry__label {
-    margin-top: 12px !important;
-    display: block !important;
-  }
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  #sib-container .input {
-    margin-top: 8px !important;
-    margin-bottom: 8px !important;
-  }
+  const updateField = <K extends keyof FhbFormState>(
+    field: K,
+    value: FhbFormState[K]
+  ) => {
+    setForm((prev) => ({ ...prev, [field]: value }));
+  };
 
-  #sib-container .entry_mcq {
-    margin-top: 8px !important;
-    margin-bottom: 8px !important;
-  }
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setErrorMessage(null);
 
-  #sib-container .sib-checkbox-group {
-    margin-bottom: 18px !important;
-  }
+    try {
+      const res = await fetch("/api/first-home-buyer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
 
-  #sib-container,
-  #sib-container * {
-    line-height: 1.2 !important;
-  }
-</style>
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        console.error("[/api/first-home-buyer] error:", data);
+        throw new Error(data?.error || "Something went wrong");
+      }
 
-<link rel="stylesheet" href="https://sibforms.com/forms/end-form/build/sib-styles.css">
+      // Zapier/Brevo/Jotform flow picks up from here
+      window.location.href = "/first-home-buyer2-success";
+    } catch (err: any) {
+      console.error("FHB submit error:", err);
+      setErrorMessage(
+        "Something went wrong submitting your details. Please try again or email connect@sold.financial."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
-<!-- Begin Brevo Form (First Home Buyer) -->
-<div class="sib-form" style="text-align: center; background-color: transparent;">
-  <div id="sib-form-container" class="sib-form-container">
+  const incomeOptions = [
+    "<$80k",
+    "$80k–$120k",
+    "$120k–$180k",
+    "$180k–$250k",
+    "$250k+",
+  ];
 
-    <div id="sib-container" class="sib-container--large sib-container--vertical" style="background-color:rgba(255,255,255,1); max-width:540px; border-radius:18px; border-width:1px; border-color:#ffffff; border-style:dashed; direction:ltr">
+  const isJoint = form.isJoint === "joint";
+
+  return (
+    <main className="max-w-5xl mx-auto px-4 sm:px-6 py-12">
+      <h1 className="text-4xl sm:text-5xl font-black mb-6">
+        First home buyer fact find
+      </h1>
+
+      <p className="text-lg text-neutral-700 max-w-3xl leading-relaxed">
+        This helps us understand your borrowing power, grants eligibility and
+        lender appetite — without a credit check.
+      </p>
+
+      <ul className="list-disc ml-6 mt-4 text-neutral-700 space-y-2">
+        <li>Sense-check your budget against current lending settings.</li>
+        <li>Work out what you might access in grants or shared-equity schemes.</li>
+        <li>
+          Get honest advice — we work for you, not lenders. We only recommend a
+          move if it puts you ahead and you feel comfy.
+        </li>
+      </ul>
+
       <form
-        id="sib-form"
-        method="POST"
-        action="https://13b359ae.sibforms.com/serve/MUIFAP-d0Nk2UbQ-sB-p-3mau7R-YM7aYsThPvSzfXQSbMaktPHcT9Gh3q7ksY_b-ZZvJMwR2zBnANTNFh9L6TLbDAvm3sFNmrbQT-EZpNCePWIpKw2Ud2MaAVi638_fLHZxii1xND4OQdljOhUAeOXPDIUmrIiAoDrH0KMnpiO98OmvTmGTZUiQ44kzgJLN-SeXw5Tozdx0jeEiCw=="
-        data-type="subscription"
+        onSubmit={handleSubmit}
+        className="mt-12 space-y-8 bg-white border border-neutral-200 rounded-3xl p-8"
       >
-
-        <!-- Preferred name -->
-        <div style="padding: 8px 0;">
-          <div class="sib-input sib-form-block">
-            <div class="form__entry entry_block">
-              <div class="form__label-row">
-                <div class="entry__field">
-                  <input
-                    class="input"
-                    type="text"
-                    name="FIRSTNAME"
-                    id="FIRSTNAME"
-                    autocomplete="off"
-                    placeholder="Preferred name"
-                    data-required="true"
-                    required
-                  />
-                </div>
-              </div>
-              <label class="entry__error entry__error--primary"></label>
-            </div>
-          </div>
-        </div>
-
-        <!-- Email -->
-        <div style="padding: 8px 0;">
-          <div class="sib-input sib-form-block">
-            <div class="form__entry entry_block">
-              <div class="form__label-row">
-                <div class="entry__field">
-                  <input
-                    class="input"
-                    type="text"
-                    name="EMAIL"
-                    id="EMAIL"
-                    autocomplete="off"
-                    placeholder="Email"
-                    data-required="true"
-                    required
-                  />
-                </div>
-              </div>
-              <label class="entry__error entry__error--primary"></label>
-            </div>
-          </div>
-        </div>
-
-        <!-- Deposit saved -->
-        <div style="padding: 8px 0;">
-          <div class="sib-input sib-form-block">
-            <div class="form__entry entry_block">
-              <div class="form__label-row">
-                <label
-                  class="entry__label"
-                  style="font-weight:700; font-size:16px; color:#3c4858;"
-                  data-required="*"
-                >
-                  How much have you saved for your deposit ($s)?
-                </label>
-                <div class="entry__field">
-                  <input
-                    class="input"
-                    type="text"
-                    name="DEPOSITSAVED"
-                    id="DEPOSITSAVED"
-                    autocomplete="off"
-                    placeholder="50,000"
-                    data-required="true"
-                    required
-                  />
-                </div>
-              </div>
-              <label class="entry__error entry__error--primary"></label>
-            </div>
-          </div>
-        </div>
-
-        <!-- Gross income (CHECKBOXES FIXED) -->
-        <div style="padding: 8px 0;">
-          <div class="sib-checkbox-group sib-form-block" data-required="true">
-            <div class="form__entry entry_mcq">
-              <div class="form__label-row">
-                <label
-                  class="entry__label"
-                  style="font-weight:700; font-size:16px; color:#3c4858;"
-                  data-required="*"
-                >
-                  What’s your gross (pre-tax) annual income?
-                </label>
-
-                <div>
-                  <div class="entry__choice">
-                    <label class="checkbox__label">
-                      <input
-                        type="checkbox"
-                        class="input_replaced"
-                        name="COMBINEDANNUALINCOME[]"
-                        value="<80k"
-                        data-required="true"
-                      />
-                      <span class="checkbox checkbox_tick_positive"></span>
-                      <span>&lt;$80k</span>
-                    </label>
-                  </div>
-
-                  <div class="entry__choice">
-                    <label class="checkbox__label">
-                      <input
-                        type="checkbox"
-                        class="input_replaced"
-                        name="COMBINEDANNUALINCOME[]"
-                        value="$80k–$120k"
-                        data-required="true"
-                      />
-                      <span class="checkbox checkbox_tick_positive"></span>
-                      <span>$80k–$120k</span>
-                    </label>
-                  </div>
-
-                  <div class="entry__choice">
-                    <label class="checkbox__label">
-                      <input
-                        type="checkbox"
-                        class="input_replaced"
-                        name="COMBINEDANNUALINCOME[]"
-                        value="$120k-$180k"
-                        data-required="true"
-                      />
-                      <span class="checkbox checkbox_tick_positive"></span>
-                      <span>$120k–$180k</span>
-                    </label>
-                  </div>
-
-                  <div class="entry__choice">
-                    <label class="checkbox__label">
-                      <input
-                        type="checkbox"
-                        class="input_replaced"
-                        name="COMBINEDANNUALINCOME[]"
-                        value="$180k-$250k"
-                        data-required="true"
-                      />
-                      <span class="checkbox checkbox_tick_positive"></span>
-                      <span>$180k–$250k</span>
-                    </label>
-                  </div>
-
-                  <div class="entry__choice">
-                    <label class="checkbox__label">
-                      <input
-                        type="checkbox"
-                        class="input_replaced"
-                        name="COMBINEDANNUALINCOME[]"
-                        value="$250k+"
-                        data-required="true"
-                      />
-                      <span class="checkbox checkbox_tick_positive"></span>
-                      <span>+$250k</span>
-                    </label>
-                  </div>
-                </div>
-              </div>
-
-              <p style="font-size:12px;color:#6b7280;margin-top:4px;">
-                If two of you are applying, add incomes together.
-              </p>
-
-              <label class="entry__error entry__error--primary"></label>
-            </div>
-          </div>
-        </div>
-
-        <!-- Submit -->
-        <div style="padding: 8px 0;">
-          <div class="sib-form-block" style="text-align:left;">
-            <button class="sib-form-block__button sib-form-block__button-with-loader" type="submit">
-              I&#039;m ready for the next steps
+        {/* JOINT APPLICATION TOGGLE (match refinance styling) */}
+        <div>
+          <p className="block font-semibold text-lg mb-3">Application type</p>
+          <div className="inline-flex rounded-full border border-neutral-300 bg-white p-1">
+            <button
+              type="button"
+              onClick={() => updateField("isJoint", "solo")}
+              className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
+                form.isJoint === "solo"
+                  ? "bg-black text-white shadow-sm"
+                  : "bg-white text-neutral-800"
+              }`}
+            >
+              Single
+            </button>
+            <button
+              type="button"
+              onClick={() => updateField("isJoint", "joint")}
+              className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
+                form.isJoint === "joint"
+                  ? "bg-black text-white shadow-sm"
+                  : "bg-white text-neutral-800"
+              }`}
+            >
+              Joint
             </button>
           </div>
         </div>
 
-        <input type="hidden" name="locale" value="en" />
+        {/* PRIMARY + PARTNER DETAILS */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block font-semibold text-lg mb-2">
+              Your preferred name *
+            </label>
+            <input
+              type="text"
+              placeholder="e.g. Ruki"
+              value={form.preferredName}
+              onChange={(e) => updateField("preferredName", e.target.value)}
+              required
+              className="w-full px-4 py-3 rounded-full border border-neutral-300 focus:ring-2 focus:ring-black/20 focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="block font-semibold text-lg mb-2">
+              Your email *
+            </label>
+            <input
+              type="email"
+              placeholder="player1@gmail.com"
+              value={form.email}
+              onChange={(e) => updateField("email", e.target.value)}
+              required
+              className="w-full px-4 py-3 rounded-full border border-neutral-300 focus:ring-2 focus:ring-black/20 focus:outline-none"
+            />
+          </div>
+        </div>
+
+        {isJoint && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block font-semibold text-lg mb-2">
+                Co-applicant preferred name
+              </label>
+              <input
+                type="text"
+                placeholder="Sandy"
+                value={form.partnerName}
+                onChange={(e) => updateField("partnerName", e.target.value)}
+                className="w-full px-4 py-3 rounded-full border border-neutral-300 focus:ring-2 focus:ring-black/20 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block font-semibold text-lg mb-2">
+                Co-applicant email
+              </label>
+              <input
+                type="email"
+                placeholder="player2@gmail.com"
+                value={form.partnerEmail}
+                onChange={(e) => updateField("partnerEmail", e.target.value)}
+                className="w-full px-4 py-3 rounded-full border border-neutral-300 focus:ring-2 focus:ring-black/20 focus:outline-none"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* DEPOSIT SAVED */}
+        <div>
+          <label className="block font-semibold text-lg mb-2">
+            How much have you saved for your deposit (approx) *
+          </label>
+          <input
+            type="text"
+            placeholder="$50,000"
+            value={form.depositSaved}
+            onChange={(e) => updateField("depositSaved", e.target.value)}
+            required
+            className="w-full px-4 py-3 rounded-full border border-neutral-300 focus:ring-2 focus:ring-black/20 focus:outline-none"
+          />
+          <p className="mt-1 text-xs text-neutral-500">
+            Cash in the bank you&apos;re planning to use towards the purchase.
+          </p>
+        </div>
+
+        {/* INCOME PILL SELECT */}
+        <div>
+          <label className="block font-semibold text-lg mb-3">
+            What&apos;s your gross (pre-tax) annual household income? *
+          </label>
+          <p className="text-xs text-neutral-500 mb-3">
+            If two of you are applying, add your incomes together.
+          </p>
+
+          <div className="flex flex-wrap gap-2">
+            {incomeOptions.map((option) => {
+              const selected = form.combinedIncome === option;
+              return (
+                <button
+                  key={option}
+                  type="button"
+                  onClick={() => updateField("combinedIncome", option)}
+                  className={`px-4 py-2 rounded-full border text-sm transition-all ${
+                    selected
+                      ? "bg-black text-white border-black"
+                      : "bg-white text-neutral-800 border-neutral-300 hover:border-neutral-500"
+                  }`}
+                >
+                  {option}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {errorMessage && (
+          <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl px-4 py-3">
+            {errorMessage}
+          </p>
+        )}
+
+        <div className="pt-4">
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="inline-block bg-[#0B0F1B] text-white font-semibold text-[17px]
+              rounded-full px-8 py-3.5 transition-all border border-[#0B0F1B]
+              hover:bg-white hover:text-black hover:border-black text-center w-full sm:w-auto disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {isSubmitting
+              ? "Sending your details…"
+              : "I’m ready for the next steps"}
+          </button>
+        </div>
       </form>
-    </div>
-  </div>
-</div>
-<!-- End Brevo Form -->
-`;
+    </main>
+  );
+}
 
 export default function FirstHomeBuyerPage() {
   return (
-    <main className="min-h-screen bg-white">
-      {/* Brevo config scripts */}
-      <Script id="brevo-config-fhb" strategy="lazyOnload">
-        {`
-          window.REQUIRED_CODE_ERROR_MESSAGE = 'Please choose a country code';
-          window.LOCALE = 'en';
-          window.EMAIL_INVALID_MESSAGE = window.SMS_INVALID_MESSAGE = "The information provided is invalid. Please review the field format and try again.";
-          window.REQUIRED_ERROR_MESSAGE = "This field cannot be left blank. ";
-          window.GENERIC_INVALID_MESSAGE = "The information provided is invalid. Please review the field format and try again.";
-          window.translation = {
-            common: {
-              selectedList: '{quantity} list selected',
-              selectedLists: '{quantity} lists selected',
-              selectedOption: '{quantity} selected',
-              selectedOptions: '{quantity} selected',
-            }
-          };
-          var AUTOHIDE = Boolean(0);
-        `}
-      </Script>
-      <Script
-        id="brevo-main-fhb"
-        src="https://sibforms.com/forms/end-form/build/main.js"
-        strategy="lazyOnload"
-      />
-
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
-        <div className="max-w-3xl">
-          <h1 className="text-4xl sm:text-5xl font-black">First Home Buyer</h1>
-          <p className="mt-4 text-lg text-neutral-700">
-            We help you understand your borrowing power, grants eligibility and
-            lender appetite — without a credit check.
-          </p>
-
-          <ul className="mt-6 list-disc list-inside text-neutral-700 space-y-2">
-            <li>Estimate borrowing based on income and savings.</li>
-            <li>Check FHOG and shared-equity program eligibility.</li>
-            <li>See which lenders are first-home friendly right now.</li>
-          </ul>
-
-          <h2 className="mt-10 text-xl font-semibold">First, tell us a bit about your plans</h2>
-          <p className="text-sm text-neutral-600 mb-6">
-            Answer a few quick questions — no credit check required.
-          </p>
-        </div>
-
-        <div
-          className="mt-4 max-w-3xl"
-          dangerouslySetInnerHTML={{ __html: brevoFhbFormHtml }}
-          suppressHydrationWarning
-        />
-
-        <div className="mt-10">
-          <Link href="/" className="btn btn-ghost">
-            ← Back to Home
-          </Link>
-        </div>
-      </section>
-    </main>
+    <Suspense
+      fallback={
+        <div className="p-8 text-neutral-500">Loading your fact find…</div>
+      }
+    >
+      <FirstHomeBuyerInner />
+    </Suspense>
   );
 }
