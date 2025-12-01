@@ -3,6 +3,9 @@ import "./globals.css";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
+// ⭐ Add Analytics import
+import { Analytics } from "@vercel/analytics/react";
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://sold.financial"),
   title: "✨ Sold — Make Loans Easy",
@@ -46,6 +49,9 @@ export default function RootLayout({
           <div className="flex-1">{children}</div>
           <Footer />
         </div>
+
+        {/* ⭐ Vercel Analytics component */}
+        <Analytics />
       </body>
     </html>
   );
