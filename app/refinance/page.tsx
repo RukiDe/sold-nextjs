@@ -26,7 +26,6 @@ function RefiInner() {
   const hasUpdatedBrevoRef = useRef(false);
 
   // 🔒 Mark DIGITAL_FACT_FIND_SENT = true in Brevo
-  // This only runs when we have an email in the URL (i.e. from Brevo email links)
   useEffect(() => {
     if (hasUpdatedBrevoRef.current) return;
     if (!emailFromUrl || !emailFromUrl.includes("@")) return;
@@ -60,6 +59,10 @@ function RefiInner() {
     propertyValue: "",
   });
 
+  const [isJoint, setIsJoint] = useState<"single" | "joint">("single");
+  const [partnerName, setPartnerName] = useState("");
+  const [partnerEmail, setPartnerEmail] = useState("");
+
   const updateField = <K extends keyof RefiFormState>(
     field: K,
     value: RefiFormState[K]
@@ -73,10 +76,11 @@ function RefiInner() {
   ) => {
     setForm((prev) => {
       const arr = prev[field];
-      const exists = arr.includes(value);
       return {
         ...prev,
-        [field]: exists ? arr.filter((v) => v !== value) : [...arr, value],
+        [field]: arr.includes(value)
+          ? arr.filter((v) => v !== value)
+          : [...arr, value],
       };
     });
   };
@@ -87,7 +91,12 @@ function RefiInner() {
     await fetch("/api/refinance", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+      body: JSON.stringify({
+        ...form,
+        applicationType: isJoint,
+        partnerName: isJoint === "joint" ? partnerName : null,
+        partnerEmail: isJoint === "joint" ? partnerEmail : null,
+      }),
     });
 
     window.location.href = "/refinance2-success";
@@ -101,7 +110,7 @@ function RefiInner() {
 
       <p className="text-lg text-neutral-700 max-w-3xl leading-relaxed">
         This is your digital fact find — a quick way for us to sense-check
-        your current rate, repayments and loan position against what&apos;s
+        your current rate, repayments and loan position against what's
         available on the market today.
       </p>
 
@@ -110,6 +119,34 @@ function RefiInner() {
         <li>Honest advice — we work for you, not lenders.</li>
         <li>We only recommend a move if it puts you ahead and you feel comfy.</li>
       </ul>
+
+      {/* APPLICATION TYPE */}
+      <div className="mt-10">
+        <label className="block font-semibold text-lg mb-3">
+          Application type
+        </label>
+
+        <div className="flex gap-4">
+          <button
+            type="button"
+            onClick={() => setIsJoint("single")}
+            className={`px-4 py-2 rounded-full border ${
+              isJoint === "single" ? "bg-black text-white" : "bg-white"
+            }`}
+          >
+            Single
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsJoint("joint")}
+            className={`px-4 py-2 rounded-full border ${
+              isJoint === "joint" ? "bg-black text-white" : "bg-white"
+            }`}
+          >
+            Joint
+          </button>
+        </div>
+      </div>
 
       <form
         onSubmit={handleSubmit}
@@ -123,7 +160,7 @@ function RefiInner() {
             </label>
             <input
               type="text"
-              placeholder="e.g. Ruki"
+              placeholder="e.g. Sandy"
               value={form.preferredName}
               onChange={(e) => updateField("preferredName", e.target.value)}
               required
@@ -136,7 +173,7 @@ function RefiInner() {
             </label>
             <input
               type="email"
-              placeholder="you@example.com"
+              placeholder="player1@gmail.com"
               value={form.email}
               onChange={(e) => updateField("email", e.target.value)}
               required
@@ -145,6 +182,40 @@ function RefiInner() {
           </div>
         </div>
 
+        {/* CO-APPLICANT */}
+        {isJoint === "joint" && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block font-semibold text-lg mb-2">
+                Co-applicant preferred name *
+              </label>
+              <input
+                type="text"
+                placeholder="Lilith"
+                value={partnerName}
+                onChange={(e) => setPartnerName(e.target.value)}
+                required
+                className="w-full px-4 py-3 rounded-full border border-neutral-300"
+              />
+            </div>
+
+            <div>
+              <label className="block font-semibold text-lg mb-2">
+                Co-applicant email *
+              </label>
+              <input
+                type="email"
+                placeholder="player2@gmail.com"
+                value={partnerEmail}
+                onChange={(e) => setPartnerEmail(e.target.value)}
+                required
+                className="w-full px-4 py-3 rounded-full border border-neutral-300"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* --- ALL YOUR EXISTING FACT-FIND FIELDS BELOW --- */}
         {/* CURRENT LENDER */}
         <div>
           <label className="block font-semibold text-lg mb-2">
@@ -156,7 +227,7 @@ function RefiInner() {
             value={form.currentLender}
             onChange={(e) => updateField("currentLender", e.target.value)}
             required
-            className="w-full px-4 py-3 rounded-full border border-neutral-300 focus:ring-2 focus:ring-black/20 focus:outline-none"
+            className="w-full px-4 py-3 rounded-full border border-neutral-300"
           />
         </div>
 
@@ -202,8 +273,9 @@ function RefiInner() {
           </div>
         </div>
 
-        {/* NUMERIC / TEXT FIELDS */}
+        {/* NUMERIC FIELDS */}
         <div className="space-y-6">
+          {/* interest rate */}
           <div>
             <label className="block font-semibold text-lg mb-2">
               What is your current interest rate?
@@ -214,10 +286,11 @@ function RefiInner() {
               value={form.rate}
               onChange={(e) => updateField("rate", e.target.value)}
               required
-              className="w-full px-4 py-3 rounded-full border border-neutral-300 focus:ring-2 focus:ring-black/20 focus:outline-none"
+              className="w-full px-4 py-3 rounded-full border border-neutral-300"
             />
           </div>
 
+          {/* balance */}
           <div>
             <label className="block font-semibold text-lg mb-2">
               What is your approximate loan balance?
@@ -228,10 +301,11 @@ function RefiInner() {
               value={form.balance}
               onChange={(e) => updateField("balance", e.target.value)}
               required
-              className="w-full px-4 py-3 rounded-full border border-neutral-300 focus:ring-2 focus:ring-black/20 focus:outline-none"
+              className="w-full px-4 py-3 rounded-full border border-neutral-300"
             />
           </div>
 
+          {/* repayments */}
           <div>
             <label className="block font-semibold text-lg mb-2">
               What are your current monthly repayments?
@@ -242,10 +316,11 @@ function RefiInner() {
               value={form.repayments}
               onChange={(e) => updateField("repayments", e.target.value)}
               required
-              className="w-full px-4 py-3 rounded-full border border-neutral-300 focus:ring-2 focus:ring-black/20 focus:outline-none"
+              className="w-full px-4 py-3 rounded-full border border-neutral-300"
             />
           </div>
 
+          {/* term */}
           <div>
             <label className="block font-semibold text-lg mb-2">
               How many years are left on your loan term?
@@ -256,13 +331,14 @@ function RefiInner() {
               value={form.termRemaining}
               onChange={(e) => updateField("termRemaining", e.target.value)}
               required
-              className="w-full px-4 py-3 rounded-full border border-neutral-300 focus:ring-2 focus:ring-black/20 focus:outline-none"
+              className="w-full px-4 py-3 rounded-full border border-neutral-300"
             />
           </div>
 
+          {/* value */}
           <div>
             <label className="block font-semibold text-lg mb-2">
-              What is your property&apos;s estimated value?
+              What is your property's estimated value?
             </label>
             <input
               type="text"
@@ -270,7 +346,7 @@ function RefiInner() {
               value={form.propertyValue}
               onChange={(e) => updateField("propertyValue", e.target.value)}
               required
-              className="w-full px-4 py-3 rounded-full border border-neutral-300 focus:ring-2 focus:ring-black/20 focus:outline-none"
+              className="w-full px-4 py-3 rounded-full border border-neutral-300"
             />
           </div>
         </div>
@@ -282,7 +358,7 @@ function RefiInner() {
               rounded-full px-8 py-3.5 transition-all border border-[#0B0F1B]
               hover:bg-white hover:text-black hover:border-black text-center w-full sm:w-auto"
           >
-            I&apos;m ready for the next steps
+            I'm ready for the next steps
           </button>
         </div>
       </form>
