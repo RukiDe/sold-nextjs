@@ -110,7 +110,7 @@ function RefiInner() {
 
       <p className="text-lg text-neutral-700 max-w-3xl leading-relaxed">
         This is your digital fact find — a quick way for us to sense-check
-        your current rate, repayments and loan position against what's
+        your current rate, repayments and loan position against what&apos;s
         available on the market today.
       </p>
 
@@ -338,7 +338,7 @@ function RefiInner() {
           {/* value */}
           <div>
             <label className="block font-semibold text-lg mb-2">
-              What is your property's estimated value?
+              What is your property&apos;s estimated value?
             </label>
             <input
               type="text"
@@ -358,7 +358,7 @@ function RefiInner() {
               rounded-full px-8 py-3.5 transition-all border border-[#0B0F1B]
               hover:bg-white hover:text-black hover:border-black text-center w-full sm:w-auto"
           >
-            I'm ready for the next steps
+            I&apos;m ready for the next steps
           </button>
         </div>
       </form>
