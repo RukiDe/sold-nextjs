@@ -29,7 +29,7 @@ export default function HomePage() {
         <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl">
           <ButtonPill href="/refinance">Refinance 💰</ButtonPill>
           <ButtonPill href="/first-home-buyer">First Home 🏰</ButtonPill>
-          <ButtonPill href="/purchase">Owner Occupier 🏡</ButtonPill>
+          <ButtonPill href="/owner-occupier">Owner Occupier 🏡</ButtonPill>
           <ButtonPill href="/investment">Investor 📈</ButtonPill>
         </div>
 
