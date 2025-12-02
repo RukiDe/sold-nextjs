@@ -12,6 +12,14 @@ type FhbFormState = {
   partnerEmail: string;
   depositSaved: string;
   combinedIncome: string;
+
+  // NEW FHB attributes
+  fhbSchemeEligibility: string; // ELIGIBLEFIRSTHOMESCHEME
+  incomeSource: string; // EMPLOYMENTTYPE
+  existingDebts: string[]; // EXISTINGDEBTS
+  loanRange: string; // LOANRANGE
+  buyingTimeframe: string; // BUYINGTIMEFRAME
+  preferredSuburb: string; // PREFERREDSUBURBS
 };
 
 function FirstHomeBuyerInner() {
@@ -50,6 +58,13 @@ function FirstHomeBuyerInner() {
     partnerEmail: "",
     depositSaved: "",
     combinedIncome: "",
+
+    fhbSchemeEligibility: "",
+    incomeSource: "",
+    existingDebts: [],
+    loanRange: "",
+    buyingTimeframe: "",
+    preferredSuburb: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -60,6 +75,19 @@ function FirstHomeBuyerInner() {
     value: FhbFormState[K]
   ) => {
     setForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const toggleMultiSelect = (field: "existingDebts", value: string) => {
+    setForm((prev) => {
+      const current = prev[field];
+      const exists = current.includes(value);
+      return {
+        ...prev,
+        [field]: exists
+          ? current.filter((v) => v !== value)
+          : [...current, value],
+      };
+    });
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -98,6 +126,27 @@ function FirstHomeBuyerInner() {
     "$120k–$180k",
     "$180k–$250k",
     "$250k+",
+  ];
+
+  const fhbSchemeOptions = ["Yes", "No", "Not sure"];
+  const incomeSourceOptions = ["PAYG", "Self employed", "Casual", "Other"];
+  const existingDebtOptions = [
+    "Credit card",
+    "HECS",
+    "Car loan",
+    "Investment property",
+  ];
+  const loanRangeOptions = [
+    "<$500k",
+    "$500k–$750k",
+    "$750k–$1.25m",
+    "$1.25m+",
+  ];
+  const buyingTimeframeOptions = [
+    "ASAP",
+    "1–3 months",
+    "3–6 months",
+    "6+ months",
   ];
 
   const isJoint = form.isJoint === "joint";
@@ -261,6 +310,154 @@ function FirstHomeBuyerInner() {
               );
             })}
           </div>
+        </div>
+
+        {/* FHB scheme eligibility */}
+        <div>
+          <label className="block font-semibold text-lg mb-3">
+            Do you qualify for the First Home Buyer Scheme? *
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {fhbSchemeOptions.map((option) => {
+              const selected = form.fhbSchemeEligibility === option;
+              return (
+                <button
+                  key={option}
+                  type="button"
+                  onClick={() => updateField("fhbSchemeEligibility", option)}
+                  className={`px-4 py-2 rounded-full border text-sm transition-all ${
+                    selected
+                      ? "bg-black text-white border-black"
+                      : "bg-white text-neutral-800 border-neutral-300 hover:border-neutral-500"
+                  }`}
+                >
+                  {option}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Income source */}
+        <div>
+          <label className="block font-semibold text-lg mb-3">
+            Where does your income come from? *
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {incomeSourceOptions.map((option) => {
+              const selected = form.incomeSource === option;
+              return (
+                <button
+                  key={option}
+                  type="button"
+                  onClick={() => updateField("incomeSource", option)}
+                  className={`px-4 py-2 rounded-full border text-sm transition-all ${
+                    selected
+                      ? "bg-black text-white border-black"
+                      : "bg-white text-neutral-800 border-neutral-300 hover:border-neutral-500"
+                  }`}
+                >
+                  {option}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Existing debts (multi-select) */}
+        <div>
+          <label className="block font-semibold text-lg mb-3">
+            Do you have any of these loans? *
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {existingDebtOptions.map((option) => {
+              const selected = form.existingDebts.includes(option);
+              return (
+                <button
+                  key={option}
+                  type="button"
+                  onClick={() => toggleMultiSelect("existingDebts", option)}
+                  className={`px-4 py-2 rounded-full border text-sm transition-all ${
+                    selected
+                      ? "bg-black text-white border-black"
+                      : "bg-white text-neutral-800 border-neutral-300 hover:border-neutral-500"
+                  }`}
+                >
+                  {option}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Loan size */}
+        <div>
+          <label className="block font-semibold text-lg mb-3">
+            What loan size are you after? *
+          </label>
+          <p className="text-xs text-neutral-500 mb-3">
+            After accounting for your deposit.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {loanRangeOptions.map((option) => {
+              const selected = form.loanRange === option;
+              return (
+                <button
+                  key={option}
+                  type="button"
+                  onClick={() => updateField("loanRange", option)}
+                  className={`px-4 py-2 rounded-full border text-sm transition-all ${
+                    selected
+                      ? "bg-black text-white border-black"
+                      : "bg-white text-neutral-800 border-neutral-300 hover:border-neutral-500"
+                  }`}
+                >
+                  {option}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Timeframe */}
+        <div>
+          <label className="block font-semibold text-lg mb-3">
+            When do you need the loan? *
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {buyingTimeframeOptions.map((option) => {
+              const selected = form.buyingTimeframe === option;
+              return (
+                <button
+                  key={option}
+                  type="button"
+                  onClick={() => updateField("buyingTimeframe", option)}
+                  className={`px-4 py-2 rounded-full border text-sm transition-all ${
+                    selected
+                      ? "bg-black text-white border-black"
+                      : "bg-white text-neutral-800 border-neutral-300 hover:border-neutral-500"
+                  }`}
+                >
+                  {option}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Preferred suburb */}
+        <div>
+          <label className="block font-semibold text-lg mb-2">
+            What&apos;s your preferred suburb? *
+          </label>
+          <input
+            type="text"
+            placeholder="e.g. Coburg, Reservoir, Preston"
+            value={form.preferredSuburb}
+            onChange={(e) => updateField("preferredSuburb", e.target.value)}
+            required
+            className="w-full px-4 py-3 rounded-full border border-neutral-300 focus:ring-2 focus:ring-black/20 focus:outline-none"
+          />
         </div>
 
         {errorMessage && (

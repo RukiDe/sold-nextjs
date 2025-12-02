@@ -17,6 +17,14 @@ export async function POST(req: Request) {
       partnerEmail,
       depositSaved,
       combinedIncome,
+
+      // NEW fields from the FHB fact-find page
+      fhbSchemeEligibility,
+      incomeSource,
+      existingDebts,
+      loanRange,
+      buyingTimeframe,
+      preferredSuburb,
     } = body as {
       email?: string;
       preferredName?: string;
@@ -25,6 +33,13 @@ export async function POST(req: Request) {
       partnerEmail?: string;
       depositSaved?: string;
       combinedIncome?: string;
+
+      fhbSchemeEligibility?: string;
+      incomeSource?: string;
+      existingDebts?: string[]; // multi-select
+      loanRange?: string;
+      buyingTimeframe?: string;
+      preferredSuburb?: string;
     };
 
     if (!email || typeof email !== "string" || !email.includes("@")) {
@@ -50,14 +65,26 @@ export async function POST(req: Request) {
     const primaryAttributes: Record<string, any> = {
       FIRSTNAME: preferredName || "",
       APPLICATION_TYPE: isJoint === "joint" ? "Joint" : "Single",
+
+      // FHB-specific relationship fields
       FHB_PARTNER_NAME: partnerName || "",
       FHB_PARTNER_EMAIL: partnerEmail || "",
-      FHB_DEPOSIT_SAVED: depositSaved || "",
 
-      // ✅ UPDATED FIELD NAME
+      // Money + income
+      FHB_DEPOSIT_SAVED: depositSaved || "",
       COMBINEDANNUALINCOME: combinedIncome || "",
 
-      FACT_FIND_COMPLETE: true,
+      // NEW: match Brevo custom attributes you set up
+      ELIGIBLEFIRSTHOMESCHEME: fhbSchemeEligibility || "",
+      EMPLOYMENTTYPE: incomeSource || "",
+      EXISTINGDEBTS: Array.isArray(existingDebts)
+        ? existingDebts.join(", ")
+        : existingDebts || "",
+      LOANRANGE: loanRange || "",
+      BUYINGTIMEFRAME: buyingTimeframe || "",
+      PREFERREDSUBURBS: preferredSuburb || "",
+
+      FACT_FIND_COMPLETE: true, // same pattern as refinance
     };
 
     const primaryPayload: any = {
@@ -132,7 +159,7 @@ export async function POST(req: Request) {
           "[/api/first-home-buyer] Brevo partner error:",
           partnerData
         );
-        // We allow the primary applicant to succeed even if partner fails
+        // Don’t hard-fail the whole request; you still have the main applicant.
       }
     }
 
