@@ -67,11 +67,11 @@ export async function POST(req: Request) {
       APPLICATION_TYPE: isJoint === "joint" ? "Joint" : "Single",
 
       // FHB-specific relationship fields
-      FHB_PARTNER_NAME: partnerName || "",
-      FHB_PARTNER_EMAIL: partnerEmail || "",
+      PARTNER_NAME: partnerName || "",
+      PARTNER_EMAIL: partnerEmail || "",
 
       // Money + income
-      FHB_DEPOSIT_SAVED: depositSaved || "",
+      DEPOSITSAVED: depositSaved || "",
       COMBINEDANNUALINCOME: combinedIncome || "",
 
       // NEW: match Brevo custom attributes you set up
