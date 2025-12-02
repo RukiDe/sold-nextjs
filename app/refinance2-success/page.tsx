@@ -18,12 +18,12 @@ export default function Refinance2SuccessPage() {
 
             <p>
               Before we can review your numbers or share lender options, we need
-              your formal <strong>Privacy &amp; Credit Consent</strong>. This is a
-              legal requirement and takes less than 20 seconds to sign.
+              your formal <strong>Privacy &amp; Credit Consent</strong> (it is a
+              legal requirement and takes minutes to review).
             </p>
 
             <p>
-              You&apos;ll receive an email shortly with your personalised consent
+              You&apos;ll receive an email shortly with your consent
               form. Once that&apos;s signed, we&apos;ll send your secure{" "}
               <strong>Open Banking link</strong> so you can verify your data in
               a fast, safe way — without uploading statements + a link to have a chat.
