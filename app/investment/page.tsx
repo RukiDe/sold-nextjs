@@ -104,7 +104,7 @@ function InvestmentInner() {
       }
 
       // Brevo / Zapier flow takes over from here (privacy + booking / OB)
-      window.location.href = "/thank-you";
+      window.location.href = "/investment2-success";
     } catch (err: any) {
       console.error("Investment submit error:", err);
       setErrorMessage(
