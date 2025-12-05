@@ -24,9 +24,7 @@ export default function Refinance2SuccessPage() {
 
             <p>
               You&apos;ll receive an email shortly with your consent
-              form. Once that&apos;s signed, we&apos;ll send your secure{" "}
-              <strong>Open Banking link</strong> so you can verify your data in
-              a fast, safe way — without uploading statements + a link to have a chat.
+              form. 
             </p>
 
             <p>Speak soon — keen to help you get clarity ❤️</p>

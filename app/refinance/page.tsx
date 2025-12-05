@@ -1,375 +1,841 @@
-// app/refinance/page.tsx
 "use client";
 
-import { Suspense } from "react";
-import { useSearchParams } from "next/navigation";
-import { useState, useEffect, useRef, FormEvent } from "react";
+import { useState } from "react";
 
-type RefiFormState = {
-  email: string;
+type Step = 0 | 1 | 2;
+type ApplicationType = "single" | "joint";
+
+interface FormState {
+  goal: string;
+
   preferredName: string;
+  email: string;
+  applicationType: ApplicationType;
+  partnerName: string;
+  partnerEmail: string;
+
+  ownerOrInvestor: string[];
+  loanTypes: string[];
   currentLender: string;
-  refinancingFor: string[];
-  loanType: string[];
-  rate: string;
+  propertyValue: string;
   balance: string;
   repayments: string;
-  termRemaining: string;
-  propertyValue: string;
+  yearsRemaining: string;
+}
+
+type Errors = Partial<Record<keyof FormState, string>>;
+
+const initialState: FormState = {
+  goal: "",
+  preferredName: "",
+  email: "",
+  applicationType: "single",
+  partnerName: "",
+  partnerEmail: "",
+  ownerOrInvestor: [],
+  loanTypes: [],
+  currentLender: "",
+  // sliders default starting points (can still be changed)
+  propertyValue: "850000",
+  balance: "520000",
+  repayments: "2450",
+  yearsRemaining: "25",
 };
 
-function RefiInner() {
-  const searchParams = useSearchParams();
-  const emailFromUrl = searchParams.get("email") || "";
+const LENDERS = [
+  "ANZ",
+  "AMP Bank",
+  "Athena",
+  "Bank Australia",
+  "Bank of Melbourne",
+  "BankSA",
+  "Bankwest",
+  "Bendigo Bank",
+  "Beyond Bank",
+  "Commonwealth Bank (CBA)",
+  "Citibank",
+  "Credit Union Australia (CUA)",
+  "Great Southern Bank",
+  "Heritage Bank",
+  "ING",
+  "Macquarie",
+  "ME Bank",
+  "NAB",
+  "Pepper Money",
+  "St.George",
+  "Suncorp",
+  "UBank",
+  "Westpac",
+];
 
-  // Prevent double-fires
-  const hasUpdatedBrevoRef = useRef(false);
+function classNames(...parts: (string | false | null | undefined)[]) {
+  return parts.filter(Boolean).join(" ");
+}
 
-  // 🔒 Mark DIGITAL_FACT_FIND_SENT = true in Brevo
-  useEffect(() => {
-    if (hasUpdatedBrevoRef.current) return;
-    if (!emailFromUrl || !emailFromUrl.includes("@")) return;
+function formatCurrency(value: string): string {
+  const numeric = value.replace(/[^\d]/g, "");
+  if (!numeric) return "";
+  const num = Number(numeric);
+  if (Number.isNaN(num)) return "";
+  return `$${num.toLocaleString("en-AU")}`;
+}
 
-    hasUpdatedBrevoRef.current = true;
+function safeNumber(value: string, fallback: number): number {
+  const cleaned = value.toString().replace(/[^\d]/g, "");
+  const num = Number(cleaned);
+  if (!cleaned || Number.isNaN(num) || num <= 0) return fallback;
+  return num;
+}
 
-    fetch("/api/brevo/update-contact", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: emailFromUrl,
-        attributes: {
-          DIGITAL_FACT_FIND_SENT: true,
-        },
-      }),
-    }).catch((err) => {
-      console.error("Failed to mark DIGITAL_FACT_FIND_SENT:", err);
-    });
-  }, [emailFromUrl]);
+function getCtaLabel(goal: string): string {
+  switch (goal) {
+    case "Lower my repayments":
+      return "Show my savings estimate";
+    case "Pay the loan off sooner":
+      return "See how fast I could pay it off";
+    case "Free up cash for renos":
+      return "Check my borrowing power";
+    case "Just checking my rate":
+      return "Check if I’m overpaying";
+    default:
+      return "See my estimated savings";
+  }
+}
 
-  const [form, setForm] = useState<RefiFormState>({
-    email: emailFromUrl,
-    preferredName: "",
-    currentLender: "",
-    refinancingFor: [],
-    loanType: [],
-    rate: "",
-    balance: "",
-    repayments: "",
-    termRemaining: "",
-    propertyValue: "",
-  });
+// Slider ranges
+const PROPERTY_MIN = 200_000;
+const PROPERTY_MAX = 3_000_000;
+const PROPERTY_STEP = 100_000;
 
-  const [isJoint, setIsJoint] = useState<"single" | "joint">("single");
-  const [partnerName, setPartnerName] = useState("");
-  const [partnerEmail, setPartnerEmail] = useState("");
+const BALANCE_MIN = 50_000;
+const BALANCE_MAX = 2_500_000;
+const BALANCE_STEP = 50_000;
 
-  const updateField = <K extends keyof RefiFormState>(
-    field: K,
-    value: RefiFormState[K]
+const REPAY_MIN = 500;
+const REPAY_MAX = 8_000;
+const REPAY_STEP = 100;
+
+const YEARS_MIN = 1;
+const YEARS_MAX = 35;
+const YEARS_STEP = 1;
+
+export default function RefinancePage() {
+  const [step, setStep] = useState<Step>(0);
+  const [form, setForm] = useState<FormState>(initialState);
+  const [errors, setErrors] = useState<Errors>({});
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [lenderFocused, setLenderFocused] = useState(false);
+
+  const progressPercent = step === 0 ? 33 : step === 1 ? 66 : 100;
+
+  const updateField = <K extends keyof FormState>(
+    key: K,
+    value: FormState[K]
   ) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
+    setForm((prev) => ({ ...prev, [key]: value }));
+    setErrors((prev) => {
+      const copy = { ...prev };
+      delete copy[key];
+      return copy;
+    });
   };
 
-  const toggleMultiselect = (
-    field: "refinancingFor" | "loanType",
-    value: string
-  ) => {
+  const toggleMulti = (key: "ownerOrInvestor" | "loanTypes", value: string) => {
     setForm((prev) => {
-      const arr = prev[field];
-      return {
-        ...prev,
-        [field]: arr.includes(value)
-          ? arr.filter((v) => v !== value)
-          : [...arr, value],
-      };
+      const current = new Set(prev[key]);
+      if (current.has(value)) current.delete(value);
+      else current.add(value);
+      return { ...prev, [key]: Array.from(current) };
+    });
+    setErrors((prev) => {
+      const copy = { ...prev };
+      delete copy[key];
+      return copy;
     });
   };
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+  const validateStep = (s: Step): boolean => {
+    const newErrors: Errors = {};
 
-    await fetch("/api/refinance", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...form,
-        applicationType: isJoint,
-        partnerName: isJoint === "joint" ? partnerName : null,
-        partnerEmail: isJoint === "joint" ? partnerEmail : null,
-      }),
-    });
+    if (s === 0) {
+      if (!form.goal) {
+        newErrors.goal = "Pick the option that best matches your goal.";
+      }
+    }
 
-    window.location.href = "/refinance2-success";
+    if (s === 1) {
+      if (!form.preferredName.trim()) {
+        newErrors.preferredName = "Please add your name so we know what to call you.";
+      }
+      if (
+        !form.email.trim() ||
+        !form.email.includes("@") ||
+        !form.email.includes(".")
+      ) {
+        newErrors.email = "Please enter a valid email address.";
+      }
+      if (form.applicationType === "joint") {
+        if (!form.partnerName.trim()) {
+          newErrors.partnerName = "Please add your partner’s name.";
+        }
+        if (
+          !form.partnerEmail.trim() ||
+          !form.partnerEmail.includes("@") ||
+          !form.partnerEmail.includes(".")
+        ) {
+          newErrors.partnerEmail = "Please enter your partner’s email.";
+        }
+      }
+    }
+
+    if (s === 2) {
+      if (form.ownerOrInvestor.length === 0) {
+        newErrors.ownerOrInvestor = "Pick at least one option.";
+      }
+      if (form.loanTypes.length === 0) {
+        newErrors.loanTypes = "Pick at least one loan type.";
+      }
+      if (!form.propertyValue.trim()) {
+        newErrors.propertyValue = "Add an approximate property value.";
+      }
+      if (!form.balance.trim()) {
+        newErrors.balance = "Add roughly how much you still owe.";
+      }
+      if (!form.repayments.trim()) {
+        newErrors.repayments = "Add your current monthly repayments.";
+      }
+      if (!form.yearsRemaining.trim()) {
+        newErrors.yearsRemaining = "Add your best guess on years remaining.";
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
+
+  const goNext = () => {
+    if (!validateStep(step)) return;
+    if (step < 2) setStep((s) => (s + 1) as Step);
+  };
+
+  const goBack = () => {
+    if (step > 0) setStep((s) => (s - 1) as Step);
+  };
+
+  const handleSubmit = async () => {
+    if (!validateStep(2)) {
+      setStep(2);
+      return;
+    }
+
+    setSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      const res = await fetch("/api/refinance", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: form.email.trim(),
+          preferredName: form.preferredName.trim(),
+          currentLender: form.currentLender.trim(),
+          refinancingFor: form.ownerOrInvestor,
+          loanType: form.loanTypes,
+          rate: "",
+          balance: form.balance.trim(),
+          repayments: form.repayments.trim(),
+          termRemaining: form.yearsRemaining.trim(),
+          propertyValue: form.propertyValue.trim(),
+          applicationType: form.applicationType,
+          partnerName: form.partnerName.trim(),
+          partnerEmail: form.partnerEmail.trim(),
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(
+          (data && (data.error || data.message)) ||
+            "Something went wrong submitting your details."
+        );
+      }
+
+      // ✅ Phase 2: no extra “success step” – just jump to next step in flow
+      window.location.href = `/refinance2-success?email=${encodeURIComponent(
+        form.email.trim()
+      )}`;
+    } catch (err: any) {
+      console.error("Refinance submit error", err);
+      setSubmitError(err?.message || "Something went wrong. Please try again.");
+      setSubmitting(false);
+    }
+  };
+
+  const renderProgress = () => (
+    <div className="mb-6">
+      <div className="flex items-center justify-between text-xs font-medium text-neutral-600 mb-2">
+        <span>{step === 0 ? "Step 1 of 3" : step === 1 ? "Step 2 of 3" : "Step 3 of 3"}</span>
+        <span>{progressPercent}% complete</span>
+      </div>
+      <div className="w-full h-1.5 bg-neutral-200 rounded-full overflow-hidden">
+        <div
+          className="h-full bg-black transition-all duration-300"
+          style={{ width: `${progressPercent}%` }}
+        />
+      </div>
+    </div>
+  );
+
+  const reassurance = (
+    <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs sm:text-sm text-neutral-600 mb-4">
+      <li>✔ No credit check</li>
+      <li>✔ Takes ~60 seconds</li>
+      <li>✔ Secure &amp; private</li>
+      <li>✔ No documents needed</li>
+    </ul>
+  );
+
+  const goalOptions = [
+    "Lower my repayments",
+    "Pay the loan off sooner",
+    "Free up cash for renos",
+    "Just checking my rate",
+  ];
+
+  const ownerOptions = ["Owner Occupier", "Investment Property"];
+  const loanTypeOptions = ["Fixed", "Variable", "Split"];
+
+  const lenderSuggestions =
+    form.currentLender && lenderFocused
+      ? LENDERS.filter((name) =>
+          name.toLowerCase().startsWith(form.currentLender.toLowerCase())
+        ).slice(0, 6)
+      : [];
+
+  const ctaLabel = getCtaLabel(form.goal);
+
+  // Slider numbers
+  const propertyNum = safeNumber(form.propertyValue, 850000);
+  const balanceNum = safeNumber(form.balance, 520000);
+  const repayNum = safeNumber(form.repayments, 2450);
+  const yearsNum = safeNumber(form.yearsRemaining, 25);
 
   return (
-    <main className="max-w-5xl mx-auto px-4 sm:px-6 py-12">
-      <h1 className="text-4xl sm:text-5xl font-black mb-6">
-        Refinance your loan
-      </h1>
+    <main className="max-w-3xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
+      {/* Hero */}
+      <header className="mb-8 sm:mb-10">
+        <p className="text-sm font-semibold text-neutral-700 mb-2">
+          Refinance check · No impact on your credit score
+        </p>
+        <h1 className="text-3xl sm:text-4xl font-black mb-3">
+          Give yourself the gift of a lower mortgage this Christmas 🎄
+        </h1>
+        <p className="text-base sm:text-lg text-neutral-700 mb-2">
+          Answer a few quick questions and we&apos;ll estimate how much you
+          could save — before you commit to anything.
+        </p>
+        <p className="text-sm text-neutral-500">
+          Trusted by Australians refinancing over $30m in home loans.
+        </p>
+      </header>
 
-      <p className="text-lg text-neutral-700 max-w-3xl leading-relaxed">
-        This is your digital fact find — a quick way for us to sense-check
-        your current rate, repayments and loan position against what&apos;s
-        available on the market today.
-      </p>
+      <section className="bg-white border border-neutral-200 rounded-2xl p-4 sm:p-6 shadow-sm">
+        {renderProgress()}
 
-      <ul className="list-disc ml-6 mt-4 text-neutral-700 space-y-2">
-        <li>No credit check at this stage.</li>
-        <li>Honest advice — we work for you, not lenders.</li>
-        <li>We only recommend a move if it puts you ahead and you feel comfy.</li>
-      </ul>
+        {reassurance}
 
-      {/* APPLICATION TYPE */}
-      <div className="mt-10">
-        <label className="block font-semibold text-lg mb-3">
-          Application type
-        </label>
+        <p className="text-sm sm:text-base text-neutral-700 mb-6">
+          Most Aussies save $300–$600 a month when they refinance — but banks
+          rarely call to tell you. Let&apos;s see if you&apos;re one of them.
+        </p>
 
-        <div className="flex gap-4">
-          <button
-            type="button"
-            onClick={() => setIsJoint("single")}
-            className={`px-4 py-2 rounded-full border ${
-              isJoint === "single" ? "bg-black text-white" : "bg-white"
-            }`}
-          >
-            Single
-          </button>
-          <button
-            type="button"
-            onClick={() => setIsJoint("joint")}
-            className={`px-4 py-2 rounded-full border ${
-              isJoint === "joint" ? "bg-black text-white" : "bg-white"
-            }`}
-          >
-            Joint
-          </button>
-        </div>
-      </div>
-
-      <form
-        onSubmit={handleSubmit}
-        className="mt-12 space-y-8 bg-white border border-neutral-200 rounded-3xl p-8"
-      >
-        {/* EMAIL + PREFERRED NAME */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* STEP 0 – goal */}
+        {step === 0 && (
           <div>
-            <label className="block font-semibold text-lg mb-2">
-              Preferred name *
-            </label>
-            <input
-              type="text"
-              placeholder="e.g. Sandy"
-              value={form.preferredName}
-              onChange={(e) => updateField("preferredName", e.target.value)}
-              required
-              className="w-full px-4 py-3 rounded-full border border-neutral-300 focus:ring-2 focus:ring-black/20 focus:outline-none"
-            />
-          </div>
-          <div>
-            <label className="block font-semibold text-lg mb-2">
-              Email *
-            </label>
-            <input
-              type="email"
-              placeholder="player1@gmail.com"
-              value={form.email}
-              onChange={(e) => updateField("email", e.target.value)}
-              required
-              className="w-full px-4 py-3 rounded-full border border-neutral-300 focus:ring-2 focus:ring-black/20 focus:outline-none"
-            />
-          </div>
-        </div>
-
-        {/* CO-APPLICANT */}
-        {isJoint === "joint" && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block font-semibold text-lg mb-2">
-                Co-applicant preferred name *
-              </label>
-              <input
-                type="text"
-                placeholder="Lilith"
-                value={partnerName}
-                onChange={(e) => setPartnerName(e.target.value)}
-                required
-                className="w-full px-4 py-3 rounded-full border border-neutral-300"
-              />
+            <h2 className="text-xl sm:text-2xl font-semibold mb-4">
+              What&apos;s your goal today?
+            </h2>
+            <div className="flex flex-wrap gap-3 mb-4">
+              {goalOptions.map((option) => {
+                const active = form.goal === option;
+                return (
+                  <button
+                    key={option}
+                    type="button"
+                    onClick={() => updateField("goal", option)}
+                    className={classNames(
+                      "px-4 py-2 rounded-full text-sm sm:text-base border transition-colors",
+                      active
+                        ? "bg-black text-white border-black"
+                        : "bg-white text-neutral-800 border-neutral-300 hover:border-neutral-500"
+                    )}
+                  >
+                    {option}
+                  </button>
+                );
+              })}
             </div>
+            {errors.goal && (
+              <p className="text-xs text-red-600 mb-2">{errors.goal}</p>
+            )}
 
-            <div>
-              <label className="block font-semibold text-lg mb-2">
-                Co-applicant email *
-              </label>
-              <input
-                type="email"
-                placeholder="player2@gmail.com"
-                value={partnerEmail}
-                onChange={(e) => setPartnerEmail(e.target.value)}
-                required
-                className="w-full px-4 py-3 rounded-full border border-neutral-300"
-              />
+            <div className="flex justify-between mt-6">
+              <span className="text-xs text-neutral-500">
+                Takes about a minute. No spam, ever.
+              </span>
+              <button
+                type="button"
+                onClick={goNext}
+                className="inline-flex items-center justify-center px-5 py-2.5 rounded-full bg-black text-white text-sm font-semibold hover:bg-white hover:text-black border border-black transition-colors"
+              >
+                Start
+              </button>
             </div>
           </div>
         )}
 
-        {/* --- ALL YOUR EXISTING FACT-FIND FIELDS BELOW --- */}
-        {/* CURRENT LENDER */}
-        <div>
-          <label className="block font-semibold text-lg mb-2">
-            Who is your current lender *
-          </label>
-          <input
-            type="text"
-            placeholder="e.g. Commonwealth Bank"
-            value={form.currentLender}
-            onChange={(e) => updateField("currentLender", e.target.value)}
-            required
-            className="w-full px-4 py-3 rounded-full border border-neutral-300"
-          />
-        </div>
+        {/* STEP 1 – basics + joint */}
+        {step === 1 && (
+          <div>
+            <h2 className="text-xl sm:text-2xl font-semibold mb-4">
+              Let&apos;s start with a few basics
+            </h2>
 
-        {/* PURPOSE */}
-        <div>
-          <label className="block font-semibold text-lg mb-3">
-            Are you refinancing for an *
-          </label>
-
-          <div className="space-y-3">
-            {["Owner Occupier", "Investment Property"].map((label) => (
-              <label key={label} className="flex items-center gap-3">
+            <div className="grid sm:grid-cols-2 gap-4 mb-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Preferred name *
+                </label>
                 <input
-                  type="checkbox"
-                  checked={form.refinancingFor.includes(label)}
-                  onChange={() => toggleMultiselect("refinancingFor", label)}
-                  className="w-5 h-5 rounded border-neutral-400"
+                  type="text"
+                  value={form.preferredName}
+                  onChange={(e) => updateField("preferredName", e.target.value)}
+                  placeholder="e.g. Alex"
+                  className={classNames(
+                    "w-full rounded-full border px-4 py-2.5 text-sm sm:text-base outline-none",
+                    errors.preferredName
+                      ? "border-red-500"
+                      : "border-neutral-300 focus:border-black"
+                  )}
                 />
-                {label}
-              </label>
-            ))}
-          </div>
-        </div>
-
-        {/* LOAN TYPE */}
-        <div>
-          <label className="block font-semibold text-lg mb-3">
-            What type of loan do you currently have *
-          </label>
-
-          <div className="space-y-3">
-            {["Fixed", "Variable", "Split"].map((label) => (
-              <label key={label} className="flex items-center gap-3">
+                {errors.preferredName && (
+                  <p className="mt-1 text-xs text-red-600">
+                    {errors.preferredName}
+                  </p>
+                )}
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Email *
+                </label>
                 <input
-                  type="checkbox"
-                  checked={form.loanType.includes(label)}
-                  onChange={() => toggleMultiselect("loanType", label)}
-                  className="w-5 h-5 rounded border-neutral-400"
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => updateField("email", e.target.value)}
+                  placeholder="e.g. alex@example.com"
+                  className={classNames(
+                    "w-full rounded-full border px-4 py-2.5 text-sm sm:text-base outline-none",
+                    errors.email
+                      ? "border-red-500"
+                      : "border-neutral-300 focus:border-black"
+                  )}
                 />
-                {label}
+                {errors.email && (
+                  <p className="mt-1 text-xs text-red-600">{errors.email}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <p className="text-sm font-medium mb-2">
+                Is this application just for you, or joint? *
+              </p>
+              <div className="flex flex-wrap gap-3">
+                {(["single", "joint"] as ApplicationType[]).map((type) => {
+                  const label =
+                    type === "single"
+                      ? "Just me"
+                      : "Joint – with my partner";
+                  const active = form.applicationType === type;
+                  return (
+                    <button
+                      key={type}
+                      type="button"
+                      onClick={() => updateField("applicationType", type)}
+                      className={classNames(
+                        "px-4 py-2 rounded-full text-sm border transition-colors",
+                        active
+                          ? "bg-black text-white border-black"
+                          : "bg-white text-neutral-800 border-neutral-300 hover:border-neutral-500"
+                      )}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {form.applicationType === "joint" && (
+              <div className="grid sm:grid-cols-2 gap-4 mb-2">
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Partner&apos;s name *
+                  </label>
+                  <input
+                    type="text"
+                    value={form.partnerName}
+                    onChange={(e) => updateField("partnerName", e.target.value)}
+                    placeholder="e.g. Jamie"
+                    className={classNames(
+                      "w-full rounded-full border px-4 py-2.5 text-sm sm:text-base outline-none",
+                      errors.partnerName
+                        ? "border-red-500"
+                        : "border-neutral-300 focus:border-black"
+                    )}
+                  />
+                  {errors.partnerName && (
+                    <p className="mt-1 text-xs text-red-600">
+                      {errors.partnerName}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Partner&apos;s email *
+                  </label>
+                  <input
+                    type="email"
+                    value={form.partnerEmail}
+                    onChange={(e) =>
+                      updateField("partnerEmail", e.target.value)
+                    }
+                    placeholder="e.g. jamie@example.com"
+                    className={classNames(
+                      "w-full rounded-full border px-4 py-2.5 text-sm sm:text-base outline-none",
+                      errors.partnerEmail
+                        ? "border-red-500"
+                        : "border-neutral-300 focus:border-black"
+                    )}
+                  />
+                  {errors.partnerEmail && (
+                    <p className="mt-1 text-xs text-red-600">
+                      {errors.partnerEmail}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            <div className="flex items-center justify-between mt-6">
+              <button
+                type="button"
+                onClick={goBack}
+                className="text-sm text-neutral-600 hover:text-black"
+              >
+                ← Back
+              </button>
+              <button
+                type="button"
+                onClick={goNext}
+                className="inline-flex items-center justify-center px-5 py-2.5 rounded-full bg-black text-white text-sm font-semibold hover:bg-white hover:text-black border border-black transition-colors"
+              >
+                Continue
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP 2 – loan details + sliders */}
+        {step === 2 && (
+          <div>
+            <h2 className="text-xl sm:text-2xl font-semibold mb-4">
+              A few details about your loan
+            </h2>
+
+            <div className="mb-4">
+              <p className="text-sm font-medium mb-2">
+                Are you refinancing for an *{" "}
+              </p>
+              <div className="flex flex-wrap gap-3">
+                {ownerOptions.map((option) => {
+                  const active = form.ownerOrInvestor.includes(option);
+                  const errorState = !!errors.ownerOrInvestor;
+                  return (
+                    <button
+                      key={option}
+                      type="button"
+                      onClick={() => toggleMulti("ownerOrInvestor", option)}
+                      className={classNames(
+                        "px-4 py-2 rounded-full text-sm border transition-colors",
+                        active
+                          ? "bg-black text-white border-black"
+                          : "bg-white text-neutral-800 border-neutral-300 hover:border-neutral-500",
+                        errorState && !active && "border-red-400"
+                      )}
+                    >
+                      {option}
+                    </button>
+                  );
+                })}
+              </div>
+              {errors.ownerOrInvestor && (
+                <p className="mt-1 text-xs text-red-600">
+                  {errors.ownerOrInvestor}
+                </p>
+              )}
+            </div>
+
+            <div className="mb-4">
+              <p className="text-sm font-medium mb-2">
+                What type of loan do you currently have? *
+              </p>
+              <div className="flex flex-wrap gap-3">
+                {loanTypeOptions.map((option) => {
+                  const active = form.loanTypes.includes(option);
+                  const errorState = !!errors.loanTypes;
+                  return (
+                    <button
+                      key={option}
+                      type="button"
+                      onClick={() => toggleMulti("loanTypes", option)}
+                      className={classNames(
+                        "px-4 py-2 rounded-full text-sm border transition-colors",
+                        active
+                          ? "bg-black text-white border-black"
+                          : "bg-white text-neutral-800 border-neutral-300 hover:border-neutral-500",
+                        errorState && !active && "border-red-400"
+                      )}
+                    >
+                      {option}
+                    </button>
+                  );
+                })}
+              </div>
+              {errors.loanTypes && (
+                <p className="mt-1 text-xs text-red-600">{errors.loanTypes}</p>
+              )}
+            </div>
+
+            {/* Lender with autosuggest */}
+            <div className="mb-5 relative">
+              <label className="block text-sm font-medium mb-1">
+                Who are you currently with?{" "}
+                <span className="text-neutral-400">(optional)</span>
               </label>
-            ))}
-          </div>
-        </div>
+              <input
+                type="text"
+                value={form.currentLender}
+                onFocus={() => setLenderFocused(true)}
+                onBlur={() => {
+                  // small delay so clicks on suggestions still register
+                  setTimeout(() => setLenderFocused(false), 120);
+                }}
+                onChange={(e) => updateField("currentLender", e.target.value)}
+                placeholder="e.g. CBA, Westpac, Macquarie"
+                className="w-full rounded-full border border-neutral-300 px-4 py-2.5 text-sm sm:text-base outline-none focus:border-black"
+              />
+              {lenderSuggestions.length > 0 && (
+                <div className="absolute z-10 mt-1 w-full bg-white border border-neutral-200 rounded-xl shadow-sm text-sm max-h-48 overflow-auto">
+                  {lenderSuggestions.map((name) => (
+                    <button
+                      key={name}
+                      type="button"
+                      className="w-full text-left px-4 py-2 hover:bg-neutral-50"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        updateField("currentLender", name);
+                        setLenderFocused(false);
+                      }}
+                    >
+                      {name}
+                    </button>
+                  ))}
+                </div>
+              )}
+              <p className="mt-1 text-xs text-neutral-500">
+                This just helps us sense-check your current deal.
+              </p>
+            </div>
 
-        {/* NUMERIC FIELDS */}
-        <div className="space-y-6">
-          {/* interest rate */}
-          <div>
-            <label className="block font-semibold text-lg mb-2">
-              What is your current interest rate?
-            </label>
-            <input
-              type="text"
-              placeholder="e.g. 6.10%"
-              value={form.rate}
-              onChange={(e) => updateField("rate", e.target.value)}
-              required
-              className="w-full px-4 py-3 rounded-full border border-neutral-300"
-            />
-          </div>
+            {/* Sliders */}
+            <div className="grid gap-5 mb-3">
+              {/* Property value */}
+              <div>
+                <div className="flex items-baseline justify-between mb-1">
+                  <label className="text-sm font-medium">
+                    Rough property value *
+                  </label>
+                  <span className="text-sm font-semibold">
+                    {formatCurrency(String(propertyNum)) || "—"}
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min={PROPERTY_MIN}
+                  max={PROPERTY_MAX}
+                  step={PROPERTY_STEP}
+                  value={propertyNum}
+                  onChange={(e) =>
+                    updateField("propertyValue", e.target.value.toString())
+                  }
+                  className="w-full"
+                />
+                <div className="flex justify-between text-[10px] text-neutral-500 mt-1">
+                  <span>{formatCurrency(String(PROPERTY_MIN))}</span>
+                  <span>{formatCurrency(String(PROPERTY_MAX))}+</span>
+                </div>
+                <p className="mt-1 text-xs text-neutral-500">
+                  This helps estimate your equity in the property.
+                </p>
+                {errors.propertyValue && (
+                  <p className="mt-1 text-xs text-red-600">
+                    {errors.propertyValue}
+                  </p>
+                )}
+              </div>
 
-          {/* balance */}
-          <div>
-            <label className="block font-semibold text-lg mb-2">
-              What is your approximate loan balance?
-            </label>
-            <input
-              type="text"
-              placeholder="e.g. $500,000"
-              value={form.balance}
-              onChange={(e) => updateField("balance", e.target.value)}
-              required
-              className="w-full px-4 py-3 rounded-full border border-neutral-300"
-            />
-          </div>
+              {/* Amount owing */}
+              <div>
+                <div className="flex items-baseline justify-between mb-1">
+                  <label className="text-sm font-medium">
+                    Approx. amount owing *
+                  </label>
+                  <span className="text-sm font-semibold">
+                    {formatCurrency(String(balanceNum)) || "—"}
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min={BALANCE_MIN}
+                  max={BALANCE_MAX}
+                  step={BALANCE_STEP}
+                  value={balanceNum}
+                  onChange={(e) =>
+                    updateField("balance", e.target.value.toString())
+                  }
+                  className="w-full"
+                />
+                <div className="flex justify-between text-[10px] text-neutral-500 mt-1">
+                  <span>{formatCurrency(String(BALANCE_MIN))}</span>
+                  <span>{formatCurrency(String(BALANCE_MAX))}+</span>
+                </div>
+                <p className="mt-1 text-xs text-neutral-500">
+                  A ballpark is plenty — we&apos;ll refine this later.
+                </p>
+                {errors.balance && (
+                  <p className="mt-1 text-xs text-red-600">{errors.balance}</p>
+                )}
+              </div>
 
-          {/* repayments */}
-          <div>
-            <label className="block font-semibold text-lg mb-2">
-              What are your current monthly repayments?
-            </label>
-            <input
-              type="text"
-              placeholder="e.g. $2,450"
-              value={form.repayments}
-              onChange={(e) => updateField("repayments", e.target.value)}
-              required
-              className="w-full px-4 py-3 rounded-full border border-neutral-300"
-            />
-          </div>
+              {/* Repayments */}
+              <div>
+                <div className="flex items-baseline justify-between mb-1">
+                  <label className="text-sm font-medium">
+                    Current monthly repayments *
+                  </label>
+                  <span className="text-sm font-semibold">
+                    {formatCurrency(String(repayNum)) || "—"}
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min={REPAY_MIN}
+                  max={REPAY_MAX}
+                  step={REPAY_STEP}
+                  value={repayNum}
+                  onChange={(e) =>
+                    updateField("repayments", e.target.value.toString())
+                  }
+                  className="w-full"
+                />
+                <div className="flex justify-between text-[10px] text-neutral-500 mt-1">
+                  <span>{formatCurrency(String(REPAY_MIN))}</span>
+                  <span>{formatCurrency(String(REPAY_MAX))}+</span>
+                </div>
+                <p className="mt-1 text-xs text-neutral-500">
+                  You can use a rough figure — we&apos;re just sizing the
+                  opportunity.
+                </p>
+                {errors.repayments && (
+                  <p className="mt-1 text-xs text-red-600">
+                    {errors.repayments}
+                  </p>
+                )}
+              </div>
 
-          {/* term */}
-          <div>
-            <label className="block font-semibold text-lg mb-2">
-              How many years are left on your loan term?
-            </label>
-            <input
-              type="text"
-              placeholder="e.g. 25"
-              value={form.termRemaining}
-              onChange={(e) => updateField("termRemaining", e.target.value)}
-              required
-              className="w-full px-4 py-3 rounded-full border border-neutral-300"
-            />
-          </div>
+              {/* Years remaining */}
+              <div>
+                <div className="flex items-baseline justify-between mb-1">
+                  <label className="text-sm font-medium">
+                    How many years are left on your loan term? *
+                  </label>
+                  <span className="text-sm font-semibold">{yearsNum} yrs</span>
+                </div>
+                <input
+                  type="range"
+                  min={YEARS_MIN}
+                  max={YEARS_MAX}
+                  step={YEARS_STEP}
+                  value={yearsNum}
+                  onChange={(e) =>
+                    updateField("yearsRemaining", e.target.value.toString())
+                  }
+                  className="w-full"
+                />
+                <div className="flex justify-between text-[10px] text-neutral-500 mt-1">
+                  <span>{YEARS_MIN} yrs</span>
+                  <span>{YEARS_MAX}+ yrs</span>
+                </div>
+                <p className="mt-1 text-xs text-neutral-500">
+                  A guess is fine — we just need a sense of how far through the
+                  loan you are.
+                </p>
+                {errors.yearsRemaining && (
+                  <p className="mt-1 text-xs text-red-600">
+                    {errors.yearsRemaining}
+                  </p>
+                )}
+              </div>
+            </div>
 
-          {/* value */}
-          <div>
-            <label className="block font-semibold text-lg mb-2">
-              What is your property&apos;s estimated value?
-            </label>
-            <input
-              type="text"
-              placeholder="e.g. $850,000"
-              value={form.propertyValue}
-              onChange={(e) => updateField("propertyValue", e.target.value)}
-              required
-              className="w-full px-4 py-3 rounded-full border border-neutral-300"
-            />
-          </div>
-        </div>
+            {submitError && (
+              <p className="mt-3 text-xs text-red-600">{submitError}</p>
+            )}
 
-        <div className="pt-4">
-          <button
-            type="submit"
-            className="inline-block bg-[#0B0F1B] text-white font-semibold text-[17px]
-              rounded-full px-8 py-3.5 transition-all border border-[#0B0F1B]
-              hover:bg-white hover:text-black hover:border-black text-center w-full sm:w-auto"
-          >
-            I&apos;m ready for the next steps
-          </button>
-        </div>
-      </form>
+            <div className="flex items-center justify-between mt-6">
+              <button
+                type="button"
+                onClick={goBack}
+                className="text-sm text-neutral-600 hover:text-black"
+                disabled={submitting}
+              >
+                ← Back
+              </button>
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={submitting}
+                className={classNames(
+                  "inline-flex items-center justify-center px-5 py-2.5 rounded-full text-sm font-semibold border transition-colors",
+                  submitting
+                    ? "bg-neutral-400 text-white border-neutral-400 cursor-not-allowed"
+                    : "bg-black text-white border-black hover:bg-white hover:text-black"
+                )}
+              >
+                {submitting ? "Sending..." : ctaLabel}
+              </button>
+            </div>
+
+            <p className="mt-3 text-[11px] text-neutral-500 leading-snug">
+              By continuing, you&apos;re happy for Sold Financial to contact you
+              about your home loan. We&apos;ll never share your details without
+              your permission.
+            </p>
+          </div>
+        )}
+      </section>
     </main>
-  );
-}
-
-export default function RefinancePage() {
-  return (
-    <Suspense fallback={<div className="p-8 text-neutral-500">Loading…</div>}>
-      <RefiInner />
-    </Suspense>
   );
 }
