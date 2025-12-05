@@ -17,7 +17,7 @@ export default function Refinance2SuccessPage() {
             </p>
 
             <p>
-              We're crunching your numbers but before we can share specific lender options, we need
+              We are crunching your numbers but before we can share specific lender options, we need
               your formal <strong>Privacy &amp; Credit Consent</strong> (it is a
               legal requirement and takes minutes to review).
             </p>
