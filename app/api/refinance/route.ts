@@ -1,5 +1,6 @@
 // app/api/refinance/route.ts
 import { NextResponse } from "next/server";
+import { createRefinanceFactFindRecord } from "@/lib/airtable";
 
 const BREVO_API_KEY = process.env.BREVO_API_KEY!;
 const REFI_LIST_ID = process.env.BREVO_REFI_LIST_ID
@@ -48,21 +49,74 @@ export async function POST(req: Request) {
       partnerEmail,
     } = body;
 
-    // --- VALIDATION ---
-    if (!email || typeof email !== "string" || !email.includes("@")) {
-      return NextResponse.json(
-        { error: "Valid email is required" },
-        { status: 400 }
-      );
+    // ----------------------------------------------------
+    // NEW: Persist fact find to Airtable as system of record
+    // ----------------------------------------------------
+    if (email && balance && rate) {
+      const currentLoanBalance = Number(balance) || 0;
+      const currentInterestRatePercent = Number(rate) || 0;
+      const remainingTermYears = Number(termRemaining) || 30;
+      const numericPropertyValue =
+        propertyValue !== undefined && propertyValue !== null
+          ? Number(propertyValue)
+          : null;
+
+      // light derivation of purpose / repaymentType from existing fields
+      let purpose: "OO" | "INV" | null = null;
+      if (Array.isArray(refinancingFor)) {
+        if (
+          refinancingFor.some((v: any) =>
+            String(v).toLowerCase().includes("invest")
+          )
+        ) {
+          purpose = "INV";
+        } else if (
+          refinancingFor.some((v: any) =>
+            String(v).toLowerCase().includes("owner")
+          )
+        ) {
+          purpose = "OO";
+        }
+      }
+
+      let repaymentType: "P&I" | "IO" | null = null;
+      if (Array.isArray(loanType)) {
+        if (
+          loanType.some((v: any) =>
+            String(v).toLowerCase().includes("interest only")
+          )
+        ) {
+          repaymentType = "IO";
+        } else if (
+          loanType.some((v: any) =>
+            String(v).toLowerCase().includes("principal")
+          )
+        ) {
+          repaymentType = "P&I";
+        }
+      }
+
+      // fire-and-forget; Airtable errors shouldn't break user flow
+      void createRefinanceFactFindRecord({
+        email: String(email).trim().toLowerCase(),
+        currentLoanBalance,
+        currentInterestRatePercent,
+        remainingTermYears,
+        propertyValue: numericPropertyValue,
+        purpose,
+        repaymentType,
+        source: "refinance-form",
+      });
     }
 
+    // If Brevo isn't configured, still treat as success (Airtable has the data)
     if (!BREVO_API_KEY) {
       console.warn(
         "[/api/refinance] BREVO_API_KEY missing – skipping Brevo call"
       );
       return NextResponse.json({
         success: true,
-        skipped: true,
+        skippedBrevo: true,
       });
     }
 
@@ -74,7 +128,7 @@ export async function POST(req: Request) {
     // ----------------------------------------------------
     //
     const primaryAttributes: Record<string, any> = {
-      // 📌 Your existing attributes (DO NOT CHANGE)
+      // 📌 Existing attributes
       FIRSTNAME: preferredName || "",
       CURRENTLENDER: currentLender || "",
       OWNERORINVESTOR: Array.isArray(refinancingFor) ? refinancingFor : [],
@@ -86,7 +140,7 @@ export async function POST(req: Request) {
       PROPERTYVALUE: propertyValue || "",
       FACT_FIND_COMPLETE: true,
 
-      // 📌 NEW ATTRIBUTES FOR JOINT LOGIC
+      // 📌 Joint logic
       APPLICATION_TYPE: isJoint ? "Joint" : "Single",
       APPLICANT_ROLE: "primary",
       PARTNER_EMAIL: isJoint ? partnerEmail : null,

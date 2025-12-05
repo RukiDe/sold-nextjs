@@ -1,6 +1,22 @@
 import { ButtonPill } from "@/components/ButtonPill";
+import SavingsPreviewClient from "@/components/SavingsPreviewClient";
 
-export default function Refinance2SuccessPage() {
+type Props = {
+  searchParams: { [key: string]: string | string[] | undefined };
+};
+
+export default function Refinance2SuccessPage({ searchParams }: Props) {
+  const emailParam = searchParams.email;
+
+  const rawEmail =
+    typeof emailParam === "string"
+      ? emailParam
+      : Array.isArray(emailParam)
+      ? emailParam[0]
+      : null;
+
+  const email = rawEmail ? decodeURIComponent(rawEmail) : null;
+
   return (
     <div className="min-h-[70vh] flex flex-col">
       <main className="flex-1">
@@ -17,18 +33,22 @@ export default function Refinance2SuccessPage() {
             </p>
 
             <p>
-              We are crunching your numbers but before we can share specific lender options, we need
-              your formal <strong>Privacy &amp; Credit Consent</strong> (it is a
-              legal requirement and takes minutes to review).
+              We are crunching your numbers but before we can share specific
+              lender options, we need your formal{" "}
+              <strong>Privacy &amp; Credit Consent</strong> (it is a legal
+              requirement and takes minutes to review).
             </p>
 
             <p>
-              You&apos;ll receive an email shortly with your consent
-              form to sign. 
+              You&apos;ll receive an email shortly with your consent form to
+              sign.
             </p>
 
             <p>Speak soon — keen to help you get clarity ❤️</p>
           </section>
+
+          {/* 🔍 Savings preview based on their fact find (Airtable + qualifier) */}
+          <SavingsPreviewClient email={email} />
 
           <div className="mt-10 flex flex-wrap gap-4">
             <ButtonPill href="/">Back to Home</ButtonPill>
