@@ -199,11 +199,7 @@ export default function SavingsPreviewClient({ email }: Props) {
             market for you or see if there&apos;s any room to sharpen things.
           </p>
 
-          <ButtonPill
-            href="https://calendly.com/rukid-sold/30min"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <ButtonPill href="https://calendly.com/rukid-sold/30min">
             Book a quick chat
           </ButtonPill>
         </div>
@@ -365,11 +361,7 @@ export default function SavingsPreviewClient({ email }: Props) {
           </section>
 
           <div className="mt-6 flex flex-wrap gap-4 mb-4">
-            <ButtonPill
-              href="https://calendly.com/rukid-sold/30min"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            <ButtonPill href="https://calendly.com/rukid-sold/30min">
               Let&apos;s have a quick chat to unpack this
             </ButtonPill>
           </div>
