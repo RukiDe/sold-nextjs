@@ -2,51 +2,66 @@
 
 export type RefinanceFactFindRecord = {
   email: string;
+  preferredName?: string | null;
+  goal?: string | null;
   currentLoanBalance: number;
+  currentMonthlyRepayments?: number | null;
   currentInterestRatePercent: number;
   remainingTermYears: number;
   propertyValue?: number | null;
-  purpose?: "OO" | "INV" | null;
-  repaymentType?: "P&I" | "IO" | null;
+  ownerOrInvestor?: "OO" | "INV" | null;
+  loanType?: "P&I" | "IO" | null;
+  currentLender?: string | null;
   source?: string | null;
 };
 
 export type RefinanceFactFindStored = {
+  recordId: string;
   email: string;
   currentLoanBalance: number;
   currentInterestRatePercent: number;
   remainingTermYears: number;
   propertyValue?: number | null;
-  purpose?: "OO" | "INV" | null;
-  repaymentType?: "P&I" | "IO" | null;
+  ownerOrInvestor?: "OO" | "INV" | null;
+  loanType?: "P&I" | "IO" | null;
+  currentMonthlyFromForm?: number | null;
 };
 
 const AIRTABLE_API_TOKEN = process.env.AIRTABLE_API_TOKEN;
 const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
-const AIRTABLE_REFI_TABLE_NAME = process.env.AIRTABLE_REFI_TABLE_NAME;
+const AIRTABLE_REFI_TABLE_NAME =
+  process.env.AIRTABLE_REFI_TABLE_NAME || "Refinance";
 
-if (!AIRTABLE_API_TOKEN || !AIRTABLE_BASE_ID || !AIRTABLE_REFI_TABLE_NAME) {
-  console.warn(
-    "[Airtable] Missing env vars. Set AIRTABLE_API_TOKEN, AIRTABLE_BASE_ID, AIRTABLE_REFI_TABLE_NAME."
-  );
+function airtableConfigured() {
+  return !!(AIRTABLE_API_TOKEN && AIRTABLE_BASE_ID && AIRTABLE_REFI_TABLE_NAME);
 }
 
-/**
- * 1) CREATE record (write fact find into Airtable)
- */
+// Debug on server start
+console.log("=== Airtable ENV DEBUG ===");
+console.log("AIRTABLE_API_TOKEN:", AIRTABLE_API_TOKEN ? "LOADED" : "MISSING");
+console.log("AIRTABLE_BASE_ID:", AIRTABLE_BASE_ID);
+console.log("AIRTABLE_REFI_TABLE_NAME:", AIRTABLE_REFI_TABLE_NAME);
+console.log("==========================");
+
+/* -------------------------------------------------------------------------- */
+/*                               CREATE RECORD                                */
+/* -------------------------------------------------------------------------- */
+
 export async function createRefinanceFactFindRecord(
   data: RefinanceFactFindRecord
 ): Promise<void> {
-  if (!AIRTABLE_API_TOKEN || !AIRTABLE_BASE_ID || !AIRTABLE_REFI_TABLE_NAME) {
+  if (!airtableConfigured()) {
+    console.warn("[Airtable] Not configured — skipping createRefinanceFactFindRecord");
     return;
   }
 
   const url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(
-    AIRTABLE_REFI_TABLE_NAME
+    AIRTABLE_REFI_TABLE_NAME!
   )}`;
 
   const fields: Record<string, any> = {
     Email: data.email,
+    "Preferred Name": data.preferredName || "",
     "Current Loan Balance": data.currentLoanBalance,
     "Current Interest Rate %": data.currentInterestRatePercent,
     "Remaining Term (years)": data.remainingTermYears,
@@ -55,79 +70,157 @@ export async function createRefinanceFactFindRecord(
   if (data.propertyValue != null) {
     fields["Property Value"] = data.propertyValue;
   }
-  if (data.purpose) {
-    fields["Purpose"] = data.purpose;
+
+  if (data.ownerOrInvestor) {
+    fields["Owner / Investor"] = data.ownerOrInvestor;
   }
-  if (data.repaymentType) {
-    fields["Repayment Type"] = data.repaymentType;
+
+  if (data.loanType) {
+    fields["Loan Types"] = data.loanType;
   }
+
+  if (data.currentLender) {
+    fields["Current Lender"] = data.currentLender;
+  }
+
   if (data.source) {
     fields["Source"] = data.source;
   }
 
-  const res = await fetch(url, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${AIRTABLE_API_TOKEN}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      records: [{ fields }],
-    }),
-    cache: "no-store",
-  });
+  if (data.currentMonthlyRepayments != null) {
+    fields["Current Monthly (form)"] = data.currentMonthlyRepayments;
+  }
 
-  if (!res.ok) {
+  console.log("[Airtable] Creating record in Refinance", fields);
+
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${AIRTABLE_API_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ records: [{ fields }] }),
+    });
+
     const text = await res.text();
-    console.error("[Airtable] Failed to create record", res.status, text);
+    if (!res.ok) {
+      console.error("[Airtable] Failed to create record", res.status, text);
+    } else {
+      console.log("[Airtable] Record created OK", text);
+    }
+  } catch (err) {
+    console.error("[Airtable] Network error creating record", err);
+    // Swallow error — don’t break user flow
   }
 }
 
-/**
- * 2) READ the most recent fact find for an email
- */
+/* -------------------------------------------------------------------------- */
+/*                                 READ RECORD                                */
+/* -------------------------------------------------------------------------- */
+
 export async function getRefinanceFactFindByEmail(
   email: string
 ): Promise<RefinanceFactFindStored | null> {
-  if (!AIRTABLE_API_TOKEN || !AIRTABLE_BASE_ID || !AIRTABLE_REFI_TABLE_NAME) {
-    console.warn("[Airtable] Env vars missing, cannot read records");
+  if (!airtableConfigured()) {
+    console.warn("[Airtable] Not configured — skipping getRefinanceFactFindByEmail");
     return null;
   }
+
+  const filter = `{Email} = "${email.replace(/"/g, '\\"')}"`;
+
+  const url =
+    `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(
+      AIRTABLE_REFI_TABLE_NAME!
+    )}` +
+    `?maxRecords=1&filterByFormula=${encodeURIComponent(filter)}`;
+
+  console.log("[Airtable] Fetching by email from Refinance", email);
+
+  try {
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${AIRTABLE_API_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    const json = await res.json().catch(() => ({} as any));
+
+    if (!res.ok) {
+      console.error("[Airtable] Failed to fetch record", res.status, json);
+      return null;
+    }
+
+    const record = json.records?.[0];
+    if (!record) {
+      console.log("[Airtable] No record found for email", email);
+      return null;
+    }
+
+    const f = record.fields || {};
+
+    return {
+      recordId: record.id,
+      email: String(f.Email || "").toLowerCase(),
+      currentLoanBalance: Number(f["Current Loan Balance"] || 0),
+      currentInterestRatePercent: Number(f["Current Interest Rate %"] || 0),
+      remainingTermYears: Number(f["Remaining Term (years)"] || 30),
+      propertyValue:
+        f["Property Value"] != null ? Number(f["Property Value"]) : null,
+      ownerOrInvestor:
+        (f["Owner / Investor"] as "OO" | "INV" | undefined) || null,
+      loanType: (f["Loan Types"] as "P&I" | "IO" | undefined) || null,
+      currentMonthlyFromForm:
+        f["Current Monthly (form)"] != null
+          ? Number(f["Current Monthly (form)"])
+          : null,
+    };
+  } catch (err) {
+    console.error("[Airtable] Network error fetching record", err);
+    return null;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/*                         UPDATE OPTION A/B/C LENDERS                        */
+/* -------------------------------------------------------------------------- */
+
+export async function updateRefinanceOptionLenders(input: {
+  recordId: string;
+  optionALenderName: string;
+  optionBLenderName: string;
+  optionCLenderName: string;
+}) {
+  if (!airtableConfigured()) return;
 
   const url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(
-    AIRTABLE_REFI_TABLE_NAME
-  )}?maxRecords=1&sort[0][field]=Created%20At&sort[0][direction]=desc&filterByFormula=${encodeURIComponent(
-    `{Email} = "${email}"`
-  )}`;
+    AIRTABLE_REFI_TABLE_NAME!
+  )}/${input.recordId}`;
 
-  const res = await fetch(url, {
-    headers: {
-      Authorization: `Bearer ${AIRTABLE_API_TOKEN}`,
-      "Content-Type": "application/json",
-    },
-    cache: "no-store",
-  });
-
-  if (!res.ok) {
-    const text = await res.text();
-    console.error("[Airtable] Failed to fetch record", res.status, text);
-    return null;
-  }
-
-  const json = await res.json();
-  const record = json.records?.[0];
-  if (!record) return null;
-
-  const f = record.fields || {};
-
-  return {
-    email: String(f.Email || "").toLowerCase(),
-    currentLoanBalance: Number(f["Current Loan Balance"] || 0),
-    currentInterestRatePercent: Number(f["Current Interest Rate %"] || 0),
-    remainingTermYears: Number(f["Remaining Term (years)"] || 30),
-    propertyValue:
-      f["Property Value"] != null ? Number(f["Property Value"]) : null,
-    purpose: (f["Purpose"] as "OO" | "INV" | undefined) || null,
-    repaymentType: (f["Repayment Type"] as "P&I" | "IO" | undefined) || null,
+  const fields: Record<string, any> = {
+    "Option A Lender": input.optionALenderName,
+    "Option B Lender": input.optionBLenderName,
+    "Option C Lender": input.optionCLenderName,
   };
+
+  try {
+    const res = await fetch(url, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${AIRTABLE_API_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ fields }),
+    });
+
+    const text = await res.text();
+    if (!res.ok) {
+      console.error("[Airtable] Failed to update option lenders", res.status, text);
+    } else {
+      console.log("[Airtable] Updated option lenders", text);
+    }
+  } catch (err) {
+    console.error("[Airtable] Network error updating option lenders", err);
+  }
 }

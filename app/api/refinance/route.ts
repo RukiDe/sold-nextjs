@@ -50,9 +50,9 @@ export async function POST(req: Request) {
     } = body;
 
     // ----------------------------------------------------
-    // NEW: Persist fact find to Airtable as system of record
+    // Persist fact find to Airtable as system of record
     // ----------------------------------------------------
-    if (email && balance && rate) {
+    if (email && balance) {
       const currentLoanBalance = Number(balance) || 0;
       const currentInterestRatePercent = Number(rate) || 0;
       const remainingTermYears = Number(termRemaining) || 30;
@@ -61,51 +61,60 @@ export async function POST(req: Request) {
           ? Number(propertyValue)
           : null;
 
-      // light derivation of purpose / repaymentType from existing fields
-      let purpose: "OO" | "INV" | null = null;
+      // derive OO / INV from refinancingFor
+      let ownerOrInvestor: "OO" | "INV" | null = null;
       if (Array.isArray(refinancingFor)) {
         if (
           refinancingFor.some((v: any) =>
             String(v).toLowerCase().includes("invest")
           )
         ) {
-          purpose = "INV";
+          ownerOrInvestor = "INV";
         } else if (
           refinancingFor.some((v: any) =>
             String(v).toLowerCase().includes("owner")
           )
         ) {
-          purpose = "OO";
+          ownerOrInvestor = "OO";
         }
       }
 
-      let repaymentType: "P&I" | "IO" | null = null;
+      // derive P&I / IO from loanType
+      let loanTypeSingle: "P&I" | "IO" | null = null;
       if (Array.isArray(loanType)) {
         if (
           loanType.some((v: any) =>
             String(v).toLowerCase().includes("interest only")
           )
         ) {
-          repaymentType = "IO";
+          loanTypeSingle = "IO";
         } else if (
           loanType.some((v: any) =>
             String(v).toLowerCase().includes("principal")
           )
         ) {
-          repaymentType = "P&I";
+          loanTypeSingle = "P&I";
         }
       }
+
+      const numericRepayments = repayments
+        ? Number(String(repayments).replace(/[^\d.]/g, ""))
+        : null;
 
       // fire-and-forget; Airtable errors shouldn't break user flow
       void createRefinanceFactFindRecord({
         email: String(email).trim().toLowerCase(),
+        preferredName: preferredName || "",
+        goal: "", // if you later capture "goal" on the form, pass it through here
         currentLoanBalance,
+        currentMonthlyRepayments: numericRepayments,
         currentInterestRatePercent,
         remainingTermYears,
         propertyValue: numericPropertyValue,
-        purpose,
-        repaymentType,
-        source: "refinance-form",
+        ownerOrInvestor,
+        loanType: loanTypeSingle,
+        currentLender,
+        source: "refinance2-form",
       });
     }
 
@@ -124,7 +133,7 @@ export async function POST(req: Request) {
 
     //
     // ----------------------------------------------------
-    // PRIMARY APPLICANT PAYLOAD
+    // PRIMARY APPLICANT PAYLOAD (Brevo)
     // ----------------------------------------------------
     //
     const primaryAttributes: Record<string, any> = {
