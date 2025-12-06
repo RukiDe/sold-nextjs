@@ -21,3 +21,106 @@ body {
 .link {
   @apply text-sm text-neutral-700 hover:text-neutral-900 hover:opacity-80 cursor-pointer;
 }
+
+/* -------------------------------------------------
+   SOLD slider styling — bigger thumbs + black track
+   ------------------------------------------------- */
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  background: transparent;
+  margin: 12px 0;
+}
+
+/* Track (background bar) */
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 6px;
+  background: #d1d5db; /* neutral-300 */
+  border-radius: 9999px;
+}
+
+input[type="range"]::-moz-range-track {
+  height: 6px;
+  background: #d1d5db;
+  border-radius: 9999px;
+}
+
+/* Thumb (draggable circle) */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 36px;
+  width: 36px;
+  border-radius: 9999px;
+  background: #000;          /* SOLD black */
+  border: 3px solid #fff;    /* white halo */
+  margin-top: -15px;         /* centre on track */
+  cursor: pointer;
+}
+
+input[type="range"]::-moz-range-thumb {
+  height: 36px;
+  width: 36px;
+  border-radius: 9999px;
+  background: #000;
+  border: 3px solid #fff;
+  cursor: pointer;
+}
+
+/* Slight darkening on active press */
+input[type="range"]::-webkit-slider-thumb:active {
+  background: #111827; /* neutral-900-ish */
+}
+
+input[type="range"]::-moz-range-thumb:active {
+  background: #111827;
+}
+
+/* Improve touch hitbox on mobile */
+@media (max-width: 640px) {
+  input[type="range"] {
+    height: 44px; /* bigger tap target area */
+  }
+}
+
+/* ------------------------------------------
+   Bubble label above the thumb (value chip)
+   ------------------------------------------ */
+
+/* Wrap your slider in .slider-wrapper and put
+   a .slider-bubble element inside it. JS will
+   update the text and --bubble-left variable. */
+
+.slider-wrapper {
+  position: relative;
+  padding-top: 1.75rem; /* room for bubble */
+}
+
+.slider-bubble {
+  position: absolute;
+  left: var(--bubble-left, 50%);
+  bottom: 100%;
+  transform: translateX(-50%);
+  padding: 0.25rem 0.6rem;
+  font-size: 0.75rem;
+  line-height: 1;
+  border-radius: 9999px;
+  background: #000;
+  color: #fff;
+  white-space: nowrap;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+
+/* Small triangle "tail" */
+.slider-bubble::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px 5px 0 5px;
+  border-style: solid;
+  border-color: #000 transparent transparent transparent;
+}

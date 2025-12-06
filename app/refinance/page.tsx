@@ -119,6 +119,14 @@ const YEARS_MIN = 1;
 const YEARS_MAX = 35;
 const YEARS_STEP = 1;
 
+// Helper for slider bubble position (CSS var)
+function getSliderBubbleStyle(value: number, min: number, max: number) {
+  const range = max - min || 1;
+  const ratio = (value - min) / range;
+  const pct = Math.min(98, Math.max(2, ratio * 100));
+  return { ["--bubble-left" as any]: `${pct}%` } as any;
+}
+
 export default function RefinancePage() {
   const [step, setStep] = useState<Step>(0);
   const [form, setForm] = useState<FormState>(initialState);
@@ -261,7 +269,6 @@ export default function RefinancePage() {
         );
       }
 
-      // ✅ Phase 2: no extra “success step” – just jump to next step in flow
       window.location.href = `/refinance2-success?email=${encodeURIComponent(
         form.email.trim()
       )}`;
@@ -320,6 +327,47 @@ export default function RefinancePage() {
   const balanceNum = safeNumber(form.balance, 520000);
   const repayNum = safeNumber(form.repayments, 2450);
   const yearsNum = safeNumber(form.yearsRemaining, 25);
+
+  // Slider bubble styles
+  const propertyBubbleStyle = getSliderBubbleStyle(
+    propertyNum,
+    PROPERTY_MIN,
+    PROPERTY_MAX
+  );
+  const balanceBubbleStyle = getSliderBubbleStyle(
+    balanceNum,
+    BALANCE_MIN,
+    BALANCE_MAX
+  );
+  const repayBubbleStyle = getSliderBubbleStyle(
+    repayNum,
+    REPAY_MIN,
+    REPAY_MAX
+  );
+  const yearsBubbleStyle = getSliderBubbleStyle(
+    yearsNum,
+    YEARS_MIN,
+    YEARS_MAX
+  );
+
+  // Haptic slider change handler
+  const handleSliderChange =
+    (field: "propertyValue" | "balance" | "repayments" | "yearsRemaining") =>
+    (e: any) => {
+      const raw = e.target.value;
+      updateField(field, raw.toString());
+
+      if (typeof window !== "undefined" && "navigator" in window) {
+        const nav: any = window.navigator;
+        if (nav.vibrate) {
+          try {
+            nav.vibrate(10);
+          } catch {
+            // ignore
+          }
+        }
+      }
+    };
 
   return (
     <main className="max-w-3xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
@@ -556,7 +604,7 @@ export default function RefinancePage() {
 
             <div className="mb-4">
               <p className="text-sm font-medium mb-2">
-                Are you refinancing for an *{" "}
+                Are you refinancing for an *
               </p>
               <div className="flex flex-wrap gap-3">
                 {ownerOptions.map((option) => {
@@ -629,7 +677,6 @@ export default function RefinancePage() {
                 value={form.currentLender}
                 onFocus={() => setLenderFocused(true)}
                 onBlur={() => {
-                  // small delay so clicks on suggestions still register
                   setTimeout(() => setLenderFocused(false), 120);
                 }}
                 onChange={(e) => updateField("currentLender", e.target.value)}
@@ -671,17 +718,23 @@ export default function RefinancePage() {
                     {formatCurrency(String(propertyNum)) || "—"}
                   </span>
                 </div>
-                <input
-                  type="range"
-                  min={PROPERTY_MIN}
-                  max={PROPERTY_MAX}
-                  step={PROPERTY_STEP}
-                  value={propertyNum}
-                  onChange={(e) =>
-                    updateField("propertyValue", e.target.value.toString())
-                  }
-                  className="w-full"
-                />
+                <div className="slider-wrapper">
+                  <div
+                    className="slider-bubble"
+                    style={propertyBubbleStyle}
+                  >
+                    {formatCurrency(String(propertyNum)) || "—"}
+                  </div>
+                  <input
+                    type="range"
+                    min={PROPERTY_MIN}
+                    max={PROPERTY_MAX}
+                    step={PROPERTY_STEP}
+                    value={propertyNum}
+                    onChange={handleSliderChange("propertyValue")}
+                    className="w-full"
+                  />
+                </div>
                 <div className="flex justify-between text-[10px] text-neutral-500 mt-1">
                   <span>{formatCurrency(String(PROPERTY_MIN))}</span>
                   <span>{formatCurrency(String(PROPERTY_MAX))}+</span>
@@ -706,17 +759,23 @@ export default function RefinancePage() {
                     {formatCurrency(String(balanceNum)) || "—"}
                   </span>
                 </div>
-                <input
-                  type="range"
-                  min={BALANCE_MIN}
-                  max={BALANCE_MAX}
-                  step={BALANCE_STEP}
-                  value={balanceNum}
-                  onChange={(e) =>
-                    updateField("balance", e.target.value.toString())
-                  }
-                  className="w-full"
-                />
+                <div className="slider-wrapper">
+                  <div
+                    className="slider-bubble"
+                    style={balanceBubbleStyle}
+                  >
+                    {formatCurrency(String(balanceNum)) || "—"}
+                  </div>
+                  <input
+                    type="range"
+                    min={BALANCE_MIN}
+                    max={BALANCE_MAX}
+                    step={BALANCE_STEP}
+                    value={balanceNum}
+                    onChange={handleSliderChange("balance")}
+                    className="w-full"
+                  />
+                </div>
                 <div className="flex justify-between text-[10px] text-neutral-500 mt-1">
                   <span>{formatCurrency(String(BALANCE_MIN))}</span>
                   <span>{formatCurrency(String(BALANCE_MAX))}+</span>
@@ -739,17 +798,23 @@ export default function RefinancePage() {
                     {formatCurrency(String(repayNum)) || "—"}
                   </span>
                 </div>
-                <input
-                  type="range"
-                  min={REPAY_MIN}
-                  max={REPAY_MAX}
-                  step={REPAY_STEP}
-                  value={repayNum}
-                  onChange={(e) =>
-                    updateField("repayments", e.target.value.toString())
-                  }
-                  className="w-full"
-                />
+                <div className="slider-wrapper">
+                  <div
+                    className="slider-bubble"
+                    style={repayBubbleStyle}
+                  >
+                    {formatCurrency(String(repayNum)) || "—"}
+                  </div>
+                  <input
+                    type="range"
+                    min={REPAY_MIN}
+                    max={REPAY_MAX}
+                    step={REPAY_STEP}
+                    value={repayNum}
+                    onChange={handleSliderChange("repayments")}
+                    className="w-full"
+                  />
+                </div>
                 <div className="flex justify-between text-[10px] text-neutral-500 mt-1">
                   <span>{formatCurrency(String(REPAY_MIN))}</span>
                   <span>{formatCurrency(String(REPAY_MAX))}+</span>
@@ -773,17 +838,23 @@ export default function RefinancePage() {
                   </label>
                   <span className="text-sm font-semibold">{yearsNum} yrs</span>
                 </div>
-                <input
-                  type="range"
-                  min={YEARS_MIN}
-                  max={YEARS_MAX}
-                  step={YEARS_STEP}
-                  value={yearsNum}
-                  onChange={(e) =>
-                    updateField("yearsRemaining", e.target.value.toString())
-                  }
-                  className="w-full"
-                />
+                <div className="slider-wrapper">
+                  <div
+                    className="slider-bubble"
+                    style={yearsBubbleStyle}
+                  >
+                    {yearsNum} yrs
+                  </div>
+                  <input
+                    type="range"
+                    min={YEARS_MIN}
+                    max={YEARS_MAX}
+                    step={YEARS_STEP}
+                    value={yearsNum}
+                    onChange={handleSliderChange("yearsRemaining")}
+                    className="w-full"
+                  />
+                </div>
                 <div className="flex justify-between text-[10px] text-neutral-500 mt-1">
                   <span>{YEARS_MIN} yrs</span>
                   <span>{YEARS_MAX}+ yrs</span>
