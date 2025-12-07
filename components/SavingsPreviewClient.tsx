@@ -347,7 +347,8 @@ export default function SavingsPreviewClient({ email }: Props) {
             These options are based on our panel of lenders as at{" "}
             <span className="font-medium">{todayString}</span>. We&apos;re not
             showing lender names here — we&apos;ll go through the actual options
-            together and talk through what&apos;s in your best interests.
+            together and talk through what&apos;s in your best interests. All applications 
+            subject to lending criteria and rates are subject to change. 
           </p>
 
           <section className="space-y-6 text-[17px] leading-relaxed text-[#1F2933] mb-8">

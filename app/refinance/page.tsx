@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
+import confetti from "canvas-confetti";
 
 type Step = 0 | 1 | 2;
 type ApplicationType = "single" | "joint";
@@ -35,7 +36,6 @@ const initialState: FormState = {
   ownerOrInvestor: [],
   loanTypes: [],
   currentLender: "",
-  // sliders default starting points (can still be changed)
   propertyValue: "850000",
   balance: "520000",
   repayments: "2450",
@@ -127,6 +127,26 @@ function getSliderBubbleStyle(value: number, min: number, max: number) {
   return { ["--bubble-left" as any]: `${pct}%` } as any;
 }
 
+// Email validation with nicer errors
+function validateEmailDetailed(email: string): string | null {
+  const trimmed = email.trim();
+  if (!trimmed) return "Please enter your email.";
+
+  const basicRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  if (!basicRegex.test(trimmed)) {
+    if (trimmed.endsWith(".con")) {
+      return "That looks like a small typo — did you mean .com?";
+    }
+    return "Please enter a valid email address.";
+  }
+
+  if (trimmed.includes("..") || trimmed.includes("@@") || trimmed.includes(" ")) {
+    return "Please enter a valid email address.";
+  }
+
+  return null;
+}
+
 export default function RefinancePage() {
   const [step, setStep] = useState<Step>(0);
   const [form, setForm] = useState<FormState>(initialState);
@@ -134,6 +154,66 @@ export default function RefinancePage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [lenderFocused, setLenderFocused] = useState(false);
+
+  // Refs for scrolling/focus
+  const step0Ref = useRef<HTMLDivElement | null>(null);
+  const step1Ref = useRef<HTMLDivElement | null>(null);
+  const ownerRef = useRef<HTMLDivElement | null>(null);
+  const loanTypeRef = useRef<HTMLDivElement | null>(null);
+  const lenderRef = useRef<HTMLDivElement | null>(null);
+  const propertyRef = useRef<HTMLDivElement | null>(null);
+  const balanceRef = useRef<HTMLDivElement | null>(null);
+  const repaymentsRef = useRef<HTMLDivElement | null>(null);
+  const yearsRef = useRef<HTMLDivElement | null>(null);
+
+  const scrollToRef = (ref: React.RefObject<HTMLDivElement> | null) => {
+    if (!ref?.current) return;
+    ref.current.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  const scrollToStepHeader = (s: Step) => {
+    if (s === 0) scrollToRef(step0Ref);
+    if (s === 1) scrollToRef(step1Ref);
+    if (s === 2) scrollToRef(ownerRef);
+  };
+
+  const scrollToField = (key: keyof FormState) => {
+    switch (key) {
+      case "goal":
+        scrollToRef(step0Ref);
+        break;
+      case "preferredName":
+      case "email":
+      case "applicationType":
+      case "partnerName":
+      case "partnerEmail":
+        scrollToRef(step1Ref);
+        break;
+      case "ownerOrInvestor":
+        scrollToRef(ownerRef);
+        break;
+      case "loanTypes":
+        scrollToRef(loanTypeRef);
+        break;
+      case "currentLender":
+        scrollToRef(lenderRef);
+        break;
+      case "propertyValue":
+        scrollToRef(propertyRef);
+        break;
+      case "balance":
+        scrollToRef(balanceRef);
+        break;
+      case "repayments":
+        scrollToRef(repaymentsRef);
+        break;
+      case "yearsRemaining":
+        scrollToRef(yearsRef);
+        break;
+      default:
+        break;
+    }
+  };
 
   const progressPercent = step === 0 ? 33 : step === 1 ? 66 : 100;
 
@@ -174,25 +254,26 @@ export default function RefinancePage() {
 
     if (s === 1) {
       if (!form.preferredName.trim()) {
-        newErrors.preferredName = "Please add your name so we know what to call you.";
+        newErrors.preferredName =
+          "Please add your name so we know what to call you.";
       }
-      if (
-        !form.email.trim() ||
-        !form.email.includes("@") ||
-        !form.email.includes(".")
-      ) {
-        newErrors.email = "Please enter a valid email address.";
+
+      const emailError = validateEmailDetailed(form.email);
+      if (emailError) {
+        newErrors.email = emailError;
       }
+
       if (form.applicationType === "joint") {
         if (!form.partnerName.trim()) {
           newErrors.partnerName = "Please add your partner’s name.";
         }
-        if (
-          !form.partnerEmail.trim() ||
-          !form.partnerEmail.includes("@") ||
-          !form.partnerEmail.includes(".")
-        ) {
-          newErrors.partnerEmail = "Please enter your partner’s email.";
+        const partnerEmailError = validateEmailDetailed(form.partnerEmail);
+        if (partnerEmailError) {
+          // tweak copy slightly
+          newErrors.partnerEmail = partnerEmailError.replace(
+            "your email",
+            "your partner’s email"
+          );
         }
       }
     }
@@ -219,23 +300,38 @@ export default function RefinancePage() {
     }
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+
+    const keys = Object.keys(newErrors) as (keyof FormState)[];
+    if (keys.length > 0) {
+      scrollToField(keys[0]);
+      return false;
+    }
+
+    return true;
   };
 
   const goNext = () => {
     if (!validateStep(step)) return;
-    if (step < 2) setStep((s) => (s + 1) as Step);
+    if (step < 2) {
+      const nextStep = ((step + 1) as Step);
+      setStep(nextStep);
+      // let the DOM update first then scroll
+      setTimeout(() => scrollToStepHeader(nextStep), 80);
+    }
   };
 
   const goBack = () => {
-    if (step > 0) setStep((s) => (s - 1) as Step);
+    if (step > 0) {
+      const prevStep = ((step - 1) as Step);
+      setStep(prevStep);
+      setTimeout(() => scrollToStepHeader(prevStep), 80);
+    }
   };
 
   const handleSubmit = async () => {
-    if (!validateStep(2)) {
-      setStep(2);
-      return;
-    }
+    // force step 2 + validate there
+    if (step !== 2) setStep(2);
+    if (!validateStep(2)) return;
 
     setSubmitting(true);
     setSubmitError(null);
@@ -258,23 +354,41 @@ export default function RefinancePage() {
           applicationType: form.applicationType,
           partnerName: form.partnerName.trim(),
           partnerEmail: form.partnerEmail.trim(),
+          goal: form.goal,
         }),
       });
 
       if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(
-          (data && (data.error || data.message)) ||
-            "Something went wrong submitting your details."
+        console.error("Refinance submit failed", await res.text());
+        setSubmitError(
+          "Hmm, something’s wrong on our side — please give it another go ❤️"
         );
+        setSubmitting(false);
+        return;
       }
 
-      window.location.href = `/refinance2-success?email=${encodeURIComponent(
-        form.email.trim()
-      )}`;
-    } catch (err: any) {
+      // 🎉 Confetti celebration
+      try {
+        confetti({
+          particleCount: 140,
+          spread: 90,
+          origin: { y: 0.7 },
+        });
+      } catch {
+        // ignore if confetti fails
+      }
+
+      // small pause so they actually see it
+      setTimeout(() => {
+        window.location.href = `/refinance2-success?email=${encodeURIComponent(
+          form.email.trim()
+        )}`;
+      }, 700);
+    } catch (err) {
       console.error("Refinance submit error", err);
-      setSubmitError(err?.message || "Something went wrong. Please try again.");
+      setSubmitError(
+        "Hmm, something’s wrong on our side — please give it another go ❤️"
+      );
       setSubmitting(false);
     }
   };
@@ -282,7 +396,9 @@ export default function RefinancePage() {
   const renderProgress = () => (
     <div className="mb-6">
       <div className="flex items-center justify-between text-xs font-medium text-neutral-600 mb-2">
-        <span>{step === 0 ? "Step 1 of 3" : step === 1 ? "Step 2 of 3" : "Step 3 of 3"}</span>
+        <span>
+          {step === 0 ? "Step 1 of 3" : step === 1 ? "Step 2 of 3" : "Step 3 of 3"}
+        </span>
         <span>{progressPercent}% complete</span>
       </div>
       <div className="w-full h-1.5 bg-neutral-200 rounded-full overflow-hidden">
@@ -400,7 +516,7 @@ export default function RefinancePage() {
 
         {/* STEP 0 – goal */}
         {step === 0 && (
-          <div>
+          <div ref={step0Ref}>
             <h2 className="text-xl sm:text-2xl font-semibold mb-4">
               What&apos;s your goal today?
             </h2>
@@ -411,7 +527,14 @@ export default function RefinancePage() {
                   <button
                     key={option}
                     type="button"
-                    onClick={() => updateField("goal", option)}
+                    onClick={() => {
+                      updateField("goal", option);
+                      // auto-advance once they tap a goal
+                      setTimeout(() => {
+                        setStep(1);
+                        setTimeout(() => scrollToStepHeader(1), 80);
+                      }, 80);
+                    }}
                     className={classNames(
                       "px-4 py-2 rounded-full text-sm sm:text-base border transition-colors",
                       active
@@ -445,7 +568,7 @@ export default function RefinancePage() {
 
         {/* STEP 1 – basics + joint */}
         {step === 1 && (
-          <div>
+          <div ref={step1Ref}>
             <h2 className="text-xl sm:text-2xl font-semibold mb-4">
               Let&apos;s start with a few basics
             </h2>
@@ -534,7 +657,9 @@ export default function RefinancePage() {
                   <input
                     type="text"
                     value={form.partnerName}
-                    onChange={(e) => updateField("partnerName", e.target.value)}
+                    onChange={(e) =>
+                      updateField("partnerName", e.target.value)
+                    }
                     placeholder="e.g. Jamie"
                     className={classNames(
                       "w-full rounded-full border px-4 py-2.5 text-sm sm:text-base outline-none",
@@ -602,7 +727,7 @@ export default function RefinancePage() {
               A few details about your loan
             </h2>
 
-            <div className="mb-4">
+            <div className="mb-4" ref={ownerRef}>
               <p className="text-sm font-medium mb-2">
                 Are you refinancing for an *
               </p>
@@ -614,7 +739,10 @@ export default function RefinancePage() {
                     <button
                       key={option}
                       type="button"
-                      onClick={() => toggleMulti("ownerOrInvestor", option)}
+                      onClick={() => {
+                        toggleMulti("ownerOrInvestor", option);
+                        setTimeout(() => scrollToRef(loanTypeRef), 80);
+                      }}
                       className={classNames(
                         "px-4 py-2 rounded-full text-sm border transition-colors",
                         active
@@ -635,7 +763,7 @@ export default function RefinancePage() {
               )}
             </div>
 
-            <div className="mb-4">
+            <div className="mb-4" ref={loanTypeRef}>
               <p className="text-sm font-medium mb-2">
                 What type of loan do you currently have? *
               </p>
@@ -647,7 +775,10 @@ export default function RefinancePage() {
                     <button
                       key={option}
                       type="button"
-                      onClick={() => toggleMulti("loanTypes", option)}
+                      onClick={() => {
+                        toggleMulti("loanTypes", option);
+                        setTimeout(() => scrollToRef(lenderRef), 80);
+                      }}
                       className={classNames(
                         "px-4 py-2 rounded-full text-sm border transition-colors",
                         active
@@ -667,7 +798,7 @@ export default function RefinancePage() {
             </div>
 
             {/* Lender with autosuggest */}
-            <div className="mb-5 relative">
+            <div className="mb-5 relative" ref={lenderRef}>
               <label className="block text-sm font-medium mb-1">
                 Who are you currently with?{" "}
                 <span className="text-neutral-400">(optional)</span>
@@ -678,6 +809,7 @@ export default function RefinancePage() {
                 onFocus={() => setLenderFocused(true)}
                 onBlur={() => {
                   setTimeout(() => setLenderFocused(false), 120);
+                  setTimeout(() => scrollToRef(propertyRef), 120);
                 }}
                 onChange={(e) => updateField("currentLender", e.target.value)}
                 placeholder="e.g. CBA, Westpac, Macquarie"
@@ -694,6 +826,7 @@ export default function RefinancePage() {
                         e.preventDefault();
                         updateField("currentLender", name);
                         setLenderFocused(false);
+                        setTimeout(() => scrollToRef(propertyRef), 80);
                       }}
                     >
                       {name}
@@ -709,7 +842,7 @@ export default function RefinancePage() {
             {/* Sliders */}
             <div className="grid gap-5 mb-3">
               {/* Property value */}
-              <div>
+              <div ref={propertyRef}>
                 <div className="flex items-baseline justify-between mb-1">
                   <label className="text-sm font-medium">
                     Rough property value *
@@ -719,10 +852,7 @@ export default function RefinancePage() {
                   </span>
                 </div>
                 <div className="slider-wrapper">
-                  <div
-                    className="slider-bubble"
-                    style={propertyBubbleStyle}
-                  >
+                  <div className="slider-bubble" style={propertyBubbleStyle}>
                     {formatCurrency(String(propertyNum)) || "—"}
                   </div>
                   <input
@@ -750,7 +880,7 @@ export default function RefinancePage() {
               </div>
 
               {/* Amount owing */}
-              <div>
+              <div ref={balanceRef}>
                 <div className="flex items-baseline justify-between mb-1">
                   <label className="text-sm font-medium">
                     Approx. amount owing *
@@ -760,10 +890,7 @@ export default function RefinancePage() {
                   </span>
                 </div>
                 <div className="slider-wrapper">
-                  <div
-                    className="slider-bubble"
-                    style={balanceBubbleStyle}
-                  >
+                  <div className="slider-bubble" style={balanceBubbleStyle}>
                     {formatCurrency(String(balanceNum)) || "—"}
                   </div>
                   <input
@@ -789,7 +916,7 @@ export default function RefinancePage() {
               </div>
 
               {/* Repayments */}
-              <div>
+              <div ref={repaymentsRef}>
                 <div className="flex items-baseline justify-between mb-1">
                   <label className="text-sm font-medium">
                     Current monthly repayments *
@@ -799,10 +926,7 @@ export default function RefinancePage() {
                   </span>
                 </div>
                 <div className="slider-wrapper">
-                  <div
-                    className="slider-bubble"
-                    style={repayBubbleStyle}
-                  >
+                  <div className="slider-bubble" style={repayBubbleStyle}>
                     {formatCurrency(String(repayNum)) || "—"}
                   </div>
                   <input
@@ -831,7 +955,7 @@ export default function RefinancePage() {
               </div>
 
               {/* Years remaining */}
-              <div>
+              <div ref={yearsRef}>
                 <div className="flex items-baseline justify-between mb-1">
                   <label className="text-sm font-medium">
                     How many years are left on your loan term? *
@@ -839,10 +963,7 @@ export default function RefinancePage() {
                   <span className="text-sm font-semibold">{yearsNum} yrs</span>
                 </div>
                 <div className="slider-wrapper">
-                  <div
-                    className="slider-bubble"
-                    style={yearsBubbleStyle}
-                  >
+                  <div className="slider-bubble" style={yearsBubbleStyle}>
                     {yearsNum} yrs
                   </div>
                   <input
