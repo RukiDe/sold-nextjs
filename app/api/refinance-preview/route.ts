@@ -2,181 +2,220 @@
 import { NextResponse } from "next/server";
 import {
   getRefinanceFactFindByEmail,
-  updateRefinanceOptionLenders,
+  updateRefinanceOptionsForRecord,
 } from "@/lib/airtable";
-import { pickLenderOptions } from "@/lib/lenderRates";
 
-function monthlyRepayment(
-  balance: number,
-  annualRatePercent: number,
-  yearsRemaining: number
-): number {
-  const n = Math.max(1, Math.round(yearsRemaining * 12));
-  const r = annualRatePercent > 0 ? annualRatePercent / 100 / 12 : 0;
+type OptionKey = "A" | "B" | "C";
+type OwnerType = "OO" | "INV" | null;
 
-  if (r === 0) {
-    return balance / n;
-  }
+type PanelConfig = {
+  key: OptionKey;
+  lender: string;
+  baseRate: number; // headline rate p.a. before any LVR adjustment
+};
 
-  const pow = Math.pow(1 + r, n);
-  const payment = (balance * r * pow) / (pow - 1);
-  return payment;
+/**
+ * Static panel config – headline rates you tuned from lender sites.
+ * You can tweak these in one spot as they move.
+ */
+const PANEL_RATES: Record<Exclude<OwnerType, null>, PanelConfig[]> = {
+  OO: [
+    { key: "A", lender: "Great Southern Bank", baseRate: 5.20 },
+    { key: "B", lender: "Macquarie", baseRate: 5.25 },
+    { key: "C", lender: "ING", baseRate: 5.28 },
+  ],
+  INV: [
+    { key: "A", lender: "Macquarie", baseRate: 5.75 },
+    { key: "B", lender: "Ubank", baseRate: 5.85 },
+    { key: "C", lender: "AMP", baseRate: 5.95 },
+  ],
+};
+
+/**
+ * Very rough LVR-loadings.
+ * You can refine later by LVR tiers or by owner/INV.
+ */
+function adjustRateForLvr(baseRate: number, lvr: number): number {
+  if (!Number.isFinite(lvr) || lvr <= 0) return baseRate;
+  if (lvr > 90) return baseRate + 0.40;
+  if (lvr > 80) return baseRate + 0.20;
+  return baseRate;
 }
 
-function interestOverMonths(
-  balance: number,
+/**
+ * Standard mortgage repayment formula.
+ * principal: dollars
+ * annualRatePercent: p.a. percentage (e.g. 5.5)
+ * years: remaining term in years
+ */
+function monthlyRepayment(
+  principal: number,
   annualRatePercent: number,
-  yearsRemaining: number,
-  months: number
+  years: number
 ): number {
+  if (!principal || !annualRatePercent || !years) return 0;
+
   const r = annualRatePercent / 100 / 12;
-  const payment = monthlyRepayment(balance, annualRatePercent, yearsRemaining);
+  const n = years * 12;
+  if (r <= 0 || n <= 0) return 0;
 
-  let outstanding = balance;
-  let interestPaid = 0;
+  const payment = principal * (r / (1 - Math.pow(1 + r, -n)));
+  return Math.round(payment);
+}
 
-  for (let i = 0; i < months && outstanding > 0.01; i++) {
-    const interest = outstanding * r;
-    interestPaid += interest;
-    const principal = payment - interest;
-    outstanding = Math.max(outstanding - principal, 0);
-  }
+/**
+ * Safe numeric extraction from Airtable fields.
+ */
+function asNumber(value: any, fallback: number): number {
+  if (value === null || value === undefined) return fallback;
+  const n = Number(value);
+  return Number.isFinite(n) ? n : fallback;
+}
 
-  return interestPaid;
+/**
+ * Try to infer owner / investor flag from Airtable field.
+ */
+function parseOwnerType(raw: any): OwnerType {
+  if (!raw) return null;
+  const v = String(raw).toUpperCase();
+  if (v.includes("INV")) return "INV";
+  if (v.includes("OO") || v.includes("OWNER")) return "OO";
+  return null;
 }
 
 export async function POST(req: Request) {
   try {
     const body = await req.json().catch(() => ({}));
-    const email = (body.email || "").toString().trim().toLowerCase();
+    const email: string | undefined = body?.email;
 
-    if (!email || !email.includes("@")) {
+    if (!email || typeof email !== "string" || !email.includes("@")) {
       return NextResponse.json(
-        { error: "Valid email required" },
+        { error: "Valid email is required" },
         { status: 400 }
       );
     }
 
-    const factFind = await getRefinanceFactFindByEmail(email);
-
-    if (!factFind) {
+    // 1) Fetch fact find from Airtable
+    const record = await getRefinanceFactFindByEmail(email);
+    if (!record) {
       return NextResponse.json(
         { error: "Fact find not found for this email" },
         { status: 404 }
       );
     }
 
-    const {
-      recordId,
-      currentLoanBalance,
-      currentInterestRatePercent,
-      remainingTermYears,
-      propertyValue,
-      ownerOrInvestor,
-      currentMonthlyFromForm,
-    } = factFind;
+    const f = record.fields || {};
 
-    if (!currentLoanBalance || currentLoanBalance <= 0) {
-      return NextResponse.json(
-        { error: "Missing or invalid loan balance" },
-        { status: 400 }
+    const currentLoanBalance = asNumber(f["Current Loan Balance"], 0);
+    const propertyValue = asNumber(f["Property Value"], 0);
+    const currentMonthlyFromForm = asNumber(
+      f["Current Monthly Repayments"],
+      0
+    );
+    const currentRatePercent = asNumber(f["Current Interest Rate %"], 0);
+    const remainingTermYears = asNumber(f["Remaining Term (years)"], 25);
+
+    const ownerType: OwnerType = parseOwnerType(f["Owner / Investor"]);
+
+    // Derive LVR and fallback currentMonthly if missing
+    const lvr =
+      propertyValue > 0 && currentLoanBalance > 0
+        ? Math.round((currentLoanBalance / propertyValue) * 100)
+        : 0;
+
+    let currentMonthly = currentMonthlyFromForm;
+    if (!currentMonthly && currentLoanBalance && currentRatePercent) {
+      currentMonthly = monthlyRepayment(
+        currentLoanBalance,
+        currentRatePercent,
+        remainingTermYears
       );
     }
 
-    const effectiveCurrentRate =
-      currentInterestRatePercent && currentInterestRatePercent > 0
-        ? currentInterestRatePercent
-        : ownerOrInvestor === "INV"
-        ? 6.6
-        : 6.3;
+    // Safety fallback
+    if (!currentMonthly) {
+      currentMonthly = 3000;
+    }
 
-    const yearsRemaining =
-      remainingTermYears && remainingTermYears > 0 ? remainingTermYears : 25;
+    // If we can't infer owner type, default to OO.
+    const effectiveOwnerType: Exclude<OwnerType, null> =
+      ownerType || "OO";
 
-    const currentMonthlyRaw = currentMonthlyFromForm
-      ? Number(currentMonthlyFromForm)
-      : monthlyRepayment(currentLoanBalance, effectiveCurrentRate, yearsRemaining);
+    const panelConfigs = PANEL_RATES[effectiveOwnerType];
 
-    const currentMonthly = Math.round(currentMonthlyRaw);
-
-    const lvr =
-      propertyValue && propertyValue > 0
-        ? (currentLoanBalance / propertyValue) * 100
-        : null;
-
-    const { optionA, optionB, optionC } = pickLenderOptions({
-      ownerOrInvestor: ownerOrInvestor || undefined,
-      lvr,
-    });
-
-    const optionsInternal = [optionA, optionB, optionC].map((opt) => {
-      const newMonthlyRaw = monthlyRepayment(
+    // 2) Build A/B/C options
+    const optionsWithLenders = panelConfigs.map((cfg) => {
+      const adjRate = adjustRateForLvr(cfg.baseRate, lvr);
+      const newMonthly = monthlyRepayment(
         currentLoanBalance,
-        opt.indicativeRate,
-        yearsRemaining
+        adjRate,
+        remainingTermYears
       );
-      const newMonthly = Math.round(newMonthlyRaw);
-
-      const monthlySaving = Math.max(currentMonthly - newMonthly, 0);
-
-      const currentInterest5 = interestOverMonths(
-        currentLoanBalance,
-        effectiveCurrentRate,
-        yearsRemaining,
-        60
-      );
-      const newInterest5 = interestOverMonths(
-        currentLoanBalance,
-        opt.indicativeRate,
-        yearsRemaining,
-        60
-      );
-      const interestSaved5 = Math.max(currentInterest5 - newInterest5, 0);
+      const monthlySaving = Math.max(0, currentMonthly - newMonthly);
+      const interestSaved5 =
+        monthlySaving > 0 ? monthlySaving * 12 * 5 : 0;
 
       return {
-        key: opt.key,
-        indicativeRate: opt.indicativeRate,
+        key: cfg.key as OptionKey,
+        lenderName: cfg.lender,
+        indicativeRate: adjRate,
         newMonthly,
         monthlySaving,
         interestSaved5,
-        lenderName: opt.lenderName,
       };
     });
 
-    const maxMonthlySaving = Math.max(
-      ...optionsInternal.map((o) => o.monthlySaving)
-    );
+    // 3) Decide "best" option and whether they're on a good wicket
+    let bestOptionKey: "A" | "B" | "C" | "none" = "none";
+    let isOnGoodWicket = false;
 
-    // If there's genuinely no saving, we still return options,
-    // but flag it so the UI can switch to the "good wicket" message.
-    const isOnGoodWicket = maxMonthlySaving <= 0;
+    if (optionsWithLenders.length === 3) {
+      const sortedByMonthly = [...optionsWithLenders].sort(
+        (a, b) => a.newMonthly - b.newMonthly
+      );
+      const best = sortedByMonthly[0];
 
-    // Store which lenders were shown (for you in Airtable)
-    await updateRefinanceOptionLenders({
-      recordId,
-      optionALenderName: optionsInternal[0].lenderName,
-      optionBLenderName: optionsInternal[1].lenderName,
-      optionCLenderName: optionsInternal[2].lenderName,
-    });
+      bestOptionKey = best.key;
 
+      // If the best option only saves less than ~$50/m or is worse, treat as "good wicket"
+      const bestSaving = currentMonthly - best.newMonthly;
+      if (bestSaving <= 50) {
+        isOnGoodWicket = true;
+      }
+    }
+
+    // 4) Fire-and-forget: stamp options back into Airtable for broker console
+    if (record.id && optionsWithLenders.length === 3) {
+      void updateRefinanceOptionsForRecord(record.id, {
+        bestOptionKey,
+        isOnGoodWicket,
+        options: optionsWithLenders.map((o) => ({
+          key: o.key,
+          lender: o.lenderName,
+          indicativeRate: o.indicativeRate,
+          newMonthly: o.newMonthly,
+          monthlySaving: o.monthlySaving,
+        })),
+      });
+    }
+
+    // 5) Response payload for the front-end
     return NextResponse.json({
-      success: true,
       currentMonthly,
-      ownerOrInvestor: ownerOrInvestor || null,
-      lvr,
+      ownerOrInvestor: ownerType, // "OO" | "INV" | null
       isOnGoodWicket,
-      options: optionsInternal.map((opt) => ({
-        key: opt.key,
-        indicativeRate: opt.indicativeRate,
-        newMonthly: opt.newMonthly,
-        monthlySaving: opt.monthlySaving,
-        interestSaved5: opt.interestSaved5,
+      options: optionsWithLenders.map((o) => ({
+        key: o.key,
+        indicativeRate: o.indicativeRate,
+        newMonthly: o.newMonthly,
+        monthlySaving: o.monthlySaving,
+        interestSaved5: o.interestSaved5,
       })),
     });
   } catch (err: any) {
-    console.error("[/api/refinance-preview] Error", err);
+    console.error("[/api/refinance-preview] Server error:", err);
     return NextResponse.json(
-      { error: "Server error", details: err?.message },
+      { error: "Server error", details: err?.message || String(err) },
       { status: 500 }
     );
   }

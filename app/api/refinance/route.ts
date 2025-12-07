@@ -2,13 +2,20 @@
 import { NextResponse } from "next/server";
 import { createRefinanceFactFindRecord } from "@/lib/airtable";
 
-const BREVO_API_KEY = process.env.BREVO_API_KEY!;
+const BREVO_API_KEY = process.env.BREVO_API_KEY || "";
 const REFI_LIST_ID = process.env.BREVO_REFI_LIST_ID
   ? Number(process.env.BREVO_REFI_LIST_ID)
   : undefined;
 
 // 🔧 Shared Brevo upsert helper
 async function upsertBrevoContact(payload: any) {
+  if (!BREVO_API_KEY) {
+    console.warn(
+      "[/api/refinance] BREVO_API_KEY missing – skipping Brevo contact upsert"
+    );
+    return { ok: false, data: null };
+  }
+
   const res = await fetch("https://api.brevo.com/v3/contacts", {
     method: "POST",
     headers: {
@@ -18,7 +25,7 @@ async function upsertBrevoContact(payload: any) {
     body: JSON.stringify(payload),
   });
 
-  const data = await res.json();
+  const data = await res.json().catch(() => ({}));
 
   if (!res.ok) {
     console.error("[/api/refinance] Brevo upsert error:", data);
@@ -35,113 +42,87 @@ export async function POST(req: Request) {
       email,
       preferredName,
       currentLender,
-      refinancingFor,
-      loanType,
+      refinancingFor, // OO / INV buttons
+      loanType,       // "Fixed" | "Variable" | "Split"
       rate,
       balance,
       repayments,
       termRemaining,
       propertyValue,
 
-      // NEW FROM FRONTEND
+      // step 0 goal
+      goal, // e.g. "Lower my repayments", "Pay the loan off sooner", etc.
+
+      // joint vs single
       applicationType, // "single" | "joint"
       partnerName,
       partnerEmail,
     } = body;
 
-    // ----------------------------------------------------
-    // Persist fact find to Airtable as system of record
-    // ----------------------------------------------------
-    if (email && balance) {
-      const currentLoanBalance = Number(balance) || 0;
-      const currentInterestRatePercent = Number(rate) || 0;
-      const remainingTermYears = Number(termRemaining) || 30;
-      const numericPropertyValue =
-        propertyValue !== undefined && propertyValue !== null
-          ? Number(propertyValue)
-          : null;
-
-      // derive OO / INV from refinancingFor
-      let ownerOrInvestor: "OO" | "INV" | null = null;
-      if (Array.isArray(refinancingFor)) {
-        if (
-          refinancingFor.some((v: any) =>
-            String(v).toLowerCase().includes("invest")
-          )
-        ) {
-          ownerOrInvestor = "INV";
-        } else if (
-          refinancingFor.some((v: any) =>
-            String(v).toLowerCase().includes("owner")
-          )
-        ) {
-          ownerOrInvestor = "OO";
-        }
-      }
-
-      // derive P&I / IO from loanType
-      let loanTypeSingle: "P&I" | "IO" | null = null;
-      if (Array.isArray(loanType)) {
-        if (
-          loanType.some((v: any) =>
-            String(v).toLowerCase().includes("interest only")
-          )
-        ) {
-          loanTypeSingle = "IO";
-        } else if (
-          loanType.some((v: any) =>
-            String(v).toLowerCase().includes("principal")
-          )
-        ) {
-          loanTypeSingle = "P&I";
-        }
-      }
-
-      const numericRepayments = repayments
-        ? Number(String(repayments).replace(/[^\d.]/g, ""))
-        : null;
-
-      // fire-and-forget; Airtable errors shouldn't break user flow
-      void createRefinanceFactFindRecord({
-        email: String(email).trim().toLowerCase(),
-        preferredName: preferredName || "",
-        goal: "", // if you later capture "goal" on the form, pass it through here
-        currentLoanBalance,
-        currentMonthlyRepayments: numericRepayments,
-        currentInterestRatePercent,
-        remainingTermYears,
-        propertyValue: numericPropertyValue,
-        ownerOrInvestor,
-        loanType: loanTypeSingle,
-        currentLender,
-        source: "refinance2-form",
-      });
+    if (!email || typeof email !== "string" || !email.includes("@")) {
+      return NextResponse.json(
+        { error: "Valid email is required" },
+        { status: 400 }
+      );
     }
 
-    // If Brevo isn't configured, still treat as success (Airtable has the data)
+    const isJoint = applicationType === "joint";
+
+    /* ---------------------------------------------------------------------- */
+    /*                            AIRTABLE WRITE                               */
+    /* ---------------------------------------------------------------------- */
+
+    // Fire-and-forget: Airtable errors shouldn’t block the user
+    void createRefinanceFactFindRecord({
+      email: String(email).trim().toLowerCase(),
+      preferredName: preferredName || null,
+      goal: goal || null,
+
+      currentLoanBalance: balance,
+      currentMonthlyRepayments: repayments,
+      currentInterestRatePercent: rate,
+      remainingTermYears: termRemaining,
+      propertyValue,
+
+      ownerOrInvestor: refinancingFor, // "Owner Occupier" / "Investment Property"
+      loanTypes: loanType,             // "Fixed" | "Variable" | "Split"
+
+      currentLender,
+      source: "refinance2-form",
+
+      applicationType,
+      partnerName,
+      partnerEmail,
+    });
+
+    /* ---------------------------------------------------------------------- */
+    /*                             BREVO CONTACTS                              */
+    /* ---------------------------------------------------------------------- */
+
     if (!BREVO_API_KEY) {
-      console.warn(
-        "[/api/refinance] BREVO_API_KEY missing – skipping Brevo call"
-      );
+      // We still consider the request a success; we just didn’t touch Brevo
       return NextResponse.json({
         success: true,
         skippedBrevo: true,
       });
     }
 
-    const isJoint = applicationType === "joint";
-
     //
-    // ----------------------------------------------------
-    // PRIMARY APPLICANT PAYLOAD (Brevo)
-    // ----------------------------------------------------
+    // PRIMARY APPLICANT
     //
     const primaryAttributes: Record<string, any> = {
-      // 📌 Existing attributes
       FIRSTNAME: preferredName || "",
       CURRENTLENDER: currentLender || "",
-      OWNERORINVESTOR: Array.isArray(refinancingFor) ? refinancingFor : [],
-      LOANTYPE: Array.isArray(loanType) ? loanType : [],
+      OWNERORINVESTOR: Array.isArray(refinancingFor)
+        ? refinancingFor
+        : refinancingFor
+        ? [refinancingFor]
+        : [],
+      LOANTYPE: Array.isArray(loanType)
+        ? loanType
+        : loanType
+        ? [loanType]
+        : [],
       CURRENTRATE: rate || "",
       CURRENTLOANBALANCE: balance || "",
       MONTHLYREPAYMENTS: repayments || "",
@@ -149,11 +130,11 @@ export async function POST(req: Request) {
       PROPERTYVALUE: propertyValue || "",
       FACT_FIND_COMPLETE: true,
 
-      // 📌 Joint logic
       APPLICATION_TYPE: isJoint ? "Joint" : "Single",
       APPLICANT_ROLE: "primary",
       PARTNER_EMAIL: isJoint ? partnerEmail : null,
       DIGITAL_FACT_FIND_SENT: false,
+      GOAL: goal || "",
     };
 
     const primaryPayload: any = {
@@ -162,14 +143,14 @@ export async function POST(req: Request) {
       updateEnabled: true,
     };
 
-    if (REFI_LIST_ID) primaryPayload.listIds = [REFI_LIST_ID];
+    if (REFI_LIST_ID) {
+      primaryPayload.listIds = [REFI_LIST_ID];
+    }
 
     await upsertBrevoContact(primaryPayload);
 
     //
-    // ----------------------------------------------------
-    // CO-APPLICANT (ONLY IF JOINT)
-    // ----------------------------------------------------
+    // CO-APPLICANT (only if joint)
     //
     if (isJoint && partnerEmail) {
       const coAttributes: Record<string, any> = {
@@ -188,7 +169,9 @@ export async function POST(req: Request) {
         updateEnabled: true,
       };
 
-      if (REFI_LIST_ID) coPayload.listIds = [REFI_LIST_ID];
+      if (REFI_LIST_ID) {
+        coPayload.listIds = [REFI_LIST_ID];
+      }
 
       await upsertBrevoContact(coPayload);
     }
@@ -197,7 +180,7 @@ export async function POST(req: Request) {
   } catch (err: any) {
     console.error("[/api/refinance] Server error:", err);
     return NextResponse.json(
-      { error: "Server error", details: err.message },
+      { error: "Server error", details: err?.message || String(err) },
       { status: 500 }
     );
   }
