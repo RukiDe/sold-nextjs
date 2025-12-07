@@ -958,7 +958,7 @@ export default function RefinancePage() {
               <div ref={yearsRef}>
                 <div className="flex items-baseline justify-between mb-1">
                   <label className="text-sm font-medium">
-                    How many years are left on your loan term? *
+                    How many years are left on your loan? *
                   </label>
                   <span className="text-sm font-semibold">{yearsNum} yrs</span>
                 </div>

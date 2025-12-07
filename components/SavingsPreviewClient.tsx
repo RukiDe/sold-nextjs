@@ -102,6 +102,7 @@ export default function SavingsPreviewClient({ email }: Props) {
               : null
           );
           setIsOnGoodWicket(!!data.isOnGoodWicket);
+          // small delay so fade-in is noticeable
           requestAnimationFrame(() => setShowContent(true));
         }
       } catch (err: any) {
@@ -144,6 +145,8 @@ export default function SavingsPreviewClient({ email }: Props) {
     maxInterestSaved5 = Math.max(...options!.map((o) => o.interestSaved5));
   }
 
+  const showGoodWicket = hasOptions && (isOnGoodWicket || maxMonthlySaving <= 0);
+
   const heading =
     ownerType === "INV"
       ? "A quick look at how your investment loan could perform"
@@ -154,17 +157,19 @@ export default function SavingsPreviewClient({ email }: Props) {
       ? "These are high-level estimates based on what you just shared about your investment loan."
       : "These are high-level estimates based on what you just shared about your home loan.";
 
-  const showGoodWicket = hasOptions && (isOnGoodWicket || maxMonthlySaving <= 0);
-
   return (
     <section className="mt-16">
-      <h2 className="text-2xl sm:text-3xl font-semibold text-[#0B0F1B] mb-3">
-        {heading}
-      </h2>
-
-      <p className="text-[15px] sm:text-[16px] text-[#4A5563] max-w-3xl mb-6">
-        {subheading}
-      </p>
+      {/* Hide main heading/subheading when they're already on a good wicket */}
+      {!showGoodWicket && (
+        <>
+          <h2 className="text-2xl sm:text-3xl font-semibold text-[#0B0F1B] mb-3">
+            {heading}
+          </h2>
+          <p className="text-[15px] sm:text-[16px] text-[#4A5563] max-w-3xl mb-6">
+            {subheading}
+          </p>
+        </>
+      )}
 
       {loading && !options && !error && (
         <div className="grid gap-6 lg:grid-cols-3 mb-8">
@@ -180,6 +185,7 @@ export default function SavingsPreviewClient({ email }: Props) {
         </div>
       )}
 
+      {/* GOOD WICKET STATE */}
       {showGoodWicket && (
         <div className="mb-8 rounded-3xl border border-[#E5E7EB] bg-[#F9FAFB] px-6 py-6 sm:px-8 sm:py-8">
           <h3 className="text-lg font-semibold text-[#111827] mb-3">
@@ -205,12 +211,14 @@ export default function SavingsPreviewClient({ email }: Props) {
         </div>
       )}
 
+      {/* NORMAL SAVINGS STATE */}
       {hasOptions && !showGoodWicket && (
         <div
           className={`transition-opacity duration-500 ${
             showContent ? "opacity-100" : "opacity-0"
           }`}
         >
+          {/* Summary + savings chips */}
           {bestOption && maxMonthlySaving > 0 && (
             <div className="mb-6 space-y-3 text-sm text-[#4B5563]">
               <div>
@@ -248,6 +256,7 @@ export default function SavingsPreviewClient({ email }: Props) {
             </div>
           )}
 
+          {/* OPTION CARDS */}
           <div className="grid gap-6 lg:grid-cols-3 mb-8">
             {options!.map((opt) => {
               const titleOO =
@@ -347,8 +356,9 @@ export default function SavingsPreviewClient({ email }: Props) {
             These options are based on our panel of lenders as at{" "}
             <span className="font-medium">{todayString}</span>. We&apos;re not
             showing lender names here — we&apos;ll go through the actual options
-            together and talk through what&apos;s in your best interests. All applications 
-            subject to lending criteria and rates are subject to change. 
+            together and talk through what&apos;s in your best interests. All
+            applications are subject to lending criteria and rates are subject
+            to change.
           </p>
 
           <section className="space-y-6 text-[17px] leading-relaxed text-[#1F2933] mb-8">
