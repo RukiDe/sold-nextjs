@@ -13,6 +13,9 @@ body {
   /* Prevent header/footer cut-off on mobile Safari */
   padding-top: env(safe-area-inset-top);
   padding-bottom: calc(env(safe-area-inset-bottom) + 16px);
+
+  /* Stop annoying sideways scroll on mobile */
+  overflow-x: hidden;
 }
 
 @supports not (padding-bottom: env(safe-area-inset-bottom)) {
@@ -107,13 +110,14 @@ input[type="range"]::-moz-range-thumb:active {
 
 .slider-wrapper {
   position: relative;
-  padding-top: 2.5rem; /* More space so bubble doesn’t overlap question text */
+  /* More space so bubble doesn’t overlap the question text */
+  padding-top: 2.5rem;
 }
 
 /* Bubble styling */
 .slider-bubble {
   position: absolute;
-  top: 1.2rem; /* lower bubble closer to track */
+  top: 1.2rem; /* pull bubble down closer to the track */
   left: var(--bubble-left, 50%);
   transform: translateX(-50%);
   padding: 0.3rem 0.75rem;

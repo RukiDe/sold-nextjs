@@ -269,7 +269,6 @@ export default function RefinancePage() {
         }
         const partnerEmailError = validateEmailDetailed(form.partnerEmail);
         if (partnerEmailError) {
-          // tweak copy slightly
           newErrors.partnerEmail = partnerEmailError.replace(
             "your email",
             "your partner’s email"
@@ -313,16 +312,15 @@ export default function RefinancePage() {
   const goNext = () => {
     if (!validateStep(step)) return;
     if (step < 2) {
-      const nextStep = ((step + 1) as Step);
+      const nextStep = (step + 1) as Step;
       setStep(nextStep);
-      // let the DOM update first then scroll
       setTimeout(() => scrollToStepHeader(nextStep), 80);
     }
   };
 
   const goBack = () => {
     if (step > 0) {
-      const prevStep = ((step - 1) as Step);
+      const prevStep = (step - 1) as Step;
       setStep(prevStep);
       setTimeout(() => scrollToStepHeader(prevStep), 80);
     }
@@ -378,7 +376,6 @@ export default function RefinancePage() {
         // ignore if confetti fails
       }
 
-      // small pause so they actually see it
       setTimeout(() => {
         window.location.href = `/refinance2-success?email=${encodeURIComponent(
           form.email.trim()
@@ -504,7 +501,7 @@ export default function RefinancePage() {
         </p>
       </header>
 
-      <section className="bg-white border border-neutral-200 rounded-2xl p-4 sm:p-6 shadow-sm">
+      <section className="bg-white border border-neutral-200 rounded-2xl p-4 sm:p-6 shadow-sm overflow-hidden">
         {renderProgress()}
 
         {reassurance}
@@ -529,7 +526,6 @@ export default function RefinancePage() {
                     type="button"
                     onClick={() => {
                       updateField("goal", option);
-                      // auto-advance once they tap a goal
                       setTimeout(() => {
                         setStep(1);
                         setTimeout(() => scrollToStepHeader(1), 80);
@@ -865,9 +861,11 @@ export default function RefinancePage() {
                     className="w-full"
                   />
                 </div>
-                <div className="flex justify-between text-[10px] text-neutral-500 mt-1">
-                  <span>{formatCurrency(String(PROPERTY_MIN))}</span>
-                  <span>{formatCurrency(String(PROPERTY_MAX))}+</span>
+                <div className="flex justify-start text-[10px] text-neutral-500 mt-1">
+                  <span>
+                    {formatCurrency(String(PROPERTY_MIN))}–
+                    {formatCurrency(String(PROPERTY_MAX))}+
+                  </span>
                 </div>
                 <p className="mt-1 text-xs text-neutral-500">
                   This helps estimate your equity in the property.
@@ -893,7 +891,7 @@ export default function RefinancePage() {
                   <div className="slider-bubble" style={balanceBubbleStyle}>
                     {formatCurrency(String(balanceNum)) || "—"}
                   </div>
-                  <input
+                <input
                     type="range"
                     min={BALANCE_MIN}
                     max={BALANCE_MAX}
@@ -903,9 +901,11 @@ export default function RefinancePage() {
                     className="w-full"
                   />
                 </div>
-                <div className="flex justify-between text-[10px] text-neutral-500 mt-1">
-                  <span>{formatCurrency(String(BALANCE_MIN))}</span>
-                  <span>{formatCurrency(String(BALANCE_MAX))}+</span>
+                <div className="flex justify-start text-[10px] text-neutral-500 mt-1">
+                  <span>
+                    {formatCurrency(String(BALANCE_MIN))}–
+                    {formatCurrency(String(BALANCE_MAX))}+
+                  </span>
                 </div>
                 <p className="mt-1 text-xs text-neutral-500">
                   A ballpark is plenty — we&apos;ll refine this later.
@@ -939,9 +939,11 @@ export default function RefinancePage() {
                     className="w-full"
                   />
                 </div>
-                <div className="flex justify-between text-[10px] text-neutral-500 mt-1">
-                  <span>{formatCurrency(String(REPAY_MIN))}</span>
-                  <span>{formatCurrency(String(REPAY_MAX))}+</span>
+                <div className="flex justify-start text-[10px] text-neutral-500 mt-1">
+                  <span>
+                    {formatCurrency(String(REPAY_MIN))}–
+                    {formatCurrency(String(REPAY_MAX))}+
+                  </span>
                 </div>
                 <p className="mt-1 text-xs text-neutral-500">
                   You can use a rough figure — we&apos;re just sizing the
@@ -976,9 +978,10 @@ export default function RefinancePage() {
                     className="w-full"
                   />
                 </div>
-                <div className="flex justify-between text-[10px] text-neutral-500 mt-1">
-                  <span>{YEARS_MIN} yrs</span>
-                  <span>{YEARS_MAX}+ yrs</span>
+                <div className="flex justify-start text-[10px] text-neutral-500 mt-1">
+                  <span>
+                    {YEARS_MIN}–{YEARS_MAX}+ yrs
+                  </span>
                 </div>
                 <p className="mt-1 text-xs text-neutral-500">
                   A guess is fine — we just need a sense of how far through the
@@ -1013,7 +1016,7 @@ export default function RefinancePage() {
                   "inline-flex items-center justify-center px-5 py-2.5 rounded-full text-sm font-semibold border transition-colors",
                   submitting
                     ? "bg-neutral-400 text-white border-neutral-400 cursor-not-allowed"
-                    : "bg-black text-white border-black hover:bg-white hover:text-black"
+                    : "bg-black text-white border-black hover:bg:white hover:text-black"
                 )}
               >
                 {submitting ? "Sending..." : ctaLabel}
