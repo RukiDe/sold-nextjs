@@ -195,21 +195,29 @@ function computeOptions(input: {
   const baseRatesOO = [5.2, 5.25, 5.28];
   const baseRatesINV = [5.6, 5.7, 5.8]; // adjust if you have specific investor rates
 
-  const rateSet = ownerType === "INV" ? baseRatesINV : baseRatesOO;
+const rateSet = ownerType === "INV" ? baseRatesINV : baseRatesOO;
 
-  const options: SavingsOption[] = ["A", "B", "C"].map((key, idx) => {
-    const indicativeRate = rateSet[idx];
-    const newMonthly = monthlyRepayment(balance, indicativeRate, yearsRemaining);
-    const monthlySaving = Math.max(0, currentMonthly - newMonthly);
-    const interestSaved5 = monthlySaving > 0 ? monthlySaving * 60 : 0;
-    return {
-      key,
-      indicativeRate,
-      newMonthly,
-      monthlySaving,
-      interestSaved5,
-    };
-  });
+// Make sure TypeScript knows these are the literal keys "A" | "B" | "C"
+const optionKeys: SavingsOption["key"][] = ["A", "B", "C"];
+
+const options: SavingsOption[] = optionKeys.map((key, idx) => {
+  const indicativeRate = rateSet[idx];
+  const newMonthly = monthlyRepayment(balance, indicativeRate, yearsRemaining);
+  const monthlySaving = Math.max(0, currentMonthly - newMonthly);
+  const interestSaved5 = interestOverFiveYears(
+    balance,
+    currentRate,
+    indicativeRate
+  );
+
+  return {
+    key,
+    indicativeRate,
+    newMonthly,
+    monthlySaving,
+    interestSaved5,
+  };
+});
 
   const maxSaving = Math.max(...options.map((o) => o.monthlySaving));
   const isOnGoodWicket = !isFinite(maxSaving) || maxSaving <= 0;
