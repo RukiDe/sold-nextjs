@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import type { RefObject } from "react";
 import confetti from "canvas-confetti";
 
 type Step = 0 | 1 | 2;
@@ -195,29 +196,27 @@ function computeOptions(input: {
   const baseRatesOO = [5.2, 5.25, 5.28];
   const baseRatesINV = [5.6, 5.7, 5.8]; // adjust if you have specific investor rates
 
-const rateSet = ownerType === "INV" ? baseRatesINV : baseRatesOO;
+  const rateSet = ownerType === "INV" ? baseRatesINV : baseRatesOO;
 
-// Make sure TypeScript knows these are the literal keys "A" | "B" | "C"
-const optionKeys: SavingsOption["key"][] = ["A", "B", "C"];
+  // Make sure TypeScript knows these are the literal keys "A" | "B" | "C"
+  const optionKeys: SavingsOption["key"][] = ["A", "B", "C"];
 
-const options: SavingsOption[] = optionKeys.map((key, idx) => {
-  const indicativeRate = rateSet[idx];
-  const newMonthly = monthlyRepayment(balance, indicativeRate, yearsRemaining);
-  const monthlySaving = Math.max(0, currentMonthly - newMonthly);
-  const interestSaved5 = interestOverFiveYears(
-    balance,
-    currentRate,
-    indicativeRate
-  );
+  const options: SavingsOption[] = optionKeys.map((key, idx) => {
+    const indicativeRate = rateSet[idx];
+    const newMonthly = monthlyRepayment(balance, indicativeRate, yearsRemaining);
+    const monthlySaving = Math.max(0, currentMonthly - newMonthly);
 
-  return {
-    key,
-    indicativeRate,
-    newMonthly,
-    monthlySaving,
-    interestSaved5,
-  };
-});
+    // Simple 5-year saving approximation (repayment difference over 60 months)
+    const interestSaved5 = Math.max(0, monthlySaving * 60);
+
+    return {
+      key,
+      indicativeRate,
+      newMonthly,
+      monthlySaving,
+      interestSaved5,
+    };
+  });
 
   const maxSaving = Math.max(...options.map((o) => o.monthlySaving));
   const isOnGoodWicket = !isFinite(maxSaving) || maxSaving <= 0;
@@ -257,7 +256,7 @@ export default function RefinanceXmasPage() {
   const partnerNameRef = useRef<HTMLDivElement | null>(null);
   const partnerEmailRef = useRef<HTMLDivElement | null>(null);
 
-  const scrollToRef = (ref: React.RefObject<HTMLDivElement> | null) => {
+  const scrollToRef = (ref: RefObject<HTMLDivElement> | null) => {
     if (!ref?.current) return;
     ref.current.scrollIntoView({ behavior: "smooth", block: "start" });
   };
@@ -1057,7 +1056,7 @@ export default function RefinanceXmasPage() {
                 <h2 className="text-xl sm:text-2xl font-semibold mb-2">
                   {heading}
                 </h2>
-                <p className="text-[15px] sm:text-[16px] text-neutral-600 max-w-3xl mb-4">
+                <p className="text-[15px] sm:text[16px] text-neutral-600 max-w-3xl mb-4">
                   {subheading}
                 </p>
 
