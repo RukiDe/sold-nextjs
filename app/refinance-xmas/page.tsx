@@ -352,16 +352,10 @@ export default function RefinanceXmasPage() {
       }
     }
 
-    // Step 1 – loan details
+    // Step 1 – loan details (minimal version)
     if (s === 1) {
       if (form.ownerOrInvestor.length === 0) {
         newErrors.ownerOrInvestor = "Pick at least one option.";
-      }
-      if (form.loanTypes.length === 0) {
-        newErrors.loanTypes = "Pick at least one loan type.";
-      }
-      if (!form.propertyValue.trim()) {
-        newErrors.propertyValue = "Add an approximate property value.";
       }
       if (!form.balance.trim()) {
         newErrors.balance = "Add roughly how much you still owe.";
@@ -572,29 +566,15 @@ export default function RefinanceXmasPage() {
   ];
 
   const ownerOptions = ["Owner Occupier", "Investment Property"];
-  const loanTypeOptions = ["Fixed", "Variable", "Split"];
-
-  const lenderSuggestions =
-    form.currentLender && lenderFocused
-      ? LENDERS.filter((name) =>
-          name.toLowerCase().startsWith(form.currentLender.toLowerCase())
-        ).slice(0, 6)
-      : [];
 
   const ctaLabel = getCtaLabel(form.goal);
 
-  // Slider numbers
-  const propertyNum = safeNumber(form.propertyValue, 850000);
+  // Slider numbers (minimal set)
   const balanceNum = safeNumber(form.balance, 520000);
   const repayNum = safeNumber(form.repayments, 2450);
   const yearsNum = safeNumber(form.yearsRemaining, 25);
 
   // Slider bubble styles
-  const propertyBubbleStyle = getSliderBubbleStyle(
-    propertyNum,
-    PROPERTY_MIN,
-    PROPERTY_MAX
-  );
   const balanceBubbleStyle = getSliderBubbleStyle(
     balanceNum,
     BALANCE_MIN,
@@ -742,13 +722,14 @@ export default function RefinanceXmasPage() {
           </div>
         )}
 
-        {/* STEP 1 – loan details + sliders */}
+        {/* STEP 1 – loan details + minimal sliders */}
         {step === 1 && (
           <div ref={loanStepRef}>
             <h2 className="text-xl sm:text-2xl font-semibold mb-4">
               A few details about your loan
             </h2>
 
+            {/* Owner/investor chips */}
             <div className="mb-4" ref={ownerRef}>
               <p className="text-sm font-medium mb-2">
                 Are you refinancing for an *
@@ -782,119 +763,8 @@ export default function RefinanceXmasPage() {
               )}
             </div>
 
-            <div className="mb-4" ref={loanTypeRef}>
-              <p className="text-sm font-medium mb-2">
-                What type of loan do you currently have? *
-              </p>
-              <div className="flex flex-wrap gap-3">
-                {loanTypeOptions.map((option) => {
-                  const active = form.loanTypes.includes(option);
-                  const errorState = !!errors.loanTypes;
-                  return (
-                    <button
-                      key={option}
-                      type="button"
-                      onClick={() => toggleMulti("loanTypes", option)}
-                      className={classNames(
-                        "px-4 py-2 rounded-full text-sm border transition-colors",
-                        active
-                          ? "bg-black text-white border-black"
-                          : "bg-white text-neutral-800 border-neutral-300 hover:border-neutral-500",
-                        errorState && !active && "border-red-400"
-                      )}
-                    >
-                      {option}
-                    </button>
-                  );
-                })}
-              </div>
-              {errors.loanTypes && (
-                <p className="mt-1 text-xs text-red-600">{errors.loanTypes}</p>
-              )}
-            </div>
-
-            {/* Lender with autosuggest */}
-            <div className="mb-5 relative" ref={lenderRef}>
-              <label className="block text-sm font-medium mb-1">
-                Who are you currently with?{" "}
-                <span className="text-neutral-400">(optional)</span>
-              </label>
-              <input
-                type="text"
-                value={form.currentLender}
-                onFocus={() => setLenderFocused(true)}
-                onBlur={() => {
-                  setTimeout(() => setLenderFocused(false), 120);
-                }}
-                onChange={(e) => updateField("currentLender", e.target.value)}
-                placeholder="e.g. CBA, Westpac, Macquarie"
-                className="w-full rounded-full border border-neutral-300 px-4 py-2.5 text-sm sm:text-base outline-none focus:border-black"
-              />
-              {lenderSuggestions.length > 0 && (
-                <div className="absolute z-10 mt-1 w-full bg-white border border-neutral-200 rounded-xl shadow-sm text-sm max-h-48 overflow-auto">
-                  {lenderSuggestions.map((name) => (
-                    <button
-                      key={name}
-                      type="button"
-                      className="w-full text-left px-4 py-2 hover:bg-neutral-50"
-                      onMouseDown={(e) => {
-                        e.preventDefault();
-                        updateField("currentLender", name);
-                        setLenderFocused(false);
-                      }}
-                    >
-                      {name}
-                    </button>
-                  ))}
-                </div>
-              )}
-              <p className="mt-1 text-xs text-neutral-500">
-                This just helps us sense-check your current deal.
-              </p>
-            </div>
-
-            {/* Sliders */}
+            {/* Minimal sliders */}
             <div className="grid gap-5 mb-3">
-              {/* Property value */}
-              <div ref={propertyRef}>
-                <div className="flex items-baseline justify-between mb-1">
-                  <label className="text-sm font-medium">
-                    Rough property value *
-                  </label>
-                  <span className="text-sm font-semibold">
-                    {formatCurrencyNumber(propertyNum) || "—"}
-                  </span>
-                </div>
-                <div className="slider-wrapper">
-                  <div className="slider-bubble" style={propertyBubbleStyle}>
-                    {formatCurrencyNumber(propertyNum) || "—"}
-                  </div>
-                  <input
-                    type="range"
-                    min={PROPERTY_MIN}
-                    max={PROPERTY_MAX}
-                    step={PROPERTY_STEP}
-                    value={propertyNum}
-                    onChange={handleSliderChange("propertyValue")}
-                    className="w-full"
-                  />
-                </div>
-                <div className="flex justify-start text-[10px] text-neutral-500 mt-1">
-                  <span>
-                    {formatCurrencyNumber(PROPERTY_MIN)}–{" "}
-                    {formatCurrencyNumber(PROPERTY_MAX)}+
-                  </span>
-                </div>
-                <p className="mt-1 text-xs text-neutral-500">
-                  This helps estimate your equity in the property.
-                </p>
-                {errors.propertyValue && (
-                  <p className="mt-1 text-xs text-red-600">
-                    {errors.propertyValue}
-                  </p>
-                )}
-              </div>
-
               {/* Amount owing */}
               <div ref={balanceRef}>
                 <div className="flex items-baseline justify-between mb-1">
@@ -1064,13 +934,13 @@ export default function RefinanceXmasPage() {
                   <div className="mb-6 space-y-3 text-sm text-neutral-700">
                     <div>
                       Your lowest repayment option is{" "}
-                      <span className="font-medium">
-                        {formatCurrencyNumber(bestOption.newMonthly)}
-                      </span>
+                        <span className="font-medium">
+                          {formatCurrencyNumber(bestOption.newMonthly)}
+                        </span>
                       , which is around{" "}
-                      <span className="font-medium">
-                        {formatCurrencyNumber(maxMonthlySaving)}
-                      </span>{" "}
+                        <span className="font-medium">
+                          {formatCurrencyNumber(maxMonthlySaving)}
+                        </span>{" "}
                       less per month than what you&apos;re paying now (before
                       any fees or changes are confirmed).
                     </div>
