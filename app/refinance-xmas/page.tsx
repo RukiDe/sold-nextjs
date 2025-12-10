@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 import type { RefObject } from "react";
 import confetti from "canvas-confetti";
 import { track } from "@vercel/analytics";
+import Image from "next/image";
 
 type Step = 0 | 1 | 2;
 type ApplicationType = "single" | "joint";
@@ -951,36 +952,45 @@ export default function RefinanceXmasPage() {
                 </p>
 
                 {/* Award badges strip */}
-                <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-[11px] sm:text-xs text-neutral-500 mb-4">
-                  <span className="uppercase tracking-[0.18em] text-neutral-400">
-                    OUR LENDER PANEL
-                  </span>
-                  <span className="inline-flex items-center rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1">
-                    <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                    50+ home loan lenders
-                  </span>
-                  <span className="inline-flex items-center rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1">
-                    Mozo Experts Choice winners
-                  </span>
-                  <span className="inline-flex items-center rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1">
-                    Finder home loan award winners
-                  </span>
-                  <span className="inline-flex items-center rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1">
-                    Canstar outstanding value lenders
-                  </span>
+                <div className="mt-1 mb-5">
+                  <div className="text-[11px] sm:text-xs uppercase tracking-[0.18em] text-neutral-400 mb-1">
+                    OUR LENDER PANEL INCLUDES AWARD WINNERS FROM
+                  </div>
+                  <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+                    <Image
+                      src="/Mozo.png"
+                      alt="Mozo Experts Choice awards"
+                      width={90}
+                      height={32}
+                      className="h-14 w-auto object-contain"
+                    />
+                    <Image
+                      src="/Finder.png"
+                      alt="Finder home loan awards"
+                      width={90}
+                      height={32}
+                      className="h-14 w-auto object-contain"
+                    />
+                    <Image
+                      src="/Canstar.png"
+                      alt="Canstar outstanding value awards"
+                      width={90}
+                      height={32}
+                      className="h-14 w-auto object-contain"
+                    />
+                  </div>
                 </div>
 
                 <p className="text-xs sm:text-[13px] text-neutral-600 mb-5 max-w-3xl">
-                  We compare options across this panel so you&apos;re seeing
-                  what award-winning lenders are actually offering today — not
-                  just one bank&apos;s view.
+                  We compare options across our panel of 50+ lenders so you&apos;re seeing
+                  what award-winning lenders are actually offering today.
                 </p>
 
                 {!previewIsGoodWicket && bestOption && maxMonthlySaving > 0 && (
                   <div className="mb-6 space-y-3 text-sm text-neutral-700">
                     <div>
                       Your lowest repayment option is{" "}
-                      <span className="font-medium">
+                        <span className="font-medium">
                         {formatCurrencyNumber(bestOption.newMonthly)}
                       </span>
                       , which is around{" "}
@@ -1149,9 +1159,7 @@ export default function RefinanceXmasPage() {
                   <span className="font-medium">{todayString}</span>. We&apos;re
                   not showing lender names here — we&apos;ll go through the
                   actual options together and talk through what&apos;s in your
-                  best interests. Many of the lenders we work with are
-                  recognised by Mozo, Finder and Canstar for outstanding value.
-                  All applications are subject to lending criteria and rates are
+                  best interests. All applications are subject to lending criteria and rates are
                   subject to change.
                 </p>
               </div>
