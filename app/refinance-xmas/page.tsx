@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import type { RefObject } from "react";
 import confetti from "canvas-confetti";
+import { track } from "@vercel/analytics";
 
 type Step = 0 | 1 | 2;
 type ApplicationType = "single" | "joint";
@@ -192,21 +193,17 @@ function computeOptions(input: {
 }): { options: SavingsOption[]; isOnGoodWicket: boolean } {
   const { balance, currentMonthly, yearsRemaining, ownerType } = input;
 
-  // Tweaked to better match your current success-page set
   const baseRatesOO = [5.2, 5.25, 5.28];
-  const baseRatesINV = [5.6, 5.7, 5.8]; // adjust if you have specific investor rates
+  const baseRatesINV = [5.6, 5.7, 5.8];
 
   const rateSet = ownerType === "INV" ? baseRatesINV : baseRatesOO;
 
-  // Make sure TypeScript knows these are the literal keys "A" | "B" | "C"
   const optionKeys: SavingsOption["key"][] = ["A", "B", "C"];
 
   const options: SavingsOption[] = optionKeys.map((key, idx) => {
     const indicativeRate = rateSet[idx];
     const newMonthly = monthlyRepayment(balance, indicativeRate, yearsRemaining);
     const monthlySaving = Math.max(0, currentMonthly - newMonthly);
-
-    // Simple 5-year saving approximation (repayment difference over 60 months)
     const interestSaved5 = Math.max(0, monthlySaving * 60);
 
     return {
@@ -272,8 +269,6 @@ export default function RefinanceXmasPage() {
       case "goal":
         scrollToRef(step0Ref);
         break;
-
-      // Loan details (step 1)
       case "ownerOrInvestor":
         scrollToRef(ownerRef);
         break;
@@ -295,8 +290,6 @@ export default function RefinanceXmasPage() {
       case "yearsRemaining":
         scrollToRef(yearsRef);
         break;
-
-      // Personal details (step 2)
       case "preferredName":
         scrollToRef(nameRef);
         break;
@@ -309,7 +302,6 @@ export default function RefinanceXmasPage() {
       case "partnerEmail":
         scrollToRef(partnerEmailRef);
         break;
-
       default:
         break;
     }
@@ -352,7 +344,6 @@ export default function RefinanceXmasPage() {
       }
     }
 
-    // Step 1 – loan details (minimal version)
     if (s === 1) {
       if (form.ownerOrInvestor.length === 0) {
         newErrors.ownerOrInvestor = "Pick at least one option.";
@@ -368,7 +359,6 @@ export default function RefinanceXmasPage() {
       }
     }
 
-    // Step 2 – personal details + joint
     if (s === 2) {
       if (!form.preferredName.trim()) {
         newErrors.preferredName =
@@ -407,9 +397,11 @@ export default function RefinanceXmasPage() {
 
   const goNext = () => {
     if (!validateStep(step)) return;
+
     if (step < 2) {
       const nextStep = (step + 1) as Step;
       setStep(nextStep);
+      track("refi_step_started", { step: nextStep });
       setTimeout(() => scrollToStepHeader(nextStep), 80);
     }
   };
@@ -424,7 +416,6 @@ export default function RefinanceXmasPage() {
 
   // Show preview options (after loan details)
   const handlePreview = () => {
-    // Ensure loan details valid
     if (!validateStep(1)) {
       setStep(1);
       return;
@@ -438,11 +429,28 @@ export default function RefinanceXmasPage() {
     const yearsNum = safeNumber(form.yearsRemaining, 25);
     const ownerType = deriveOwnerType(form.ownerOrInvestor);
 
+    // step 1 completed
+    track("refi_step1_completed", {
+      ownerOrInvestor: form.ownerOrInvestor,
+      balance: balanceNum,
+      repayments: repayNum,
+      yearsRemaining: yearsNum,
+    });
+
     const { options, isOnGoodWicket } = computeOptions({
       balance: balanceNum,
       currentMonthly: repayNum,
       yearsRemaining: yearsNum,
       ownerType,
+    });
+
+    const maxSaving = Math.max(...options.map((o) => o.monthlySaving));
+    track("refi_preview_generated", {
+      ownerType,
+      isOnGoodWicket,
+      maxMonthlySaving: Math.round(
+        isFinite(maxSaving) && maxSaving > 0 ? maxSaving : 0
+      ),
     });
 
     setPreviewOptions(options);
@@ -451,15 +459,21 @@ export default function RefinanceXmasPage() {
     setPreviewLoading(false);
 
     setStep(2);
+    track("refi_step_started", { step: 2 });
     setTimeout(() => scrollToStepHeader(2), 80);
   };
 
   const handleSubmit = async () => {
-    // validate personal details step
     if (!validateStep(2)) {
       setStep(2);
       return;
     }
+
+    track("refi_lead_submitted_attempt", {
+      goal: form.goal,
+      applicationType: form.applicationType,
+      ownerOrInvestor: form.ownerOrInvestor,
+    });
 
     setSubmitting(true);
     setSubmitError(null);
@@ -489,6 +503,7 @@ export default function RefinanceXmasPage() {
 
       if (!res.ok) {
         console.error("Refinance submit failed", await res.text());
+        track("refi_lead_submit_failed");
         setSubmitError(
           "Hmm, something’s wrong on our side — please give it another go ❤️"
         );
@@ -496,7 +511,8 @@ export default function RefinanceXmasPage() {
         return;
       }
 
-      // 🎉 Confetti celebration
+      track("refi_lead_submitted_success");
+
       try {
         confetti({
           particleCount: 140,
@@ -507,7 +523,6 @@ export default function RefinanceXmasPage() {
         // ignore if confetti fails
       }
 
-      // Redirect straight to Calendly with prefilled details
       const url = new URL("https://calendly.com/rukid-sold/30min");
       if (form.preferredName.trim()) {
         url.searchParams.set("name", form.preferredName.trim());
@@ -521,6 +536,7 @@ export default function RefinanceXmasPage() {
       }, 500);
     } catch (err) {
       console.error("Refinance submit error", err);
+      track("refi_lead_submit_error");
       setSubmitError(
         "Hmm, something’s wrong on our side — please give it another go ❤️"
       );
@@ -551,11 +567,11 @@ export default function RefinanceXmasPage() {
 
   const reassurance = (
     <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs sm:text-sm text-neutral-600 mb-4">
-  <li>✔ See savings upfront</li>
-  <li>✔ No credit checks</li>
-  <li>✔ Takes ~60 seconds</li>
-  <li>✔ No phone calls required</li>
-</ul>
+      <li>✔ See savings upfront</li>
+      <li>✔ No credit checks</li>
+      <li>✔ Takes ~60 seconds</li>
+      <li>✔ No phone calls required</li>
+    </ul>
   );
 
   const goalOptions = [
@@ -569,12 +585,10 @@ export default function RefinanceXmasPage() {
 
   const ctaLabel = getCtaLabel(form.goal);
 
-  // Slider numbers (minimal set)
   const balanceNum = safeNumber(form.balance, 520000);
   const repayNum = safeNumber(form.repayments, 2450);
   const yearsNum = safeNumber(form.yearsRemaining, 25);
 
-  // Slider bubble styles
   const balanceBubbleStyle = getSliderBubbleStyle(
     balanceNum,
     BALANCE_MIN,
@@ -591,7 +605,6 @@ export default function RefinanceXmasPage() {
     YEARS_MAX
   );
 
-  // Haptic slider change handler
   const handleSliderChange =
     (field: "propertyValue" | "balance" | "repayments" | "yearsRemaining") =>
     (e: any) => {
@@ -610,7 +623,6 @@ export default function RefinanceXmasPage() {
       }
     };
 
-  // Derived preview summary
   const hasPreview = !!previewOptions && previewOptions.length === 3;
   let maxMonthlySaving = 0;
   let maxInterestSaved5 = 0;
@@ -647,20 +659,22 @@ export default function RefinanceXmasPage() {
       {/* Hero */}
       <header className="mb-8 sm:mb-10">
         <p className="text-sm font-semibold text-neutral-700 mb-2">
-  No credit check · Takes ~60 seconds
-</p>
+          No credit check · Takes ~60 seconds
+        </p>
 
-<h1 className="text-3xl sm:text-4xl font-black mb-3">
-  See How Much You Could Save on Your Home Loan This Christmas 🎄
-</h1>
+        <h1 className="text-3xl sm:text-4xl font-black mb-3">
+          See How Much You Could Save on Your Home Loan This Christmas 🎄
+        </h1>
 
-<p className="text-base sm:text-lg text-neutral-700 mb-2">
-  We’ll show you your estimated monthly savings before you share your details — so you can see if it’s worth it.
-</p>
+        <p className="text-base sm:text-lg text-neutral-700 mb-2">
+          We’ll show you your estimated monthly savings before you share your
+          details — so you can see if it’s worth it.
+        </p>
 
-<p className="text-sm text-neutral-500">
-  Most Aussies save $300–$600/month when they refinance. Let’s see if you’re one of them.
-</p>
+        <p className="text-sm text-neutral-500">
+          Most Aussies save $300–$600/month when they refinance. Let’s see if
+          you’re one of them.
+        </p>
       </header>
 
       <section className="bg-white border border-neutral-200 rounded-2xl p-4 sm:p-6 shadow-sm overflow-hidden">
@@ -671,14 +685,14 @@ export default function RefinanceXmasPage() {
         {/* STEP 0 – goal */}
         {step === 0 && (
           <div ref={step0Ref}>
-<h2 className="text-xl sm:text-2xl font-semibold mb-2">
-  Let&apos;s size up your savings
-</h2>
+            <h2 className="text-xl sm:text-2xl font-semibold mb-2">
+              Let&apos;s size up your savings
+            </h2>
 
-<p className="text-sm text-neutral-700 mb-4">
-  Pick the option that best matches what you want to achieve — we&apos;ll tailor your savings estimate.
-. 
-</p>
+            <p className="text-sm text-neutral-700 mb-4">
+              Pick the option that best matches what you want to achieve —
+              we&apos;ll tailor your savings estimate.
+            </p>
 
             <div className="flex flex-wrap gap-3 mb-4">
               {goalOptions.map((option) => {
@@ -689,9 +703,12 @@ export default function RefinanceXmasPage() {
                     type="button"
                     onClick={() => {
                       updateField("goal", option);
+                      track("refi_step0_completed", { goal: option });
                       setTimeout(() => {
-                        setStep(1);
-                        setTimeout(() => scrollToStepHeader(1), 80);
+                        const nextStep: Step = 1;
+                        setStep(nextStep);
+                        track("refi_step_started", { step: nextStep });
+                        setTimeout(() => scrollToStepHeader(nextStep), 80);
                       }, 80);
                     }}
                     className={classNames(
@@ -937,13 +954,13 @@ export default function RefinanceXmasPage() {
                   <div className="mb-6 space-y-3 text-sm text-neutral-700">
                     <div>
                       Your lowest repayment option is{" "}
-                        <span className="font-medium">
-                          {formatCurrencyNumber(bestOption.newMonthly)}
-                        </span>
+                      <span className="font-medium">
+                        {formatCurrencyNumber(bestOption.newMonthly)}
+                      </span>
                       , which is around{" "}
-                        <span className="font-medium">
-                          {formatCurrencyNumber(maxMonthlySaving)}
-                        </span>{" "}
+                      <span className="font-medium">
+                        {formatCurrencyNumber(maxMonthlySaving)}
+                      </span>{" "}
                       less per month than what you&apos;re paying now (before
                       any fees or changes are confirmed).
                     </div>
@@ -1114,15 +1131,15 @@ export default function RefinanceXmasPage() {
 
             {/* Personal details */}
             <div className="mt-4">
-<h3 className="text-lg sm:text-xl font-semibold mb-3">
-  Want your personalised options? Enter your details and we’ll confirm which
-  lender can offer you the best deal.
-</h3>
+              <h3 className="text-lg sm:text-xl font-semibold mb-3">
+                Want your personalised options? Enter your details and we’ll
+                confirm which lender can offer you the best deal.
+              </h3>
 
-<p className="text-sm text-neutral-600 mb-4">
-  No obligations, no credit checks — just a clear view of your sharpest options.
-</p>
-
+              <p className="text-sm text-neutral-600 mb-4">
+                No obligations, no credit checks — just a clear view of your
+                sharpest options.
+              </p>
 
               <div className="grid sm:grid-cols-2 gap-4 mb-4">
                 <div ref={nameRef}>
