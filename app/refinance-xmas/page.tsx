@@ -431,7 +431,7 @@ export default function RefinanceXmasPage() {
 
     // step 1 completed
     track("refi_step1_completed", {
-      ownerOrInvestor: form.ownerOrInvestor,
+      ownerOrInvestor: form.ownerOrInvestor.join(", "),
       balance: balanceNum,
       repayments: repayNum,
       yearsRemaining: yearsNum,
@@ -472,7 +472,7 @@ export default function RefinanceXmasPage() {
     track("refi_lead_submitted_attempt", {
       goal: form.goal,
       applicationType: form.applicationType,
-      ownerOrInvestor: form.ownerOrInvestor,
+      ownerOrInvestor: form.ownerOrInvestor.join(", "),
     });
 
     setSubmitting(true);
