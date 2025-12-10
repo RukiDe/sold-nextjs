@@ -672,11 +672,11 @@ export default function RefinanceXmasPage() {
         {step === 0 && (
           <div ref={step0Ref}>
 <h2 className="text-xl sm:text-2xl font-semibold mb-2">
-  Let’s size up your savings
+  Let&apos;s size up your savings
 </h2>
 
 <p className="text-sm text-neutral-700 mb-4">
-  Pick the option that best matches what you're hoping to do — we’ll tailor your savings estimate and show it to you before you enter any details.
+  Pick the option that best matches what you&apos;re hoping to do — we&apos;ll tailor your savings estimate and show it to you before you enter any details.
 </p>
 
             <div className="flex flex-wrap gap-3 mb-4">
