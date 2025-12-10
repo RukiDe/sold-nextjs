@@ -551,11 +551,11 @@ export default function RefinanceXmasPage() {
 
   const reassurance = (
     <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs sm:text-sm text-neutral-600 mb-4">
-      <li>✔ No credit check</li>
-      <li>✔ Takes ~60 seconds</li>
-      <li>✔ Secure &amp; private</li>
-      <li>✔ No documents needed</li>
-    </ul>
+  <li>✔ See savings before email</li>
+  <li>✔ No credit check</li>
+  <li>✔ Takes ~60 seconds</li>
+  <li>✔ No phone calls required</li>
+</ul>
   );
 
   const goalOptions = [
@@ -647,18 +647,20 @@ export default function RefinanceXmasPage() {
       {/* Hero */}
       <header className="mb-8 sm:mb-10">
         <p className="text-sm font-semibold text-neutral-700 mb-2">
-          Refinance check · No impact on your credit score
-        </p>
-        <h1 className="text-3xl sm:text-4xl font-black mb-3">
-          Give yourself the gift of a lower mortgage this Christmas 🎄
-        </h1>
-        <p className="text-base sm:text-lg text-neutral-700 mb-2">
-          Answer a few quick questions and we&apos;ll estimate how much you
-          could save — before you commit to anything.
-        </p>
-        <p className="text-sm text-neutral-500">
-          Trusted by Australians refinancing over $30m in home loans.
-        </p>
+  No credit check · Takes ~60 seconds
+</p>
+
+<h1 className="text-3xl sm:text-4xl font-black mb-3">
+  See How Much You Could Save on Your Home Loan This Christmas 🎄
+</h1>
+
+<p className="text-base sm:text-lg text-neutral-700 mb-2">
+  We’ll show you your **estimated monthly savings** before you share your details — so you can see if it’s worth it.
+</p>
+
+<p className="text-sm text-neutral-500">
+  Most Aussies save $300–$600/month when they refinance. Let’s see if you’re one of them.
+</p>
       </header>
 
       <section className="bg-white border border-neutral-200 rounded-2xl p-4 sm:p-6 shadow-sm overflow-hidden">
@@ -666,17 +668,17 @@ export default function RefinanceXmasPage() {
 
         {reassurance}
 
-        <p className="text-sm sm:text-base text-neutral-700 mb-6">
-          Most Aussies save $300–$600 a month when they refinance — but banks
-          rarely call to tell you. Let&apos;s see if you&apos;re one of them.
-        </p>
-
         {/* STEP 0 – goal */}
         {step === 0 && (
           <div ref={step0Ref}>
-            <h2 className="text-xl sm:text-2xl font-semibold mb-4">
-              What&apos;s your goal today?
-            </h2>
+<h2 className="text-xl sm:text-2xl font-semibold mb-2">
+  Let’s size up your savings
+</h2>
+
+<p className="text-sm text-neutral-700 mb-4">
+  Pick the option that best matches what you're hoping to do — we’ll tailor your savings estimate and show it to you before you enter any details.
+</p>
+
             <div className="flex flex-wrap gap-3 mb-4">
               {goalOptions.map((option) => {
                 const active = form.goal === option;
@@ -709,7 +711,7 @@ export default function RefinanceXmasPage() {
 
             <div className="flex justify-between mt-6">
               <span className="text-xs text-neutral-500">
-                Takes about a minute. No spam, ever.
+                Takes under 60 seconds · See savings before entering your email.
               </span>
               <button
                 type="button"
@@ -1111,10 +1113,15 @@ export default function RefinanceXmasPage() {
 
             {/* Personal details */}
             <div className="mt-4">
-              <h3 className="text-lg sm:text-xl font-semibold mb-3">
-                Like the look of one of these? Pop your details in and we&apos;ll
-                unpack it together.
-              </h3>
+<h3 className="text-lg sm:text-xl font-semibold mb-3">
+  Want your personalised options? Enter your details and we’ll confirm which
+  lender can offer you the best deal.
+</h3>
+
+<p className="text-sm text-neutral-600 mb-4">
+  No obligations, no credit check — just a clear view of your sharpest options.
+</p>
+
 
               <div className="grid sm:grid-cols-2 gap-4 mb-4">
                 <div ref={nameRef}>
@@ -1270,7 +1277,7 @@ export default function RefinanceXmasPage() {
                       : "bg-black text-white border-black hover:bg:white hover:text-black"
                   )}
                 >
-                  {submitting ? "Sending..." : "Lock in a quick chat"}
+                  {submitting ? "Sending..." : "Get my personalised savings report →"}
                 </button>
               </div>
 
