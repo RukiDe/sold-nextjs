@@ -946,8 +946,34 @@ export default function RefinanceXmasPage() {
                 <h2 className="text-xl sm:text-2xl font-semibold mb-2">
                   {heading}
                 </h2>
-                <p className="text-[15px] sm:text[16px] text-neutral-600 max-w-3xl mb-4">
+                <p className="text-[15px] sm:text[16px] text-neutral-600 max-w-3xl mb-3">
                   {subheading}
+                </p>
+
+                {/* Award badges strip */}
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-[11px] sm:text-xs text-neutral-500 mb-4">
+                  <span className="uppercase tracking-[0.18em] text-neutral-400">
+                    OUR LENDER PANEL
+                  </span>
+                  <span className="inline-flex items-center rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1">
+                    <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                    50+ home loan lenders
+                  </span>
+                  <span className="inline-flex items-center rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1">
+                    Mozo Experts Choice winners
+                  </span>
+                  <span className="inline-flex items-center rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1">
+                    Finder home loan award winners
+                  </span>
+                  <span className="inline-flex items-center rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1">
+                    Canstar outstanding value lenders
+                  </span>
+                </div>
+
+                <p className="text-xs sm:text-[13px] text-neutral-600 mb-5 max-w-3xl">
+                  We compare options across this panel so you&apos;re seeing
+                  what award-winning lenders are actually offering today — not
+                  just one bank&apos;s view.
                 </p>
 
                 {!previewIsGoodWicket && bestOption && maxMonthlySaving > 0 && (
@@ -1123,8 +1149,10 @@ export default function RefinanceXmasPage() {
                   <span className="font-medium">{todayString}</span>. We&apos;re
                   not showing lender names here — we&apos;ll go through the
                   actual options together and talk through what&apos;s in your
-                  best interests. All applications are subject to lending
-                  criteria and rates are subject to change.
+                  best interests. Many of the lenders we work with are
+                  recognised by Mozo, Finder and Canstar for outstanding value.
+                  All applications are subject to lending criteria and rates are
+                  subject to change.
                 </p>
               </div>
             )}
