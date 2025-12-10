@@ -551,8 +551,8 @@ export default function RefinanceXmasPage() {
 
   const reassurance = (
     <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs sm:text-sm text-neutral-600 mb-4">
-  <li>✔ See savings before email</li>
-  <li>✔ No credit check</li>
+  <li>✔ See savings upfront</li>
+  <li>✔ No credit checks</li>
   <li>✔ Takes ~60 seconds</li>
   <li>✔ No phone calls required</li>
 </ul>
@@ -655,7 +655,7 @@ export default function RefinanceXmasPage() {
 </h1>
 
 <p className="text-base sm:text-lg text-neutral-700 mb-2">
-  We’ll show you your **estimated monthly savings** before you share your details — so you can see if it’s worth it.
+  We’ll show you your estimated monthly savings before you share your details — so you can see if it’s worth it.
 </p>
 
 <p className="text-sm text-neutral-500">
@@ -676,7 +676,7 @@ export default function RefinanceXmasPage() {
 </h2>
 
 <p className="text-sm text-neutral-700 mb-4">
-  Pick the option that best matches what you&apos;re hoping to do — we&apos;ll tailor your savings estimate and show it to you before you enter any details.
+  Pick the option that best matches what you&apos;re hoping to do. 
 </p>
 
             <div className="flex flex-wrap gap-3 mb-4">
@@ -1119,7 +1119,7 @@ export default function RefinanceXmasPage() {
 </h3>
 
 <p className="text-sm text-neutral-600 mb-4">
-  No obligations, no credit check — just a clear view of your sharpest options.
+  No obligations, no credit checks — just a clear view of your sharpest options.
 </p>
 
 
@@ -1277,7 +1277,7 @@ export default function RefinanceXmasPage() {
                       : "bg-black text-white border-black hover:bg:white hover:text-black"
                   )}
                 >
-                  {submitting ? "Sending..." : "Get my personalised savings report →"}
+                  {submitting ? "Sending..." : "Show me the lenders →"}
                 </button>
               </div>
 
