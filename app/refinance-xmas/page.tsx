@@ -676,7 +676,8 @@ export default function RefinanceXmasPage() {
 </h2>
 
 <p className="text-sm text-neutral-700 mb-4">
-  Pick the option that best matches what you&apos;re hoping to do. 
+  Pick the option that best matches what you want to achieve — we&apos;ll tailor your savings estimate.
+. 
 </p>
 
             <div className="flex flex-wrap gap-3 mb-4">
@@ -711,7 +712,7 @@ export default function RefinanceXmasPage() {
 
             <div className="flex justify-between mt-6">
               <span className="text-xs text-neutral-500">
-                Takes under 60 seconds · See savings before entering your email.
+                Takes under 60 seconds · See savings before entering your email
               </span>
               <button
                 type="button"
