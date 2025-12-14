@@ -1,10 +1,67 @@
 // lib/airtable.ts
 
+/* ========================================================================== */
+/*                               CONFIG SETUP                                 */
+/* ========================================================================== */
+
 const AIRTABLE_API_TOKEN = process.env.AIRTABLE_API_TOKEN;
+
+// Refinance (your existing setup)
 const AIRTABLE_REFI_BASE_ID =
   process.env.AIRTABLE_REFI_BASE_ID || process.env.AIRTABLE_BASE_ID;
 const AIRTABLE_REFI_TABLE_NAME =
   process.env.AIRTABLE_REFI_TABLE_NAME || "Refinance";
+
+// ReadinessCheck (new)
+const AIRTABLE_READINESS_BASE_ID =
+  process.env.AIRTABLE_READINESS_BASE_ID ||
+  AIRTABLE_REFI_BASE_ID || // fallback to the same base
+  process.env.AIRTABLE_BASE_ID;
+
+const AIRTABLE_READINESS_TABLE_NAME =
+  process.env.AIRTABLE_READINESS_TABLE_NAME || "ReadinessChecks";
+
+/* ========================================================================== */
+/*                           SHARED CONFIG CHECKERS                            */
+/* ========================================================================== */
+
+function airtableConfigured(): boolean {
+  const configured =
+    !!AIRTABLE_API_TOKEN &&
+    !!AIRTABLE_REFI_BASE_ID &&
+    !!AIRTABLE_REFI_TABLE_NAME;
+
+  if (!configured) {
+    console.warn("[Airtable] Missing Refinance config", {
+      hasToken: !!AIRTABLE_API_TOKEN,
+      baseId: AIRTABLE_REFI_BASE_ID,
+      table: AIRTABLE_REFI_TABLE_NAME,
+    });
+  }
+
+  return configured;
+}
+
+function readinessConfigured(): boolean {
+  const configured =
+    !!AIRTABLE_API_TOKEN &&
+    !!AIRTABLE_READINESS_BASE_ID &&
+    !!AIRTABLE_READINESS_TABLE_NAME;
+
+  if (!configured) {
+    console.warn("[Airtable] Missing Readiness config", {
+      hasToken: !!AIRTABLE_API_TOKEN,
+      baseId: AIRTABLE_READINESS_BASE_ID,
+      table: AIRTABLE_READINESS_TABLE_NAME,
+    });
+  }
+
+  return configured;
+}
+
+/* ========================================================================== */
+/*                       TYPES: REFINANCE (YOUR EXISTING CODE)                */
+/* ========================================================================== */
 
 type OptionKey = "A" | "B" | "C";
 type BestOptionKey = OptionKey | "none";
@@ -49,24 +106,9 @@ export type RefinanceFactFindStored = {
   createdTime: string;
 };
 
-function airtableConfigured(): boolean {
-  const configured =
-    !!AIRTABLE_API_TOKEN &&
-    !!AIRTABLE_REFI_BASE_ID &&
-    !!AIRTABLE_REFI_TABLE_NAME;
-
-  if (!configured) {
-    console.warn("[Airtable] Missing config", {
-      hasToken: !!AIRTABLE_API_TOKEN,
-      baseId: AIRTABLE_REFI_BASE_ID,
-      table: AIRTABLE_REFI_TABLE_NAME,
-    });
-  }
-
-  return configured;
-}
-
-/* --------------------------- CREATE FACT-FIND ROW -------------------------- */
+/* ========================================================================== */
+/*                        CREATE REFINANCE FACT-FIND ROW                      */
+/* ========================================================================== */
 
 export async function createRefinanceFactFindRecord(
   payload: RefinanceFactFindRecord
@@ -78,7 +120,7 @@ export async function createRefinanceFactFindRecord(
     return;
   }
 
-  // Normalise numeric inputs (force numbers, or null)
+  // Normalise numeric inputs
   const currentLoanBalanceRaw =
     payload.currentLoanBalance ?? payload.balance ?? null;
   const currentLoanBalance =
@@ -110,6 +152,7 @@ export async function createRefinanceFactFindRecord(
   // Owner / Investor
   let ownerOrInvestor: string | null = null;
   const ownerRaw = payload.ownerOrInvestor ?? payload.purpose;
+
   if (Array.isArray(ownerRaw)) {
     const joined = ownerRaw.join(" ").toUpperCase();
     if (joined.includes("INV")) ownerOrInvestor = "INV";
@@ -121,9 +164,10 @@ export async function createRefinanceFactFindRecord(
     else if (v.includes("OO") || v.includes("OWNER")) ownerOrInvestor = "OO";
   }
 
-  // Loan Types → multi-select array
+  // Loan Types → multi-select
   let loanTypes: string[] | null = null;
   const loanTypesRaw = payload.loanTypes ?? payload.loanType;
+
   if (Array.isArray(loanTypesRaw)) {
     loanTypes = loanTypesRaw
       .map((v) => String(v).trim())
@@ -133,7 +177,7 @@ export async function createRefinanceFactFindRecord(
     loanTypes = [loanTypesRaw.trim()];
   }
 
-  // Goal → multi-select array
+  // Goal → multi-select
   let goalValue: string[] | null = null;
   if (Array.isArray(payload.goal)) {
     goalValue = payload.goal
@@ -159,12 +203,9 @@ export async function createRefinanceFactFindRecord(
 
     "Current Lender": payload.currentLender ?? null,
     Source: payload.source ?? "refinance2-form",
-
   };
 
-  if (goalValue) {
-    fields["Goal"] = goalValue;
-  }
+  if (goalValue) fields["Goal"] = goalValue;
 
   console.log("[Airtable] Creating record in", AIRTABLE_REFI_TABLE_NAME, fields);
 
@@ -188,7 +229,9 @@ export async function createRefinanceFactFindRecord(
   }
 }
 
-/* --------------------------- READ BY EMAIL -------------------------------- */
+/* ========================================================================== */
+/*                     READ REFINANCE RECORD BY EMAIL                         */
+/* ========================================================================== */
 
 export async function getRefinanceFactFindByEmail(
   email: string
@@ -215,9 +258,7 @@ export async function getRefinanceFactFindByEmail(
 
   const res = await fetch(url, {
     method: "GET",
-    headers: {
-      Authorization: `Bearer ${AIRTABLE_API_TOKEN}`,
-    },
+    headers: { Authorization: `Bearer ${AIRTABLE_API_TOKEN}` },
   });
 
   const data = await res.json().catch(() => ({}));
@@ -245,7 +286,9 @@ export async function getRefinanceFactFindByEmail(
   };
 }
 
-/* -------------------- UPDATE ROW WITH OPTION SNAPSHOT --------------------- */
+/* ========================================================================== */
+/*                      UPDATE REFINANCE OPTIONS SNAPSHOT                     */
+/* ========================================================================== */
 
 export async function updateRefinanceOptionsForRecord(
   recordId: string,
@@ -314,4 +357,200 @@ export async function updateRefinanceOptionsForRecord(
   }
 
   return data;
+}
+
+/* ========================================================================== */
+/*                        READINESSCHECK — TYPES                              */
+/* ========================================================================== */
+
+export type ReadinessCheckCreatePayload = {
+  goal: string;
+  householdIncome: number;
+  employmentType: string;
+  housingStatus: string;
+  rentWeekly: number | null;
+  loanBalance: number | null;
+  loanRepaymentMonthly: number | null;
+  creditCardLimits: number;
+  personalLoanRepayments: number;
+  hasHecs: boolean;
+  expenseBand: string;
+
+  score: number;
+  band: string;
+  strengths: string[];
+  focusAreas: string[];
+  readyMoves: string[];
+
+  email?: string | null;
+  source?: string | null;
+};
+
+export type ReadinessCheckStored = {
+  id: string;
+  createdTime: string;
+  input: {
+    goal: string;
+    householdIncome: number;
+    employmentType: string;
+    housingStatus: string;
+    rentWeekly: number | null;
+    loanBalance: number | null;
+    loanRepaymentMonthly: number | null;
+    creditCardLimits: number;
+    personalLoanRepayments: number;
+    hasHecs: boolean;
+    expenseBand: string;
+  };
+  result: {
+    score: number;
+    band: string;
+    strengths: string[];
+    focusAreas: string[];
+    readyMoves: string[];
+  };
+  email?: string | null;
+  source?: string | null;
+};
+
+/* ========================================================================== */
+/*                     CREATE READINESSCHECK RECORD                            */
+/* ========================================================================== */
+
+export async function createReadinessCheckRecord(
+  payload: ReadinessCheckCreatePayload
+): Promise<{ id: string } | null> {
+  if (!readinessConfigured()) {
+    console.warn(
+      "[Airtable] Not configured — skipping createReadinessCheckRecord"
+    );
+    return null;
+  }
+
+  const url = `https://api.airtable.com/v0/${AIRTABLE_READINESS_BASE_ID}/${encodeURIComponent(
+    AIRTABLE_READINESS_TABLE_NAME!
+  )}`;
+
+  const fields: Record<string, any> = {
+    goal: payload.goal,
+    householdIncome: payload.householdIncome,
+    employmentType: payload.employmentType,
+    housingStatus: payload.housingStatus,
+    rentWeekly: payload.rentWeekly,
+    loanBalance: payload.loanBalance,
+    loanRepaymentMonthly: payload.loanRepaymentMonthly,
+    creditCardLimits: payload.creditCardLimits,
+    personalLoanRepayments: payload.personalLoanRepayments,
+    hasHecs: payload.hasHecs,
+    expenseBand: payload.expenseBand,
+
+    score: payload.score,
+    band: payload.band,
+    strengths: payload.strengths.join("\n"),
+    focusAreas: payload.focusAreas.join("\n"),
+    readyMoves: payload.readyMoves.join("\n"),
+
+    email: payload.email ?? "",
+    source: payload.source ?? "readiness_v1_web",
+  };
+
+  console.log(
+    "[Airtable] Creating ReadinessCheck in",
+    AIRTABLE_READINESS_TABLE_NAME,
+    fields
+  );
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${AIRTABLE_API_TOKEN}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ fields }),
+  });
+
+  const data = await res.json().catch(() => ({}));
+
+  if (!res.ok) {
+    console.error(
+      "[Airtable] Failed to create ReadinessCheck record",
+      res.status,
+      data
+    );
+    return null;
+  }
+
+  return { id: data.id };
+}
+
+/* ========================================================================== */
+/*                   FETCH READINESSCHECK RECORD BY ID                        */
+/* ========================================================================== */
+
+export async function getReadinessCheckById(
+  id: string
+): Promise<ReadinessCheckStored | null> {
+  if (!readinessConfigured()) {
+    console.warn(
+      "[Airtable] Not configured — skipping getReadinessCheckById"
+    );
+    return null;
+  }
+
+  const url = `https://api.airtable.com/v0/${AIRTABLE_READINESS_BASE_ID}/${encodeURIComponent(
+    AIRTABLE_READINESS_TABLE_NAME!
+  )}/${id}`;
+
+  console.log(
+    "[Airtable] Fetching ReadinessCheck by id from",
+    AIRTABLE_READINESS_TABLE_NAME,
+    id
+  );
+
+  const res = await fetch(url, {
+    method: "GET",
+    headers: { Authorization: `Bearer ${AIRTABLE_API_TOKEN}` },
+  });
+
+  const data = await res.json().catch(() => ({}));
+
+  if (!res.ok) {
+    console.error(
+      "[Airtable] Error fetching ReadinessCheck by id:",
+      res.status,
+      data
+    );
+    return null;
+  }
+
+  const fields = data.fields || {};
+
+  return {
+    id: data.id,
+    createdTime: data.createdTime,
+    input: {
+      goal: fields.goal ?? "",
+      householdIncome: fields.householdIncome ?? 0,
+      employmentType: fields.employmentType ?? "",
+      housingStatus: fields.housingStatus ?? "",
+      rentWeekly: fields.rentWeekly ?? null,
+      loanBalance: fields.loanBalance ?? null,
+      loanRepaymentMonthly: fields.loanRepaymentMonthly ?? null,
+      creditCardLimits: fields.creditCardLimits ?? 0,
+      personalLoanRepayments: fields.personalLoanRepayments ?? 0,
+      hasHecs: Boolean(fields.hasHecs),
+      expenseBand: fields.expenseBand ?? "",
+    },
+    result: {
+      score: fields.score ?? 0,
+      band: fields.band ?? "",
+      strengths: String(fields.strengths || "").split("\n").filter(Boolean),
+      focusAreas: String(fields.focusAreas || "")
+        .split("\n")
+        .filter(Boolean),
+      readyMoves: String(fields.readyMoves || "").split("\n").filter(Boolean),
+    },
+    email: fields.email ?? null,
+    source: fields.source ?? null,
+  };
 }

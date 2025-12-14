@@ -11,3 +11,5 @@ out/
 .vscode/
 .idea/
 *.log
+
+/lib/generated/prisma
