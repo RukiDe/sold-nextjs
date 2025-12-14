@@ -1,9 +1,11 @@
-"use client";
+// app/readinesscheck/result/page.tsx
 
-import React, { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { ButtonPill } from "@/components/ButtonPill";
-import { ReadinessResult, ReadyBand } from "@/lib/readinessScore";
+import {
+  ReadinessResult,
+  ReadyBand,
+} from "@/lib/readinessScore";
+import { getReadinessCheckById } from "@/lib/airtable";
 
 type ReadinessApiRecord = {
   id: string;
@@ -34,59 +36,35 @@ function bandDescription(band: ReadyBand): string {
     case "not_ready":
       return "There are a few key areas to work on before most lenders are likely to say yes. The upside is that you know exactly what to focus on.";
     case "almost_there":
-      return "You’re closer than you might think. A few tweaks to debts, surplus or deposit could move you into a comfortable lender-ready zone.";
+      return "You're closer than you might think. A few tweaks to debts, surplus or deposit could move you into a comfortable lender-ready zone.";
     case "ready":
-      return "You’re in a generally strong position. Many lenders are likely to consider you, subject to full assessment and policy checks.";
+      return "You're in a generally strong position. Many lenders are likely to consider you, subject to full assessment and policy checks.";
     case "very_ready":
-      return "You’re in a very strong position. You’re likely to have a wide choice of lenders and products, subject to full assessment.";
+      return "You're in a very strong position. You're likely to have a wide choice of lenders and products, subject to full assessment.";
     default:
       return "";
   }
 }
 
-export default function ReadinessCheckResultPage() {
-  const searchParams = useSearchParams();
-  const sessionId = searchParams.get("sessionId");
+export const dynamic = "force-dynamic";
 
-  const [record, setRecord] = useState<ReadinessApiRecord | null>(null);
-  const [error, setError] = useState<string | null>(null);
+export default async function ReadinessCheckResultPage({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
+  const rawSessionId = searchParams.sessionId;
+  const sessionId = Array.isArray(rawSessionId)
+    ? rawSessionId[0]
+    : rawSessionId;
 
-  useEffect(() => {
-    if (!sessionId) {
-      setError("Missing session. Please start a new ReadinessCheck.");
-      return;
-    }
-
-    let cancelled = false;
-
-    const fetchResult = async () => {
-      try {
-        const res = await fetch(`/api/readinesscheck/${sessionId}`);
-        if (!res.ok) {
-          throw new Error(`Status ${res.status}`);
-        }
-        const data = (await res.json()) as ReadinessApiRecord;
-        if (!cancelled) setRecord(data);
-      } catch (err) {
-        console.error("Error loading ReadinessCheck result", err);
-        if (!cancelled) {
-          setError("We couldn’t load your result. Please try again.");
-        }
-      }
-    };
-
-    fetchResult();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [sessionId]);
-
-  if (error) {
+  if (!sessionId) {
     return (
       <main className="w-full flex flex-col items-center">
         <section className="w-full max-w-3xl mx-auto py-24 px-4 text-center">
-          <p className="text-gray-600 mb-6">{error}</p>
+          <p className="text-gray-600 mb-6">
+            We couldn&apos;t find a recent ReadinessCheck session.
+          </p>
           <ButtonPill href="/readinesscheck/start">
             Start a new ReadinessCheck
           </ButtonPill>
@@ -95,11 +73,21 @@ export default function ReadinessCheckResultPage() {
     );
   }
 
-  if (!record) {
+  // Directly read from Airtable via your lib function
+  const record = (await getReadinessCheckById(
+    sessionId
+  )) as ReadinessApiRecord | null;
+
+  if (!record || !record.result) {
     return (
       <main className="w-full flex flex-col items-center">
         <section className="w-full max-w-3xl mx-auto py-24 px-4 text-center">
-          <p className="text-gray-600">Loading your ReadinessCheck…</p>
+          <p className="text-gray-600 mb-6">
+            We couldn&apos;t load your ReadinessCheck result. Please try again.
+          </p>
+          <ButtonPill href="/readinesscheck/start">
+            Start a new ReadinessCheck
+          </ButtonPill>
         </section>
       </main>
     );
@@ -142,7 +130,7 @@ export default function ReadinessCheckResultPage() {
             <p className="text-gray-600">{bandDescription(band)}</p>
 
             <p className="text-xs text-gray-400 mt-4">
-              This is an estimate only. It’s not a credit assessment or
+              This is an estimate only. It&apos;s not a credit assessment or
               approval.
             </p>
           </div>
@@ -152,7 +140,7 @@ export default function ReadinessCheckResultPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
           <div className="p-6 border rounded-lg">
             <h2 className="text-lg font-semibold mb-3">
-              What’s working for you
+              What&apos;s working for you
             </h2>
             {strengths.length ? (
               <ul className="list-disc ml-5 space-y-2 text-gray-600 text-sm">
@@ -180,8 +168,8 @@ export default function ReadinessCheckResultPage() {
               </ul>
             ) : (
               <p className="text-gray-600 text-sm">
-                There are no major red flags based on what you&apos;ve
-                shared. A lender will still complete a full assessment.
+                There are no major red flags based on what you&apos;ve shared. A
+                lender will still complete a full assessment.
               </p>
             )}
           </div>
@@ -192,7 +180,7 @@ export default function ReadinessCheckResultPage() {
           <h2 className="text-2xl font-semibold mb-3">
             Your next ReadyMoves
           </h2>
-            <p className="text-gray-600 mb-4">
+          <p className="text-gray-600 mb-4">
             Here are a few practical steps that are likely to improve your
             ReadyScore over the next few months.
           </p>
@@ -204,8 +192,8 @@ export default function ReadinessCheckResultPage() {
           </ol>
 
           <p className="text-sm text-gray-500 mt-4">
-            You don’t need to do everything at once. Start with the step that
-            feels most achievable for you.
+            You don&apos;t need to do everything at once. Start with the step
+            that feels most achievable for you.
           </p>
         </section>
 
