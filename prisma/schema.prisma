@@ -1,32 +1,12 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
-generator client {
-  provider = "prisma-client"
-  output   = "../lib/generated/prisma"
-}
-
-datasource db {
-  provider = "postgresql"
-}
-datasource db {
-  provider = "postgresql"
-  url      = env("sold_PRISMA_DATABASE_URL")
-}
+// prisma/schema.prisma
 
 generator client {
   provider = "prisma-client-js"
 }
-generator client {
-  provider = "prisma-client-js"
-}
 
 datasource db {
   provider = "postgresql"
-  url      = env("sold_PRISMA_DATABASE_URL")
+  // ❌ no `url` here in Prisma 7
 }
 
 model Brand {
@@ -39,6 +19,7 @@ model Brand {
   priority        Int      @default(0)
   registerBaseUrl String?
   apiBaseUrl      String?
+
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
@@ -47,4 +28,74 @@ model Brand {
   rawProducts     RawProduct[]
 }
 
-# Continue with the rest of the models…
+model ProductIndex {
+  id                String   @id @default(cuid())
+  brandCode         String
+  brandName         String
+  productExternalId String
+  prdUrl            String
+  lastModified      String?
+  lastSeenAt        DateTime @default(now())
+  lastHash          String?
+
+  brand             Brand?   @relation(fields: [brandCode], references: [code])
+
+  @@unique([brandCode, productExternalId], name: "brand_product_external_unique")
+  @@index([brandCode])
+}
+
+model RawProduct {
+  id                String   @id @default(cuid())
+  brandCode         String
+  productExternalId String
+  source            String
+  payload           Json
+  hash              String
+  fetchedAt         DateTime @default(now())
+
+  brand             Brand?   @relation(fields: [brandCode], references: [code])
+
+  @@index([brandCode, productExternalId])
+}
+
+model Product {
+  id               String   @id @default(cuid())
+  brandId          String
+  externalId       String
+  name             String
+
+  channel          String
+  purpose          String
+  ownerTypes       String
+  repaymentTypes   String
+
+  isActive         Boolean  @default(true)
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  brand            Brand    @relation(fields: [brandId], references: [id])
+  rates            ProductRate[]
+
+  @@index([externalId])
+  @@index([brandId])
+}
+
+model ProductRate {
+  id               String   @id @default(cuid())
+  productId        String
+  lvrMax           Float
+  rateType         String
+  annualRate       Float
+  comparisonRate   Float?
+  fixedTermMonths  Int?
+  revertAnnualRate Float?
+
+  effectiveFrom    DateTime @default(now())
+  effectiveTo      DateTime?
+
+  product          Product  @relation(fields: [productId], references: [id])
+
+  @@index([productId])
+  @@index([effectiveFrom])
+}
