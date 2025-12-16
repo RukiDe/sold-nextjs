@@ -1,18 +1,35 @@
-import { prisma } from "@/lib/prisma";
+// app/admin/rates/page.tsx
+import "server-only";
+
+type RateRow = {
+  id: string;
+  lvrMax: number;
+  rateType: string;
+  annualRate: number;
+  comparisonRate: number | null;
+  fixedTermMonths: number | null;
+  revertAnnualRate: number | null;
+  effectiveFrom: string;
+  product: {
+    name: string;
+    channel: string;
+    purpose: string;
+    ownerTypes: string;
+    repaymentTypes: string;
+    brand: { code: string; name: string } | null;
+  };
+};
+
+async function getRates(): Promise<RateRow[]> {
+  const res = await fetch("http://localhost:3000/api/admin/rates", {
+    cache: "no-store",
+  });
+  if (!res.ok) throw new Error(`Failed to load rates: ${res.status}`);
+  return (await res.json()) as RateRow[];
+}
 
 export default async function RatesPage() {
-  const liveRates = await prisma.productRate.findMany({
-    where: { effectiveTo: null },
-    include: {
-      product: {
-        include: {
-          brand: true,
-        },
-      },
-    },
-    orderBy: { annualRate: "asc" },
-    take: 200,
-  });
+  const liveRates = await getRates();
 
   return (
     <main className="max-w-6xl mx-auto px-4 py-10">
@@ -39,6 +56,7 @@ export default async function RatesPage() {
               <th className="px-3 py-2">Effective from</th>
             </tr>
           </thead>
+
           <tbody>
             {liveRates.map((r) => {
               const p = r.product;
@@ -51,33 +69,27 @@ export default async function RatesPage() {
               return (
                 <tr key={r.id} className="border-t hover:bg-gray-50">
                   <td className="px-3 py-2 whitespace-nowrap">
-                    <div className="font-medium">{brand?.code}</div>
-                    <div className="text-xs text-gray-500">
-                      {brand?.name}
-                    </div>
+                    <div className="font-medium">{brand?.code ?? "—"}</div>
+                    <div className="text-xs text-gray-500">{brand?.name ?? ""}</div>
                   </td>
                   <td className="px-3 py-2">{p.name}</td>
                   <td className="px-3 py-2">{p.channel}</td>
                   <td className="px-3 py-2">{purpose}</td>
                   <td className="px-3 py-2">{owners}</td>
                   <td className="px-3 py-2">{repay}</td>
-                  <td className="px-3 py-2 text-right">
-                    {(r.lvrMax * 100).toFixed(0)}%
-                  </td>
+                  <td className="px-3 py-2 text-right">{(r.lvrMax * 100).toFixed(0)}%</td>
                   <td className="px-3 py-2">{r.rateType}</td>
+
+                  {/* IMPORTANT: your DB stores rate as percentage already (e.g. 6.24),
+                      so DO NOT multiply by 100 here. */}
+                  <td className="px-3 py-2 text-right">{Number(r.annualRate).toFixed(2)}%</td>
+
                   <td className="px-3 py-2 text-right">
-                    {(r.annualRate * 100).toFixed(2)}%
+                    {r.comparisonRate != null ? Number(r.comparisonRate).toFixed(2) + "%" : "—"}
                   </td>
-                  <td className="px-3 py-2 text-right">
-                    {r.comparisonRate != null
-                      ? (r.comparisonRate * 100).toFixed(2) + "%"
-                      : "—"}
-                  </td>
-                  <td className="px-3 py-2 text-right">
-                    {r.fixedTermMonths ?? "—"}
-                  </td>
+                  <td className="px-3 py-2 text-right">{r.fixedTermMonths ?? "—"}</td>
                   <td className="px-3 py-2 text-xs text-gray-500 whitespace-nowrap">
-                    {new Date(r.effectiveFrom).toLocaleString()}
+                    {new Date(r.effectiveFrom).toLocaleString("en-AU")}
                   </td>
                 </tr>
               );

@@ -6,7 +6,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  // ❌ no `url` here in Prisma 7
 }
 
 model Brand {

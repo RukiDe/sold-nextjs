@@ -1,41 +1,37 @@
 // app/api/admin/products/route.ts
+import "server-only";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
-  const products = await prisma.product.findMany({
+  // Cast prisma to avoid Prisma v7 overload typing weirdness in TS checks
+  const db: any = prisma;
+
+  const products = await db.product.findMany({
     where: { isActive: true },
     include: {
       brand: true,
       rates: {
         where: { effectiveTo: null },
         orderBy: { annualRate: "asc" },
-        take: 5,
+        take: 3,
       },
     },
     orderBy: { updatedAt: "desc" },
-    take: 500,
+    take: 300,
   });
 
-  return NextResponse.json({
-    count: products.length,
-    products: products.map((p) => ({
-      id: p.id,
-      brand: p.brand?.name ?? "—",
-      brandCode: p.brand?.code ?? "—",
-      externalId: p.externalId,
-      name: p.name,
-      channel: p.channel,
-      purpose: p.purpose,
-      ownerTypes: p.ownerTypes,
-      repaymentTypes: p.repaymentTypes,
-      liveRates: p.rates.map((r) => ({
-        rateType: r.rateType,
-        annualRate: r.annualRate,
-        fixedTermMonths: r.fixedTermMonths,
-        lvrMax: r.lvrMax,
-      })),
-      updatedAt: p.updatedAt,
+  // Serialize Dates for JSON
+  const out = products.map((p: any) => ({
+    ...p,
+    updatedAt: p.updatedAt?.toISOString?.() ?? String(p.updatedAt),
+    createdAt: p.createdAt?.toISOString?.() ?? String(p.createdAt),
+    rates: (p.rates ?? []).map((r: any) => ({
+      ...r,
+      effectiveFrom: r.effectiveFrom?.toISOString?.() ?? String(r.effectiveFrom),
+      effectiveTo: r.effectiveTo ? (r.effectiveTo?.toISOString?.() ?? String(r.effectiveTo)) : null,
     })),
-  });
+  }));
+
+  return NextResponse.json(out);
 }
