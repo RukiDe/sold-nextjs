@@ -1,5 +1,6 @@
 // app/admin/rates/page.tsx
 import "server-only";
+import { headers } from "next/headers";
 
 type RateRow = {
   id: string;
@@ -11,6 +12,7 @@ type RateRow = {
   revertAnnualRate: number | null;
   effectiveFrom: string;
   product: {
+    id: string;
     name: string;
     channel: string;
     purpose: string;
@@ -20,16 +22,26 @@ type RateRow = {
   };
 };
 
+function getBaseUrlFromHeaders(h: Headers): string {
+  const host = h.get("x-forwarded-host") ?? h.get("host") ?? "localhost:3000";
+  const proto = h.get("x-forwarded-proto") ?? "http";
+  return `${proto}://${host}`;
+}
+
 async function getRates(): Promise<RateRow[]> {
-  const res = await fetch("http://localhost:3000/api/admin/rates", {
-    cache: "no-store",
-  });
-  if (!res.ok) throw new Error(`Failed to load rates: ${res.status}`);
-  return (await res.json()) as RateRow[];
+  const h = await headers();
+  const baseUrl = getBaseUrlFromHeaders(h);
+
+  const res = await fetch(`${baseUrl}/api/rates?limit=200`, { cache: "no-store" });
+
+  if (!res.ok) throw new Error(`Failed to load rates: ${res.status} ${res.statusText}`);
+
+  const data = (await res.json()) as { rates: RateRow[] } | RateRow[];
+  return Array.isArray(data) ? data : data.rates;
 }
 
 export default async function RatesPage() {
-  const liveRates = await getRates();
+  const liveRates: RateRow[] = await getRates();
 
   return (
     <main className="max-w-6xl mx-auto px-4 py-10">
@@ -58,7 +70,7 @@ export default async function RatesPage() {
           </thead>
 
           <tbody>
-            {liveRates.map((r) => {
+            {liveRates.map((r: RateRow) => {
               const p = r.product;
               const brand = p.brand;
 
@@ -80,14 +92,15 @@ export default async function RatesPage() {
                   <td className="px-3 py-2 text-right">{(r.lvrMax * 100).toFixed(0)}%</td>
                   <td className="px-3 py-2">{r.rateType}</td>
 
-                  {/* IMPORTANT: your DB stores rate as percentage already (e.g. 6.24),
-                      so DO NOT multiply by 100 here. */}
+                  {/* NOTE: r.annualRate is already a percent in your DB (e.g. 5.43), so don't *100 */}
                   <td className="px-3 py-2 text-right">{Number(r.annualRate).toFixed(2)}%</td>
 
                   <td className="px-3 py-2 text-right">
                     {r.comparisonRate != null ? Number(r.comparisonRate).toFixed(2) + "%" : "—"}
                   </td>
+
                   <td className="px-3 py-2 text-right">{r.fixedTermMonths ?? "—"}</td>
+
                   <td className="px-3 py-2 text-xs text-gray-500 whitespace-nowrap">
                     {new Date(r.effectiveFrom).toLocaleString("en-AU")}
                   </td>
