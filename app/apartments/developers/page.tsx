@@ -7,20 +7,24 @@ export default function DevelopersPage() {
         <h1 className="text-3xl font-semibold mb-4">Developers</h1>
 
         <p className="text-lg text-gray-700 mb-8">
-          <span className="font-medium text-gray-900">Buildings that stay easier to own.</span>{" "}
+          <span className="font-medium text-gray-900">
+            Buildings that stay easier to own.
+          </span>{" "}
           Optional financial resilience for apartment projects.
         </p>
 
         <div className="border border-gray-200 rounded-2xl p-6 mb-10">
           <p className="text-gray-700">
-            Sold partners with developers to support stronger long-term building outcomes through a voluntary levy
-            offset model that benefits owners without adding risk or complexity.
+            Sold partners with developers to support stronger long-term building
+            outcomes through a voluntary levy offset model that benefits owners
+            without adding risk or complexity.
           </p>
         </div>
 
         <h2 className="text-xl font-semibold mb-3">The long-term challenge</h2>
         <p className="text-gray-700 mb-6">
-          Most buildings are compliant at handover. Few are financially resilient years later.
+          Most buildings are compliant at handover. Few are financially resilient
+          years later.
         </p>
         <ul className="text-gray-700 list-disc pl-5 mb-10 space-y-2">
           <li>Maintenance plans drift from reality</li>
@@ -32,7 +36,8 @@ export default function DevelopersPage() {
         <h2 className="text-xl font-semibold mb-3">How it works for developers</h2>
         <div className="border border-gray-200 rounded-2xl p-6 mb-10">
           <p className="text-gray-700">
-            Levy Offset can be introduced at any stage of a project’s lifecycle:
+            Levy Offset can be introduced at any stage of a project&apos;s
+            lifecycle:
           </p>
           <ul className="text-gray-700 list-disc pl-5 mt-3 space-y-2">
             <li>During development</li>
@@ -44,10 +49,15 @@ export default function DevelopersPage() {
             <ul className="text-gray-700 list-disc pl-5 space-y-2">
               <li>Participation is individual and voluntary</li>
               <li>Finance decisions are owner-initiated</li>
-              <li>Rebates are offset directly to owners and appear as a credit on individual strata invoices</li>
+              <li>
+                Rebates are offset directly to owners and appear as a credit on
+                individual strata invoices
+              </li>
               <li>The Owners Corporation does not rely on participation</li>
             </ul>
-            <p className="text-gray-700 mt-4">If no owners participate, nothing breaks.</p>
+            <p className="text-gray-700 mt-4">
+              If no owners participate, nothing breaks.
+            </p>
           </div>
         </div>
 
@@ -78,14 +88,17 @@ export default function DevelopersPage() {
 
         <h2 className="text-xl font-semibold mb-3">Start the conversation</h2>
         <p className="text-gray-700 mb-6">
-          We work with developers on both current and future projects. This begins with a short discussion.
+          We work with developers on both current and future projects. This
+          begins with a short discussion.
         </p>
 
         {/* Simple form stub (wire to API later) */}
         <form className="border border-gray-200 rounded-2xl p-6 space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="block text-sm font-medium text-gray-900 mb-1">Company name</label>
+              <label className="block text-sm font-medium text-gray-900 mb-1">
+                Company name
+              </label>
               <input
                 className="w-full rounded-xl border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black"
                 type="text"
@@ -95,7 +108,9 @@ export default function DevelopersPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-900 mb-1">Contact name</label>
+              <label className="block text-sm font-medium text-gray-900 mb-1">
+                Contact name
+              </label>
               <input
                 className="w-full rounded-xl border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black"
                 type="text"
@@ -108,7 +123,9 @@ export default function DevelopersPage() {
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="block text-sm font-medium text-gray-900 mb-1">Email</label>
+              <label className="block text-sm font-medium text-gray-900 mb-1">
+                Email
+              </label>
               <input
                 className="w-full rounded-xl border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black"
                 type="email"
@@ -118,7 +135,9 @@ export default function DevelopersPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-900 mb-1">Phone</label>
+              <label className="block text-sm font-medium text-gray-900 mb-1">
+                Phone
+              </label>
               <input
                 className="w-full rounded-xl border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black"
                 type="tel"
@@ -132,7 +151,8 @@ export default function DevelopersPage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <label className="block text-sm font-medium text-gray-900 mb-1">
-                Project name / portfolio size <span className="text-gray-500 font-normal">(optional)</span>
+                Project name / portfolio size{" "}
+                <span className="text-gray-500 font-normal">(optional)</span>
               </label>
               <input
                 className="w-full rounded-xl border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black"
@@ -143,7 +163,8 @@ export default function DevelopersPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-900 mb-1">
-                Project stage <span className="text-gray-500 font-normal">(optional)</span>
+                Project stage{" "}
+                <span className="text-gray-500 font-normal">(optional)</span>
               </label>
               <select
                 className="w-full rounded-xl border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black"
@@ -151,7 +172,7 @@ export default function DevelopersPage() {
                 defaultValue=""
               >
                 <option value="" disabled>
-                  Select…
+                  Select...
                 </option>
                 <option value="planning">Planning</option>
                 <option value="construction">Construction</option>
@@ -162,7 +183,8 @@ export default function DevelopersPage() {
 
           <div>
             <label className="block text-sm font-medium text-gray-900 mb-1">
-              Are you currently involved with the Owners Corporation? <span className="text-gray-500 font-normal">(optional)</span>
+              Are you currently involved with the Owners Corporation?{" "}
+              <span className="text-gray-500 font-normal">(optional)</span>
             </label>
             <select
               className="w-full rounded-xl border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black"
@@ -170,7 +192,7 @@ export default function DevelopersPage() {
               defaultValue=""
             >
               <option value="" disabled>
-                Select…
+                Select...
               </option>
               <option value="yes">Yes</option>
               <option value="no">No</option>
@@ -178,12 +200,15 @@ export default function DevelopersPage() {
           </div>
 
           <div className="pt-2">
-            <ButtonPill href="https://calendly.com/rukid-sold/30min">Let's chat</ButtonPill>
+            <ButtonPill href="https://calendly.com/rukid-sold/30min">
+              Let&apos;s chat
+            </ButtonPill>
           </div>
         </form>
 
         <p className="text-xs text-gray-500 mt-8">
-          Note: This page is general information only and does not constitute financial advice.
+          Note: This page is general information only and does not constitute
+          financial advice.
         </p>
       </section>
     </main>
