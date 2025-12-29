@@ -17,9 +17,10 @@ export default function OwnersCorporationsPage() {
             participating owners’ levies.
           </p>
           <ul className="mt-4 space-y-2 text-gray-700 list-disc pl-5">
-            <li>No pooled funds</li>
+            <li>Only recommended where the outcome is equal to or better than the current setup</li>
             <li>No governance changes</li>
             <li>No reliance on participation</li>
+            <li>No pooled funds</li>
           </ul>
         </div>
 
@@ -52,7 +53,7 @@ export default function OwnersCorporationsPage() {
           </ul>
 
           <p className="text-gray-700 mt-4">
-            No funds are paid to the Owners Corporation and levy obligations remain unchanged.
+            No fees are paid by the Owners Corporation or Owners.
           </p>
         </div>
 
@@ -61,7 +62,7 @@ export default function OwnersCorporationsPage() {
           <div className="border border-gray-200 rounded-2xl p-6">
             <h3 className="font-semibold mb-2">For the Owners Corporation</h3>
             <ul className="text-gray-700 list-disc pl-5 space-y-2">
-              <li>Levy offsets for participating owners (up to 100% of lender payments)</li>
+              <li>Levy offsets for participating owners</li>
               <li>Reduced pressure on future levies</li>
               <li>Improved cashflow resilience</li>
               <li>Better long-term maintenance outcomes</li>
@@ -173,8 +174,7 @@ export default function OwnersCorporationsPage() {
           </div>
 
           <div className="pt-2">
-            <ButtonPill type="submit">Request a building review</ButtonPill>
-            <p className="text-sm text-gray-500 mt-3">We’ll be in touch to book a short call. No obligation.</p>
+            <ButtonPill href="https://calendly.com/rukid-sold/30min">Request a building review</ButtonPill>
           </div>
         </form>
 

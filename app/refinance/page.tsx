@@ -490,7 +490,7 @@ export default function RefinancePage() {
           Refinance check · No impact on your credit score
         </p>
         <h1 className="text-3xl sm:text-4xl font-black mb-3">
-          Give yourself the gift of a lower mortgage this Christmas 🎄
+          Give yourself the gift of a lower mortgage this year ✨
         </h1>
         <p className="text-base sm:text-lg text-neutral-700 mb-2">
           Answer a few quick questions and we&apos;ll estimate how much you

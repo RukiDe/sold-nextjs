@@ -275,7 +275,7 @@ export default function LevyOffsetReviewPage() {
 
         {/* CTAs */}
         <div className="flex flex-col sm:flex-row gap-4">
-          <ButtonPill href="/levyoffsetreview/start">
+          <ButtonPill href="https://sold.financial/refinance">
             Request a mortgage review
           </ButtonPill>
 

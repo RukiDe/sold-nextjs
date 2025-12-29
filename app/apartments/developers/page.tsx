@@ -20,7 +20,7 @@ export default function DevelopersPage() {
 
         <h2 className="text-xl font-semibold mb-3">The long-term challenge</h2>
         <p className="text-gray-700 mb-6">
-          Most buildings look compliant at handover. Few are financially resilient years later.
+          Most buildings are compliant at handover. Few are financially resilient years later.
         </p>
         <ul className="text-gray-700 list-disc pl-5 mb-10 space-y-2">
           <li>Maintenance plans drift from reality</li>
@@ -37,14 +37,14 @@ export default function DevelopersPage() {
           <ul className="text-gray-700 list-disc pl-5 mt-3 space-y-2">
             <li>During development</li>
             <li>At handover</li>
-            <li>Or years after completion while the developer remains involved</li>
+            <li>Or years after completion</li>
           </ul>
 
           <div className="mt-4">
             <ul className="text-gray-700 list-disc pl-5 space-y-2">
               <li>Participation is individual and voluntary</li>
               <li>Finance decisions are owner-initiated</li>
-              <li>Rebates are offset directly to owners and appear as a credit on owner’s strata invoice</li>
+              <li>Rebates are offset directly to owners and appear as a credit on individual strata invoices</li>
               <li>The Owners Corporation does not rely on participation</li>
             </ul>
             <p className="text-gray-700 mt-4">If no owners participate, nothing breaks.</p>
@@ -178,7 +178,7 @@ export default function DevelopersPage() {
           </div>
 
           <div className="pt-2">
-            <ButtonPill type="submit">Book a discussion</ButtonPill>
+            <ButtonPill href="https://calendly.com/rukid-sold/30min">Let's chat</ButtonPill>
           </div>
         </form>
 
