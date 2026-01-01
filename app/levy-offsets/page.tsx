@@ -9,16 +9,16 @@ export default function ApartmentsHubPage() {
         <div className="grid gap-10 md:grid-cols-2 items-center">
           <div>
             <h1 className="text-3xl font-semibold mb-4">
-              Reducing levy pressure for apartment buildings, without changing how they&apos;re run.
+              Levy offsets for apartment buildings
             </h1>
 
             <p className="text-lg text-gray-700">
-              Lower costs for owners. No governance changes. No pooled funds.
+              Reducing levy pressure for apartment buildings, without changing how they&apos;re run.
             </p>
 
             {/* Reassurance: sceptic-friendly */}
             <div className="mt-6 border border-gray-200 rounded-2xl p-4 bg-gray-50 text-sm text-gray-700">
-              Nothing changes at a building level unless an individual owner chooses to participate.
+              A voluntary mortgage review that can reduce the personal cashflow impact of maintenance levies, without changing budgets or funding plans.
             </div>
 
             <div className="mt-8 space-y-4">
@@ -29,17 +29,9 @@ export default function ApartmentsHubPage() {
 
               {/* One-line unlock: “how it works” */}
               <p className="text-gray-700">
-                In simple terms: individual owners may refinance their own loans. Where that results in a lender-paid
-                commission, it can be credited back against that owner&apos;s levy, without affecting the building&apos;s
-                budget.
+                In simple terms, individual owners may choose to refinance their own loans. Where that results in a lender-paid trail commission, we automatically credit this against that owner’s levy, without affecting the building’s budget or other owners.
               </p>
             </div>
-
-            {/* One sentence to reduce “separate sales paths” confusion */}
-            <p className="mt-6 text-sm text-gray-500">
-              The same underlying model applies across buildings, the difference is simply who initiates the
-              conversation.
-            </p>
           </div>
 
           <div className="relative w-full h-64 md:h-72 rounded-2xl bg-gray-50 flex items-center justify-center overflow-hidden">
