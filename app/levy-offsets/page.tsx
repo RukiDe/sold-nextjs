@@ -78,7 +78,7 @@ export default function ApartmentsHubPage() {
           </ul>
 
           <div className="mt-6">
-            <ButtonPill href="/apartments/ownerscorporations">For Owners Corporations</ButtonPill>
+            <ButtonPill href="/levy-offsets/for-committees">For Owners Corporations</ButtonPill>
           </div>
         </div>
 
@@ -116,7 +116,7 @@ export default function ApartmentsHubPage() {
           </ul>
 
           <div className="mt-6">
-            <ButtonPill href="/apartments/developers">For Developers</ButtonPill>
+            <ButtonPill href="/levy-offsets/for-developers">For Developers</ButtonPill>
           </div>
         </div>
 
@@ -147,7 +147,7 @@ export default function ApartmentsHubPage() {
           </ul>
 
           <div className="mt-6">
-            <ButtonPill href="/apartments/owners">For Owners</ButtonPill>
+            <ButtonPill href="/levy-offsets/for-owners">For Owners</ButtonPill>
           </div>
         </div>
 

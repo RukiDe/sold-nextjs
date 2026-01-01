@@ -89,6 +89,8 @@ function safeNumber(value: string, fallback: number): number {
 
 function getCtaLabel(goal: string): string {
   switch (goal) {
+    case "Offset my body corporate fees":
+      return "Show my savings estimate";
     case "Lower my repayments":
       return "Show my savings estimate";
     case "Pay the loan off sooner":
@@ -417,6 +419,7 @@ export default function RefinancePage() {
   );
 
   const goalOptions = [
+    "Offset my body corporate fees",
     "Lower my repayments",
     "Pay the loan off sooner",
     "Free up cash for renos",
