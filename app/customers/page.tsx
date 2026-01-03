@@ -28,7 +28,7 @@ export default function CustomersPage() {
           </div>
 
           <p className="text-sm text-gray-500 mt-6">
-            You'll be directed to Frollo, our Open Banking partner and can withdraw consent at any time. Connecting doesn&apos;t obligate
+            You&apos;ll be directed to Frollo, our Open Banking partner and can withdraw consent at any time. Connecting doesn&apos;t obligate
             you to refinance.
           </p>
         </div>
