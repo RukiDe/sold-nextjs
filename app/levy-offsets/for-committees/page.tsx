@@ -195,62 +195,108 @@ export default function OwnersCorporationsPage() {
         </div>
       </section>
 
-      {/* FAQ */}
-      <section className="max-w-5xl mx-auto px-4 py-12">
-        <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">
-          Details
+{/* FAQ */}
+<section className="max-w-5xl mx-auto px-4 py-12">
+  <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">
+    Details
+  </p>
+  <h2 className="text-2xl font-semibold mb-6">
+    Frequently asked questions
+  </h2>
+
+  <div className="border border-gray-200 rounded-2xl p-6 shadow-sm bg-white space-y-4">
+    {/* FAQ 1 */}
+    <details>
+      <summary className="cursor-pointer font-medium">
+        What&apos;s your connection to Owners Corporations?
+      </summary>
+
+      <div className="mt-4 space-y-4 text-gray-700 leading-relaxed">
+        <p>I&apos;ve been on an Owners Committee myself.</p>
+
+        <p>
+          I joined at handover from a developer and stayed on the committee for
+          over four years. Like most committee members, I started with no
+          background in strata, building management, or governance. Everything
+          was learned through experience.
         </p>
-        <h2 className="text-2xl font-semibold mb-6">
-          Frequently asked questions
-        </h2>
 
-        <div className="border border-gray-200 rounded-2xl p-6 shadow-sm bg-white space-y-3">
-          <details>
-            <summary className="cursor-pointer font-medium">
-              Why would an Owners Corporation support this at all?
-            </summary>
-            <p className="mt-2 text-gray-700">
-              Because buildings with steadier levy outcomes are easier to manage,
-              easier to maintain, and easier to sell. Levy Offset stacks the odds
-              in favour of long-term building resilience without introducing
-              financial risk.
-            </p>
-          </details>
+        <p>Over that time, I saw firsthand:</p>
 
-          <details>
-            <summary className="cursor-pointer font-medium">
-              Why can&apos;t rebates be paid as cash to owners?
-            </summary>
-            <p className="mt-2 text-gray-700">
-              The purpose is to reduce levy pressure and support building
-              resilience, not to create cash incentives. Applying the benefit to
-              levies keeps it transparent, auditable, and aligned with
-              maintenance outcomes.
-            </p>
-          </details>
+        <ul className="list-disc pl-6 space-y-2">
+          <li>the steep learning curve after the first AGM</li>
+          <li>how quickly “one-off” expenses can become recurring issues</li>
+          <li>
+            how maintenance plans can feel painful for owners in the short term,
+            but are essential for long-term value
+          </li>
+          <li>the stress and disruption of special levies</li>
+          <li>
+            how easily misunderstandings arise when people are under financial
+            pressure
+          </li>
+        </ul>
 
-          <details>
-            <summary className="cursor-pointer font-medium">
-              Is this a sales program for mortgages?
-            </summary>
-            <p className="mt-2 text-gray-700">
-              No. A refinance is only recommended if the outcome is objectively
-              equal to or better than the owner&apos;s current setup. The levy
-              credit is a by-product, not the reason for a recommendation.
-            </p>
-          </details>
+        <p>
+          Our building also went through a legal dispute with the developer,
+          which added complexity, cost, and uncertainty for residents. It
+          reinforced how important building resilience, adequate funding, and
+          clear decision-making are to protecting long-term outcomes.
+        </p>
 
-          <details>
-            <summary className="cursor-pointer font-medium">
-              Does participation affect non-participating owners?
-            </summary>
-            <p className="mt-2 text-gray-700">
-              No. Non-participating owners continue exactly as before. No funds
-              are pooled or redistributed.
-            </p>
-          </details>
-        </div>
-      </section>
+        <p>
+          Like many committee members, I did the role alongside full-time work,
+          largely unpaid, and often felt the weight of responsibility without
+          having perfect information or clear answers.
+        </p>
+
+        <p>
+          Levy offsets are informed by that experience. They’re not about
+          avoiding necessary costs or changing how buildings are run. They’re
+          about reducing pressure where possible, so committees can make the
+          right long-term decisions with less friction.
+        </p>
+      </div>
+    </details>
+
+    {/* FAQ 2 */}
+    <details>
+      <summary className="cursor-pointer font-medium">
+        Can rebates be paid as cash to owners?
+      </summary>
+      <p className="mt-3 text-gray-700 leading-relaxed">
+        The purpose is to reduce levy pressure and support building resilience,
+        not to create cash incentives. Applying the benefit to levies keeps it
+        transparent, auditable, and aligned with maintenance outcomes.
+      </p>
+    </details>
+
+    {/* FAQ 3 */}
+    <details>
+      <summary className="cursor-pointer font-medium">
+        Does refinancing for a levy offset make sense?
+      </summary>
+      <p className="mt-3 text-gray-700 leading-relaxed">
+        A refinance is only recommended if the outcome is objectively equal to
+        or better than the owner&apos;s current mortgage. The levy credit is a
+        by-product, not the reason for a recommendation, and owners are the sole
+        decision-maker on whether to proceed.
+      </p>
+    </details>
+
+    {/* FAQ 4 */}
+    <details>
+      <summary className="cursor-pointer font-medium">
+        Does participation affect non-participating owners?
+      </summary>
+      <p className="mt-3 text-gray-700 leading-relaxed">
+        No. Non-participating owners continue exactly as they are. No funds are
+        pooled, redistributed, or taken from the Owners Corporation.
+      </p>
+    </details>
+  </div>
+</section>
+
 
       {/* QUALIFY FORM */}
       <section className="max-w-5xl mx-auto px-4 py-12">

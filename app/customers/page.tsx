@@ -63,7 +63,7 @@ export default function CustomersPage() {
           <div className="border border-gray-200 rounded-2xl p-4 bg-white">
             <p className="text-sm font-medium text-gray-900">Best Interests Duty</p>
             <p className="text-sm text-gray-600 mt-1">
-              Recommendations must be better
+              Recommendations must improve your position
             </p>
           </div>
         </div>
