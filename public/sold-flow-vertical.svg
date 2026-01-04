@@ -1,0 +1,126 @@
+<svg
+  width="420"
+  height="720"
+  viewBox="0 0 420 720"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <!-- Outer container -->
+  <rect
+    x="1"
+    y="1"
+    width="418"
+    height="718"
+    rx="20"
+    fill="white"
+    stroke="#E5E7EB"
+  />
+
+  <!-- Title -->
+  <text
+    x="32"
+    y="56"
+    font-size="20"
+    font-weight="600"
+    fill="#111827"
+    font-family="Inter, system-ui, -apple-system, BlinkMacSystemFont"
+  >
+    How Sold works
+  </text>
+
+  <text
+    x="32"
+    y="82"
+    font-size="14"
+    fill="#6B7280"
+    font-family="Inter, system-ui, -apple-system, BlinkMacSystemFont"
+  >
+    A calm, verified path to a clear decision.
+  </text>
+
+  <!-- Step 1 -->
+  <rect
+    x="32"
+    y="120"
+    width="356"
+    height="96"
+    rx="14"
+    fill="#F9FAFB"
+    stroke="#E5E7EB"
+  />
+  <text x="52" y="152" font-size="15" font-weight="600" fill="#111827"
+    font-family="Inter, system-ui, -apple-system, BlinkMacSystemFont">
+    Verified data
+  </text>
+  <text x="52" y="176" font-size="13" fill="#6B7280"
+    font-family="Inter, system-ui, -apple-system, BlinkMacSystemFont">
+    Open Banking (read-only)
+  </text>
+  <text x="52" y="196" font-size="13" fill="#6B7280"
+    font-family="Inter, system-ui, -apple-system, BlinkMacSystemFont">
+    Time-limited consent
+  </text>
+
+  <!-- Arrow 1 -->
+  <path d="M210 216 L210 248" stroke="#9CA3AF" stroke-width="2" />
+  <path d="M204 242 L210 248 L216 242" stroke="#9CA3AF" stroke-width="2" fill="none" />
+
+  <!-- Step 2 -->
+  <rect
+    x="32"
+    y="260"
+    width="356"
+    height="96"
+    rx="14"
+    fill="#F9FAFB"
+    stroke="#E5E7EB"
+  />
+  <text x="52" y="292" font-size="15" font-weight="600" fill="#111827"
+    font-family="Inter, system-ui, -apple-system, BlinkMacSystemFont">
+    Independent assessment
+  </text>
+  <text x="52" y="316" font-size="13" fill="#6B7280"
+    font-family="Inter, system-ui, -apple-system, BlinkMacSystemFont">
+    Best Interests Duty
+  </text>
+
+  <!-- Arrow 2 -->
+  <path d="M210 356 L210 388" stroke="#9CA3AF" stroke-width="2" />
+  <path d="M204 382 L210 388 L216 382" stroke="#9CA3AF" stroke-width="2" fill="none" />
+
+  <!-- Step 3 -->
+  <rect
+    x="32"
+    y="400"
+    width="356"
+    height="96"
+    rx="14"
+    fill="#F9FAFB"
+    stroke="#E5E7EB"
+  />
+  <text x="52" y="432" font-size="15" font-weight="600" fill="#111827"
+    font-family="Inter, system-ui, -apple-system, BlinkMacSystemFont">
+    Clear outcome
+  </text>
+  <text x="52" y="456" font-size="13" fill="#6B7280"
+    font-family="Inter, system-ui, -apple-system, BlinkMacSystemFont">
+    Better option
+  </text>
+  <text x="52" y="476" font-size="13" fill="#6B7280"
+    font-family="Inter, system-ui, -apple-system, BlinkMacSystemFont">
+    or “no change”
+  </text>
+
+  <!-- Divider -->
+  <line x1="32" y1="536" x2="388" y2="536" stroke="#E5E7EB" />
+
+  <!-- Footer reassurance -->
+  <text x="32" y="572" font-size="13" fill="#4B5563"
+    font-family="Inter, system-ui, -apple-system, BlinkMacSystemFont">
+    No obligation to proceed.
+  </text>
+  <text x="32" y="594" font-size="13" fill="#4B5563"
+    font-family="Inter, system-ui, -apple-system, BlinkMacSystemFont">
+    If the numbers don’t clearly stack up, we’ll say so.
+  </text>
+</svg>
