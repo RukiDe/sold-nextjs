@@ -259,6 +259,41 @@ export default function OwnersCorporationsPage() {
       </div>
     </details>
 
+       <details>
+          <summary className="cursor-pointer font-medium">
+            What might the offset look like on levy notices?
+          </summary>
+    
+          <div className="mt-4 space-y-4">
+            <p className="text-gray-700">
+              Where an offset applies, it appears as a clearly labelled credit
+              against your individual levy contribution. It does not change the
+              Owners Corporation&apos;s budget, levy schedule, or funding plan.
+            </p>
+    
+            <div className="border border-gray-200 rounded-xl bg-gray-50 p-4">
+              <p className="text-sm text-gray-600 mb-3">
+                Example levy notice with an offset applied
+              </p>
+    
+              <div className="relative w-full overflow-hidden rounded-lg border border-gray-200 bg-white">
+                <Image
+                  src="/levy-bill-inc-offsets.png"
+                  alt="Example levy notice showing a levy offset applied as a credit"
+                  width={1200}
+                  height={700}
+                  className="w-full h-auto"
+                />
+              </div>
+            </div>
+    
+            <p className="text-sm text-gray-600">
+              Rebates are applied automatically, typically quarterly in arrears, and
+              stop if the underlying loan changes or no longer qualifies.
+            </p>
+          </div>
+        </details>
+
     {/* FAQ 2 */}
     <details>
       <summary className="cursor-pointer font-medium">

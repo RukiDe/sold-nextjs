@@ -161,79 +161,96 @@ export default function OwnersPage() {
       </section>
 
       {/* FAQ */}
-      <section className="max-w-5xl mx-auto px-4 py-12">
-        <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">
-          Common questions
+ {/* FAQ */}
+<section className="max-w-5xl mx-auto px-4 py-12">
+  <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">
+    Common questions
+  </p>
+  <h2 className="text-2xl font-semibold mb-6">
+    Frequently asked questions
+  </h2>
+
+  <div className="border border-gray-200 rounded-2xl p-6 shadow-sm bg-white space-y-3">
+    <details>
+      <summary className="cursor-pointer font-medium">
+        Why can’t the offset be paid to me as cash?
+      </summary>
+      <p className="mt-2 text-gray-700">
+        Because the purpose is to reduce levy pressure and support building
+        maintenance, not to create cash incentives. Applying the offset to
+        levies keeps the benefit transparent, auditable, and aligned with
+        long-term building outcomes.
+      </p>
+    </details>
+
+    <details>
+      <summary className="cursor-pointer font-medium">
+        What might the offset look like on my levy notice?
+      </summary>
+
+      <div className="mt-4 space-y-4">
+        <p className="text-gray-700">
+          Where an offset applies, it appears as a clearly labelled credit
+          against your individual levy contribution. It does not change the
+          Owners Corporation&apos;s budget, levy schedule, or funding plan.
         </p>
-        <h2 className="text-2xl font-semibold mb-6">
-          Frequently asked questions
-        </h2>
 
-        <div className="border border-gray-200 rounded-2xl p-6 shadow-sm bg-white space-y-3">
-          <details>
-            <summary className="cursor-pointer font-medium">
-              Why can’t the rebate be paid to me as cash?
-            </summary>
-            <p className="mt-2 text-gray-700">
-              Because the purpose is to reduce levy pressure and support building
-              maintenance, not to create cash incentives. Applying the rebate to
-              levies keeps the benefit transparent, auditable, and aligned with
-              long-term building outcomes.
-            </p>
-          </details>
+        <div className="border border-gray-200 rounded-xl bg-gray-50 p-4">
+          <p className="text-sm text-gray-600 mb-3">
+            Example levy notice with an offset applied
+          </p>
 
-          <details>
-            <summary className="cursor-pointer font-medium">
-              Why is Sold giving up commission?
-            </summary>
-            <p className="mt-2 text-gray-700">
-              The intent is alignment. Buildings that are easier to maintain and
-              easier to own tend to perform better over time. Levy Offset is
-              designed to support that outcome rather than maximise broker
-              revenue.
-            </p>
-          </details>
-
-          <details>
-            <summary className="cursor-pointer font-medium">
-              Does this affect other owners?
-            </summary>
-            <p className="mt-2 text-gray-700">
-              No. Non-participating owners continue exactly as before. No funds
-              are pooled or redistributed.
-            </p>
-          </details>
-
-          <details>
-            <summary className="cursor-pointer font-medium">
-              Is there any cost or obligation?
-            </summary>
-            <p className="mt-2 text-gray-700">
-              No cost to review and no obligation to proceed. If you refinance,
-              standard lender fees may apply and are disclosed upfront.
-            </p>
-          </details>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="max-w-5xl mx-auto px-4 py-12">
-        <div className="flex flex-col sm:flex-row gap-4">
-          <ButtonPill href="https://sold.financial/refinance">
-            Request a mortgage review
-          </ButtonPill>
-
-          <ButtonPill href="/" variant="secondary">
-            No thanks
-          </ButtonPill>
+          <div className="relative w-full overflow-hidden rounded-lg border border-gray-200 bg-white">
+            <Image
+              src="/levy-bill-inc-offsets.png"
+              alt="Example levy notice showing a levy offset applied as a credit"
+              width={1200}
+              height={700}
+              className="w-full h-auto"
+            />
+          </div>
         </div>
 
-        <p className="text-sm text-gray-500 mt-6">
-          No obligation. No guarantee of an offset. Any rebate only applies if a
-          suitable refinance proceeds. Commission rates vary by lender and may
-          change.
+        <p className="text-sm text-gray-600">
+          Rebates are applied automatically, typically quarterly in arrears, and
+          stop if the underlying loan changes or no longer qualifies.
         </p>
-      </section>
+      </div>
+    </details>
+
+    <details>
+      <summary className="cursor-pointer font-medium">
+        Why is Sold giving up commission?
+      </summary>
+      <p className="mt-2 text-gray-700">
+        The intent is alignment. Buildings that are easier to maintain and
+        easier to own tend to perform better over time. Levy Offset is designed
+        to support that outcome rather than maximise broker revenue.
+      </p>
+    </details>
+
+    <details>
+      <summary className="cursor-pointer font-medium">
+        Does this affect other owners?
+      </summary>
+      <p className="mt-2 text-gray-700">
+        No. Non-participating owners continue exactly as before. No funds are
+        pooled or redistributed.
+      </p>
+    </details>
+
+    <details>
+      <summary className="cursor-pointer font-medium">
+        Is there any cost or obligation?
+      </summary>
+      <p className="mt-2 text-gray-700">
+        No cost to review and no obligation to proceed. If you refinance,
+        standard lender fees may apply and are disclosed upfront.
+      </p>
+    </details>
+  </div>
+</section>
+
     </main>
   );
 }
