@@ -48,7 +48,7 @@ export default function HomePage() {
               priority
             />
             <p className="mt-4 text-sm text-gray-600">
-              Quiet, predictable and enriching apartment living, by design.
+              Enriching apartment living, by design.
             </p>
           </div>
         </div>

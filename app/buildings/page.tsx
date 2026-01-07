@@ -10,13 +10,8 @@ export default function BuildingsPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
           <div>
 <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight mb-3">
-  Making apartment costs easier to live with
+  Buildings
 </h1>
-
-<p className="text-lg text-gray-700 max-w-xl mb-6">
-  Creating shared upside for owners, residents and local businesses over time
-</p>
-
 
             <p className="text-lg text-gray-700 mb-4">
               <span className="font-medium text-gray-900">
@@ -46,7 +41,7 @@ export default function BuildingsPage() {
             </div>
 
             <div className="mt-4 text-sm text-gray-600">
-              Quiet, predictable and enriching apartment living, by design.
+              Quiet, predictable building resilience and community.
             </div>
           </div>
         </div>
