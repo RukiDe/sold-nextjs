@@ -58,10 +58,10 @@ export default function HomePage() {
                   For buildings
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <ButtonPill href="/buildings">Buildings</ButtonPill>
-                  <ButtonPill href="/buildings/community">Community</ButtonPill>
-                  <ButtonPill href="/buildings/levy-offsets">Levy offsets</ButtonPill>
-                  <ButtonPill href="/buildings/balance-sheets">Balance sheets</ButtonPill>
+                  <ButtonPill href="/buildings">Owners</ButtonPill>
+                  <ButtonPill href="/buildings/levy-offsets">Owners Corps</ButtonPill>
+                  <ButtonPill href="/buildings/community">Residents</ButtonPill>
+                  <ButtonPill href="/buildings/levy-offsets/for-developers">Developers</ButtonPill>
                 </div>
                 <p className="mt-4 text-xs sm:text-sm text-neutral-500">
                   For Owners Corporations, residents, and local businesses.
