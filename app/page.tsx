@@ -48,7 +48,7 @@ export default function HomePage() {
               priority
             />
             <p className="mt-4 text-sm text-gray-600">
-              Enriching apartment living, by design.
+              Reducing levy pressure for owners. Strengthening apartment living.
             </p>
           </div>
         </div>
