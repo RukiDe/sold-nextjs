@@ -28,8 +28,7 @@ export default function IndividualsPage() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3">
-              <ButtonPill href="#pathways">Choose a pathway</ButtonPill>
-              <ButtonPill href="#open-banking">Open Banking</ButtonPill>
+              <ButtonPill href="#pathways">Home Loans</ButtonPill>
             </div>
 
             <p className="text-sm text-gray-500 mt-6">
@@ -46,7 +45,7 @@ export default function IndividualsPage() {
               priority
             />
             <p className="mt-4 text-sm text-gray-600">
-              Verified inputs. Clear outcomes. No obligation.
+              Clear outcomes. Offset levies. No obligations.
             </p>
           </div>
         </div>

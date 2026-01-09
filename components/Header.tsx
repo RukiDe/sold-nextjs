@@ -5,7 +5,7 @@ const navItems = [
   { href: "/individuals", label: "Individuals" },
   { href: "/buildings", label: "Buildings" },
   { href: "/terms", label: "Terms" },
-  { href: "/privacy", label: "Privacy Policy" }
+  { href: "/privacy", label: "Privacy" }
 ];
 
 export default function Header() {

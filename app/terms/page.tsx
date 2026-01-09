@@ -1,6 +1,6 @@
 const html = `
   <h1 class="text-3xl sm:text-4xl font-bold">Terms and Conditions</h1>
-  <p class="mt-2 text-neutral-600">Last updated: November 2025</p>
+  <p class="mt-2 text-neutral-600">Last updated: January 2026</p>
 
   <div class="mt-8 space-y-6 text-[15px] leading-7 text-neutral-800">
 

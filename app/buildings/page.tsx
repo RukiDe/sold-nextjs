@@ -41,7 +41,7 @@ export default function BuildingsPage() {
             </div>
 
             <div className="mt-4 text-sm text-gray-600">
-              Quiet, predictable building resilience and community.
+              Superannuation, but for buildings.
             </div>
           </div>
         </div>
