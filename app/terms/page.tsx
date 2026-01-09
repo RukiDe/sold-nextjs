@@ -70,7 +70,14 @@ const html = `
     </div>
 
     <div>
-      <h2 class="text-xl font-semibold">7. Limitation of information</h2>
+    <h2 class="text-xl font-semibold">7. Assignment and continuity</h2>
+      <p>If Sold or the Levy Offset program is transferred, assigned, or sold as part of a business sale or restructure, participation in any levy offset arrangement remains voluntary and subject to the new owner’s terms.
+            Where a levy offset continues, the new owner may require users to maintain an Open Banking connection (or re-consent where required) to support verification, compliance, and ongoing administration. Users are not obligated to continue participation and may withdraw at any time.
+      </p>
+    </div>
+
+    <div>
+      <h2 class="text-xl font-semibold">8. Limitation of information</h2>
       <p>
         Content is general and does not take your personal circumstances into account. Formal credit assistance
         is provided only after written documents are issued and accepted.
@@ -78,7 +85,7 @@ const html = `
     </div>
 
     <div>
-      <h2 class="text-xl font-semibold">8. Fees and commissions</h2>
+      <h2 class="text-xl font-semibold">9. Fees and commissions</h2>
       <p>
         There is no charge to use this website. If you proceed with a loan arranged through Sold Financial,
         we may receive commission payments from the lender. All benefits are disclosed in writing before acceptance.
@@ -86,7 +93,7 @@ const html = `
     </div>
 
     <div>
-      <h2 class="text-xl font-semibold">9. Privacy and data handling</h2>
+      <h2 class="text-xl font-semibold">10. Privacy and data handling</h2>
       <p>
         We comply with the <em>Privacy Act 1988 (Cth)</em> and the CDR Rules. Please see our
         <a href="/privacy" class="underline">Privacy Policy</a>.
@@ -94,7 +101,7 @@ const html = `
     </div>
 
     <div>
-      <h2 class="text-xl font-semibold">10. Liability</h2>
+      <h2 class="text-xl font-semibold">11. Liability</h2>
       <p>
         To the extent permitted by law, we are not liable for loss arising from use of this website or reliance
         on indicative estimates prior to full assessment.
@@ -102,14 +109,14 @@ const html = `
     </div>
 
     <div>
-      <h2 class="text-xl font-semibold">11. Governing law</h2>
+      <h2 class="text-xl font-semibold">12. Governing law</h2>
       <p>
         These Terms are governed by the laws of Victoria, Australia.
       </p>
     </div>
 
     <div>
-      <h2 class="text-xl font-semibold">12. Contact us</h2>
+      <h2 class="text-xl font-semibold">13. Contact us</h2>
       <p>
         <strong>Homei Fi Pty Ltd t/a Sold Financial</strong><br />
         Email: <a href="mailto:connect@sold.financial" class="underline">connect@sold.financial</a><br />

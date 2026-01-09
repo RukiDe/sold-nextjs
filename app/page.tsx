@@ -34,8 +34,7 @@ export default function HomePage() {
             </div>
 
             <p className="text-sm text-gray-500 mt-6">
-              Voluntary participation • Transparent outcomes • Designed to be
-              boring (in a good way)
+              Lower levies • Voluntary participation • Transparent outcomes  
             </p>
           </div>
 
