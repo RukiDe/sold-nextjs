@@ -25,7 +25,7 @@ export default function BuildingsPage() {
             <p className="text-gray-700 mb-8">
               We don’t replace levies or change governance. We add careful,
               voluntary revenue or offset opportunities around the system that already exists, designed
-              to be transparent, low-risk, and easy to explain.
+              to be transparent and low-risk.
             </p>
           </div>
 
@@ -64,9 +64,9 @@ export default function BuildingsPage() {
               </p>
 
               <ul className="text-gray-700 space-y-2 mb-6">
-                <li>• Levies still exist. Budgets still exist. Governance stays the same.</li>
+                <li>• Levies still exist. Owners Corporations budgets remain independent Governance stays the same.</li>
                 <li>• No impact on owners who don’t participate.</li>
-                <li>• Designed to be boring, predictable, and easy to audit.</li>
+                <li>• Designed to be predictable, and easy to audit.</li>
               </ul>
 
               <div className="flex flex-wrap gap-3">
@@ -94,8 +94,8 @@ export default function BuildingsPage() {
               </p>
 
               <ul className="text-gray-700 space-y-2 mb-6">
-                <li>• Designed for residential environments, not “ad tech”.</li>
-                <li>• No speculation. No debt. No balance-sheet risk for the OC.</li>
+                <li>• Designed for residents, and community not “ads".</li>
+                <li>• Fluid community notice board meets deals for residents from local businesses.</li>
                 <li>• Clear disclosures and opt-in where appropriate.</li>
               </ul>
 
@@ -127,7 +127,7 @@ export default function BuildingsPage() {
 
               <ul className="text-gray-700 space-y-2 mb-6">
                 <li>• Focused on cashflow predictability, not “optimisation theatre”.</li>
-                <li>• Helps investors understand true ongoing ownership costs.</li>
+                <li>• Helps owners manage their balance sheets.</li>
                 <li>• Supports decisions that still make sense in year 10.</li>
               </ul>
 
