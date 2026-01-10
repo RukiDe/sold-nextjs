@@ -64,7 +64,7 @@ export default function BuildingsPage() {
               </p>
 
               <ul className="text-gray-700 space-y-2 mb-6">
-                <li>• Levies still exist. Owners Corporations budgets remain independent Governance stays the same.</li>
+                <li>• Levies still exist. Owners Corporations budgets remain independent of offsets.</li>
                 <li>• No impact on owners who don’t participate.</li>
                 <li>• Designed to be predictable, and easy to audit.</li>
               </ul>
@@ -94,7 +94,7 @@ export default function BuildingsPage() {
               </p>
 
               <ul className="text-gray-700 space-y-2 mb-6">
-                <li>• Designed for residents, and community not “ads".</li>
+                <li>• Designed for residents, and community not ads.</li>
                 <li>• Fluid community notice board meets deals for residents from local businesses.</li>
                 <li>• Clear disclosures and opt-in where appropriate.</li>
               </ul>
