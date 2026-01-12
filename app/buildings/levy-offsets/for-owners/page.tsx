@@ -4,11 +4,6 @@ import { ButtonPill } from "@/components/ButtonPill";
 export default function OwnersPage() {
   return (
     <main>
-      {/* TOP NOTICE */}
-      <div className="bg-black text-white text-sm px-4 py-2 text-center">
-        This page is intended for owners participating in a committee-approved
-        levy offset pilot.
-      </div>
 
       {/* HERO */}
       <section className="max-w-3xl mx-auto px-4 py-12">
