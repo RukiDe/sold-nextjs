@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { createLevyOffsetEstimateLead } from "@/lib/airtable";
 
 function coerceToBoolean(value: any): boolean {
   return (
@@ -67,7 +68,7 @@ export async function POST(req: Request) {
       }),
     });
 
-    const data = await res.json();
+    const data = await res.json().catch(() => ({}));
 
     if (!res.ok) {
       console.error("Brevo levy-offset error:", data);
@@ -76,6 +77,44 @@ export async function POST(req: Request) {
         { status: 500 }
       );
     }
+
+    /* ---------------------------------------------------------------------- */
+    /*                             AIRTABLE WRITE                              */
+    /* ---------------------------------------------------------------------- */
+    // Pull values from attributes (these are what your estimate page sends)
+    const loanAmount =
+      Number(attributes?.OFFSETESTIMATE_LOAN) ||
+      Number(attributes?.loanAmount) ||
+      0;
+
+    const annualOffset =
+      Number(attributes?.OFFSETESTIMATE_ANNUAL) ||
+      Number(attributes?.annualOffset) ||
+      0;
+
+    const trailRate =
+      Number(attributes?.OFFSETESTIMATE_RATE) ||
+      Number(attributes?.trailRate) ||
+      0.0015;
+
+    const page =
+      (attributes?.OFFSETESTIMATE_PAGE as string | undefined) ||
+      (attributes?.page as string | undefined) ||
+      "/buildings/levy-offsets/for-owners/estimate";
+
+    const source =
+      (attributes?.SOURCE as string | undefined) ||
+      "OFFSETESTIMATE";
+
+    // Fire-and-forget so Airtable issues don’t block the user journey
+    void createLevyOffsetEstimateLead({
+      email: String(email).trim().toLowerCase(),
+      loanAmount,
+      annualOffset,
+      trailRate,
+      source,
+      page,
+    });
 
     return NextResponse.json({ success: true, data });
   } catch (err: any) {
