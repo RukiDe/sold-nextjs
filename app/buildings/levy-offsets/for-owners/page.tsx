@@ -173,7 +173,7 @@ export default function OwnersPage() {
   <div className="border border-gray-200 rounded-2xl p-6 shadow-sm bg-white space-y-3">
         <details>
       <summary className="cursor-pointer font-medium">
-        Why don't other brokers do this?
+        Will other brokers do this?
       </summary>
       <p className="mt-2 text-gray-700">
         Ongoing commissions are highly prized by brokers. We believe they should help you.
