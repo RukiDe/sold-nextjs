@@ -179,7 +179,7 @@ export default function OwnersEstimatePage() {
               {show && (
                 <div className="mt-5 border border-gray-200 rounded-xl bg-gray-50 p-4 space-y-2">
                   <p className="text-xs uppercase tracking-wide text-gray-500">
-                    Your estimate
+                    Your estimated levy offset
                   </p>
                   <p className="text-2xl font-semibold text-gray-900">
                     {fmt(annual)} / year
