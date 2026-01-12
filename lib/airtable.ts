@@ -6,13 +6,13 @@
 
 const AIRTABLE_API_TOKEN = process.env.AIRTABLE_API_TOKEN;
 
-// Refinance (existing setup)
+// Refinance (your existing setup)
 const AIRTABLE_REFI_BASE_ID =
   process.env.AIRTABLE_REFI_BASE_ID || process.env.AIRTABLE_BASE_ID;
 const AIRTABLE_REFI_TABLE_NAME =
   process.env.AIRTABLE_REFI_TABLE_NAME || "Refinance";
 
-// ReadinessCheck (existing setup)
+// ReadinessCheck (new)
 const AIRTABLE_READINESS_BASE_ID =
   process.env.AIRTABLE_READINESS_BASE_ID ||
   AIRTABLE_REFI_BASE_ID || // fallback to the same base
@@ -60,7 +60,7 @@ function readinessConfigured(): boolean {
 }
 
 /* ========================================================================== */
-/*                       TYPES: REFINANCE (EXISTING)                           */
+/*                       TYPES: REFINANCE (YOUR EXISTING CODE)                */
 /* ========================================================================== */
 
 type OptionKey = "A" | "B" | "C";
@@ -107,7 +107,7 @@ export type RefinanceFactFindStored = {
 };
 
 /* ========================================================================== */
-/*                        CREATE REFINANCE FACT-FIND ROW                       */
+/*                        CREATE REFINANCE FACT-FIND ROW                      */
 /* ========================================================================== */
 
 export async function createRefinanceFactFindRecord(
@@ -226,90 +226,6 @@ export async function createRefinanceFactFindRecord(
 
   if (!res.ok) {
     console.error("[Airtable] Failed to create record", res.status, data);
-  }
-}
-
-/* ========================================================================== */
-/*             LEVY OFFSET ESTIMATE → WRITE INTO REFINANCE TABLE               */
-/* ========================================================================== */
-
-export type LevyOffsetEstimatePayload = {
-  email: string;
-  loanAmount: number;
-  annualOffset: number;
-  trailRate: number; // for audit/debug (optional to store)
-  source?: string; // e.g. "OFFSETESTIMATE"
-  page?: string; // optional (only store if you have a column)
-};
-
-/**
- * Writes a "lead-style" row into the Refinance table for levy offset estimate flows.
- *
- * IMPORTANT:
- * - Uses existing columns you confirmed:
- *   - Email
- *   - Current Loan Balance
- *   - Offset Estimate
- *   - Goal (multi-select)
- *   - Source
- *
- * If you add more columns later (e.g. "Trail Rate", "Landing Page"), you can safely extend fields below.
- */
-export async function createLevyOffsetEstimateLead(
-  payload: LevyOffsetEstimatePayload
-): Promise<void> {
-  if (!airtableConfigured()) {
-    console.warn(
-      "[Airtable] Not configured — skipping createLevyOffsetEstimateLead"
-    );
-    return;
-  }
-
-  const email = payload.email?.trim();
-  if (!email || !email.includes("@")) {
-    console.warn("[Airtable] createLevyOffsetEstimateLead: invalid email", email);
-    return;
-  }
-
-  const fields: Record<string, any> = {
-    Email: email,
-    Goal: ["Offset my body corporate fees"],
-    "Current Loan Balance": Number(payload.loanAmount),
-    "Offset Estimate": Number(payload.annualOffset),
-    Source: payload.source ?? "OFFSETESTIMATE",
-  };
-
-  // Only add these if/when you create matching Airtable columns.
-  // fields["Trail Rate"] = payload.trailRate;
-  // if (payload.page) fields["Landing Page"] = payload.page;
-
-  const url = `https://api.airtable.com/v0/${AIRTABLE_REFI_BASE_ID}/${encodeURIComponent(
-    AIRTABLE_REFI_TABLE_NAME!
-  )}`;
-
-  console.log(
-    "[Airtable] Creating levy offset estimate lead in",
-    AIRTABLE_REFI_TABLE_NAME,
-    fields
-  );
-
-  const res = await fetch(url, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${AIRTABLE_API_TOKEN}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ fields }),
-  });
-
-  const data = await res.json().catch(() => ({}));
-
-  if (!res.ok) {
-    console.error(
-      "[Airtable] Failed to create levy offset estimate lead",
-      res.status,
-      data
-    );
   }
 }
 
@@ -444,6 +360,65 @@ export async function updateRefinanceOptionsForRecord(
 }
 
 /* ========================================================================== */
+/*                        LEVY OFFSET — TYPES & CREATORS                       */
+
+export type LevyOffsetEstimateLead = {
+  email: string;
+  loanAmount: number;
+  annualOffset: number;
+  trailRate: number;
+  source: string; // e.g. "OFFSETESTIMATE"
+  page?: string; // e.g. "/buildings/levy-offsets/for-owners/estimate"
+};
+
+export async function createLevyOffsetEstimateLead(
+  payload: LevyOffsetEstimateLead
+): Promise<void> {
+  if (!airtableConfigured()) {
+    console.warn("[Airtable] Not configured — skipping createLevyOffsetEstimateLead");
+    return;
+  }
+
+  const fields: Record<string, any> = {
+    Email: payload.email.trim().toLowerCase(),
+
+    // Keep this aligned with how you're grouping leads in Refinance
+    Goal: ["Offset my body corporate fees"],
+
+    // Use an existing numeric column if you have it.
+    // If your table already uses "Current Loan Balance", reuse it:
+    "Current Loan Balance": Number(payload.loanAmount),
+
+    // You told me this column exists ✅
+    "Offset Estimate": Number(payload.annualOffset),
+
+    // Optional extra tracking (only works if these columns exist)
+    "Trail Rate": payload.trailRate,
+    Source: payload.source,
+    "Landing Page": payload.page ?? null,
+  };
+
+  const url = `https://api.airtable.com/v0/${AIRTABLE_REFI_BASE_ID}/${encodeURIComponent(
+    AIRTABLE_REFI_TABLE_NAME!
+  )}`;
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${AIRTABLE_API_TOKEN}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ fields }),
+  });
+
+  const data = await res.json().catch(() => ({}));
+
+  if (!res.ok) {
+    console.error("[Airtable] createLevyOffsetEstimateLead error:", res.status, data);
+  }
+}
+
+/* ========================================================================== */
 /*                        READINESSCHECK — TYPES                              */
 /* ========================================================================== */
 
@@ -575,7 +550,9 @@ export async function getReadinessCheckById(
   id: string
 ): Promise<ReadinessCheckStored | null> {
   if (!readinessConfigured()) {
-    console.warn("[Airtable] Not configured — skipping getReadinessCheckById");
+    console.warn(
+      "[Airtable] Not configured — skipping getReadinessCheckById"
+    );
     return null;
   }
 

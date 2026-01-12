@@ -1,3 +1,4 @@
+// app/api/brevo/levy-offset/route.ts
 import { NextResponse } from "next/server";
 import { createLevyOffsetEstimateLead } from "@/lib/airtable";
 
@@ -51,9 +52,11 @@ export async function POST(req: Request) {
       );
     }
 
-    const LIST_ID = 13;
+    // Prefer env var, fallback to 13
+    const listIdRaw = process.env.BREVO_LEVY_OFFSET_LIST_ID;
+    const LIST_ID = listIdRaw ? Number(listIdRaw) : 13;
 
-    // Upsert contact and ensure they're added to list 13
+    // Upsert contact and ensure they're added to Levy Offset list
     const res = await fetch("https://api.brevo.com/v3/contacts", {
       method: "POST",
       headers: {
@@ -81,32 +84,47 @@ export async function POST(req: Request) {
     /* ---------------------------------------------------------------------- */
     /*                             AIRTABLE WRITE                              */
     /* ---------------------------------------------------------------------- */
-    // Pull values from attributes (these are what your estimate page sends)
+    // Prefer values from the request body (what your estimate page sends),
+    // and fall back to attributes if you're passing via Brevo attributes.
     const loanAmount =
+      Number(body?.loanAmount) ||
       Number(attributes?.OFFSETESTIMATE_LOAN) ||
       Number(attributes?.loanAmount) ||
       0;
 
     const annualOffset =
+      Number(body?.annualOffset) ||
       Number(attributes?.OFFSETESTIMATE_ANNUAL) ||
       Number(attributes?.annualOffset) ||
       0;
 
     const trailRate =
+      Number(body?.trailRate) ||
       Number(attributes?.OFFSETESTIMATE_RATE) ||
       Number(attributes?.trailRate) ||
       0.0015;
 
     const page =
+      (body?.page as string | undefined) ||
       (attributes?.OFFSETESTIMATE_PAGE as string | undefined) ||
       (attributes?.page as string | undefined) ||
       "/buildings/levy-offsets/for-owners/estimate";
 
     const source =
+      (body?.source as string | undefined) ||
       (attributes?.SOURCE as string | undefined) ||
       "OFFSETESTIMATE";
 
     // Fire-and-forget so Airtable issues don’t block the user journey
+    console.log("[levy-offset] Writing to Airtable", {
+      email,
+      loanAmount,
+      annualOffset,
+      trailRate,
+      source,
+      page,
+    });
+
     void createLevyOffsetEstimateLead({
       email: String(email).trim().toLowerCase(),
       loanAmount,
