@@ -1,4 +1,3 @@
-// app/api/brevo/levy-offset/route.ts
 import { NextResponse } from "next/server";
 import { createLevyOffsetEstimateLead } from "@/lib/airtable";
 
@@ -52,71 +51,60 @@ export async function POST(req: Request) {
       );
     }
 
-    // Prefer env var, fallback to 13
-    const listIdRaw = process.env.BREVO_LEVY_OFFSET_LIST_ID;
-    const LIST_ID = listIdRaw ? Number(listIdRaw) : 13;
+    const LIST_ID = 13;
 
-    // Upsert contact and ensure they're added to Levy Offset list
-    const res = await fetch("https://api.brevo.com/v3/contacts", {
+    // 1) BREVO UPSERT
+    const brevoRes = await fetch("https://api.brevo.com/v3/contacts", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "api-key": apiKey,
       },
       body: JSON.stringify({
-        email,
+        email: email.trim().toLowerCase(),
         attributes,
         listIds: [LIST_ID],
         updateEnabled: true,
       }),
     });
 
-    const data = await res.json().catch(() => ({}));
+    const brevoData = await brevoRes.json().catch(() => ({}));
 
-    if (!res.ok) {
-      console.error("Brevo levy-offset error:", data);
+    if (!brevoRes.ok) {
+      console.error("[levy-offset] Brevo error:", brevoData);
       return NextResponse.json(
-        { error: "Failed to create/update Brevo contact", details: data },
+        { error: "Failed to create/update Brevo contact", details: brevoData },
         { status: 500 }
       );
     }
 
-    /* ---------------------------------------------------------------------- */
-    /*                             AIRTABLE WRITE                              */
-    /* ---------------------------------------------------------------------- */
-    // Prefer values from the request body (what your estimate page sends),
-    // and fall back to attributes if you're passing via Brevo attributes.
+    // 2) AIRTABLE WRITE (don’t block Brevo success if Airtable fails)
     const loanAmount =
-      Number(body?.loanAmount) ||
       Number(attributes?.OFFSETESTIMATE_LOAN) ||
       Number(attributes?.loanAmount) ||
       0;
 
     const annualOffset =
-      Number(body?.annualOffset) ||
       Number(attributes?.OFFSETESTIMATE_ANNUAL) ||
       Number(attributes?.annualOffset) ||
       0;
 
     const trailRate =
-      Number(body?.trailRate) ||
       Number(attributes?.OFFSETESTIMATE_RATE) ||
       Number(attributes?.trailRate) ||
       0.0015;
 
     const page =
-      (body?.page as string | undefined) ||
       (attributes?.OFFSETESTIMATE_PAGE as string | undefined) ||
       (attributes?.page as string | undefined) ||
       "/buildings/levy-offsets/for-owners/estimate";
 
     const source =
-      (body?.source as string | undefined) ||
       (attributes?.SOURCE as string | undefined) ||
+      (attributes?.source as string | undefined) ||
       "OFFSETESTIMATE";
 
-    // Fire-and-forget so Airtable issues don’t block the user journey
-    console.log("[levy-offset] Writing to Airtable", {
+    console.log("[levy-offset] Airtable payload:", {
       email,
       loanAmount,
       annualOffset,
@@ -125,18 +113,23 @@ export async function POST(req: Request) {
       page,
     });
 
-    void createLevyOffsetEstimateLead({
-      email: String(email).trim().toLowerCase(),
-      loanAmount,
-      annualOffset,
-      trailRate,
-      source,
-      page,
-    });
+    try {
+      await createLevyOffsetEstimateLead({
+        email: email.trim().toLowerCase(),
+        loanAmount,
+        annualOffset,
+        trailRate,
+        source,
+        page,
+      });
+    } catch (e: any) {
+      console.error("[levy-offset] Airtable write failed:", e?.message || e);
+      // still return success (Brevo already worked)
+    }
 
-    return NextResponse.json({ success: true, data });
+    return NextResponse.json({ success: true, data: brevoData });
   } catch (err: any) {
-    console.error("levy-offset route error:", err);
+    console.error("[levy-offset] route error:", err);
     return NextResponse.json(
       { error: "Server error", details: err?.message },
       { status: 500 }

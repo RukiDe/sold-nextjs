@@ -1,260 +1,205 @@
-import Image from "next/image";
-import { ButtonPill } from "@/components/ButtonPill";
+import OwnersEstimatePage from "./estimate/OwnersEstimate";
+import { PdfExplainerCta } from "@/components/PdfExplainerCta";
 
-export default function OwnersPage() {
+export default function LevyOffsetsForOwnersPage() {
   return (
-    <main>
-
-      {/* HERO */}
-      <section className="max-w-3xl mx-auto px-4 py-12">
-        <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">
-          For individual apartment owners
-        </p>
-
-        <h1 className="text-3xl font-semibold mb-4">
-          Mortgage Review for Levy Offset Pilot
-        </h1>
-
-        <p className="text-lg text-gray-700 mb-6">
-          <span className="font-medium text-gray-900">
-            Nothing changes unless you choose to proceed.
-          </span>{" "}
-          A voluntary mortgage review that may offset part of your levy where a
-          better loan outcome exists.
-        </p>
-
-        <div className="border border-gray-200 rounded-2xl p-6 shadow-sm bg-gray-50">
-          <p className="text-gray-700 mb-3 font-medium">
-            What stays exactly the same:
+    <main className="bg-white">
+      <section className="max-w-4xl mx-auto px-4 py-12 space-y-16">
+        {/* HERO */}
+        <header className="space-y-4">
+          <p className="text-xs uppercase tracking-wide text-gray-500">
+            Levy offsets for apartment owners
           </p>
-          <ul className="space-y-2 text-gray-700 list-disc pl-5">
-            <li>Your building’s levies, budget, and maintenance plan</li>
-            <li>No pooled rebates or shared accounts</li>
-            <li>No impact on non-participating owners</li>
-            <li>No obligation to refinance</li>
-          </ul>
-        </div>
-      </section>
-
-      {/* SYSTEM STENCIL */}
-      <div className="max-w-5xl mx-auto px-4 -mt-2 mb-12">
-        <div className="relative w-full h-44 rounded-2xl bg-gray-50 flex items-center justify-center overflow-hidden">
-          <Image
-            src="/stencils/apartments-hub-stencil.svg"
-            alt=""
-            width={900}
-            height={400}
-            className="w-5/6 h-5/6 opacity-45"
-            priority
-          />
-        </div>
-      </div>
-
-      {/* WHY NOW */}
-      <section className="max-w-5xl mx-auto px-4 py-12">
-        <div className="grid gap-10 md:grid-cols-2 items-center">
-          <div>
-            <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">
-              Context
-            </p>
-            <h2 className="text-2xl font-semibold mb-3">
-              Why this is being explored
-            </h2>
-
-            <p className="text-gray-700 mb-4">
-              Apartment living depends on well-funded maintenance plans to
-              protect building condition and long-term value. Buyers,
-              conveyancers, and lenders routinely assess levy stability and
-              maintenance history.
-            </p>
-
-            <p className="text-gray-700 mb-4">
-              At the same time, many owners have not reviewed their mortgage
-              despite major changes in interest rates and lender pricing.
-            </p>
-
-            <p className="text-gray-700">
-              This pilot explores whether improvements to an individual mortgage
-              can help reduce levy cashflow pressure without changing how the
-              building is funded or managed.
-            </p>
-          </div>
-
-          <div className="relative w-full h-56 rounded-2xl bg-gray-50 flex items-center justify-center overflow-hidden">
-            <Image
-              src="/stencils/individual-owner-stencil.svg"
-              alt=""
-              width={700}
-              height={350}
-              className="w-4/5 h-4/5 opacity-50"
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* HOW IT WORKS */}
-      <section className="max-w-5xl mx-auto px-4 py-12">
-        <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">
-          How it works
-        </p>
-        <h2 className="text-2xl font-semibold mb-6">
-          A review first. A refinance only if better.
-        </h2>
-
-        <div className="grid gap-10 md:grid-cols-2">
-          <div className="border border-gray-200 rounded-2xl p-6 shadow-sm">
-            <ol className="list-decimal pl-5 text-gray-700 space-y-2">
-              <li>You request a free mortgage review</li>
-              <li>You choose how to share information (Open Banking or manual)</li>
-              <li>Your current loan is assessed objectively</li>
-              <li>
-                A refinance is only recommended if it clearly improves your
-                position
-              </li>
-              <li>You decide whether to proceed</li>
-            </ol>
-          </div>
-
-          <div className="border border-gray-200 rounded-2xl p-6 shadow-sm bg-white">
-            <p className="text-gray-700 mb-3">
-              Where a refinance proceeds and a lender pays an ongoing commission,
-              that amount is applied as a credit against your levy using your
-              existing BPAY reference.
-            </p>
-
-            <ul className="list-disc pl-5 text-gray-700 space-y-2">
-              <li>Calculated quarterly in arrears</li>
-              <li>Appears as a visible credit on your strata invoice</li>
-              <li>Stops automatically if your loan changes</li>
-            </ul>
-
-            <p className="text-gray-700 mt-4">
-              This is a by-product of a better loan outcome, not the reason for a
-              recommendation.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* BEST INTERESTS */}
-      <section className="max-w-5xl mx-auto px-4 py-12">
-        <div className="border border-gray-200 rounded-2xl p-6 bg-gray-50">
-          <h2 className="text-xl font-semibold mb-3">
-            Best Interests Duty
-          </h2>
-
-          <ul className="list-disc pl-5 text-gray-700 space-y-2 mb-3">
-            <li>A worse loan is never justified by a rebate</li>
-            <li>Fees, features, and suitability are considered</li>
-            <li>If no better option exists, no refinance is recommended</li>
-          </ul>
-
-          <p className="text-gray-700 text-sm">
-            Sold acts independently and is separate from the Owners Corporation.
+          <h1 className="text-3xl md:text-4xl font-semibold text-gray-900">
+            A voluntary levy offset for apartment owners
+          </h1>
+          <p className="text-lg text-gray-700 max-w-3xl">
+            Some apartment owners with mortgages may be able to offset part of
+            their individual Owners Corporation levy. This page explains how
+            levy offsets work, when they don’t, and the optional ways you can
+            explore whether it’s relevant for you.
           </p>
-        </div>
-      </section>
+        </header>
 
-      {/* FAQ */}
- {/* FAQ */}
-<section className="max-w-5xl mx-auto px-4 py-12">
-  <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">
-    Common questions
-  </p>
-  <h2 className="text-2xl font-semibold mb-6">
-    Frequently asked questions
-  </h2>
-
-  <div className="border border-gray-200 rounded-2xl p-6 shadow-sm bg-white space-y-3">
-        <details>
-      <summary className="cursor-pointer font-medium">
-        Will other brokers do this?
-      </summary>
-      <p className="mt-2 text-gray-700">
-        Ongoing commissions are highly prized by brokers. We believe they should help you.
-      </p>
-    </details>
-    
-    <details>
-      <summary className="cursor-pointer font-medium">
-        Why can’t the offset be paid to me as cash?
-      </summary>
-      <p className="mt-2 text-gray-700">
-        Because the purpose is to reduce levy pressure and support building
-        maintenance, not to create cash incentives. Applying the offset to
-        levies keeps the benefit transparent, auditable, and aligned with
-        long-term building outcomes.
-      </p>
-    </details>
-
-    <details>
-      <summary className="cursor-pointer font-medium">
-        What might the offset look like on my levy notice?
-      </summary>
-
-      <div className="mt-4 space-y-4">
-        <p className="text-gray-700">
-          Where an offset applies, it appears as a clearly labelled credit
-          against your individual levy contribution. It does not change the
-          Owners Corporation&apos;s budget, levy schedule, or funding plan.
-        </p>
-
-        <div className="border border-gray-200 rounded-xl bg-gray-50 p-4">
-          <p className="text-sm text-gray-600 mb-3">
-            Example levy notice with an offset applied
-          </p>
-
-          <div className="relative w-full overflow-hidden rounded-lg border border-gray-200 bg-white">
-            <Image
-              src="/levy-bill-inc-offsets.png"
-              alt="Example levy notice showing a levy offset applied as a credit"
-              width={1200}
-              height={700}
+        {/* MONEY SHOT */}
+        <section className="space-y-3">
+          <div className="border border-gray-200 rounded-2xl overflow-hidden bg-gray-50">
+            <img
+              src="/images/levy-bill-inc-offsets.png"
+              alt="Illustrative levy notice showing levy offset"
               className="w-full h-auto"
             />
           </div>
-        </div>
+          <p className="text-sm text-gray-500">
+            An illustrative example of how a levy offset <em>might</em> appear
+            on a levy notice if a refinance proceeds. Figures shown are
+            indicative only.
+          </p>
+        </section>
 
-        <p className="text-sm text-gray-600">
-          Rebates are applied automatically, typically quarterly in arrears, and
-          stop if the underlying loan changes or no longer qualifies.
-        </p>
-      </div>
-    </details>
+        {/* WHAT THIS IS / ISN'T */}
+        <section className="grid md:grid-cols-2 gap-8">
+          <div>
+            <h2 className="text-lg font-semibold mb-3 text-gray-900">
+              What this is
+            </h2>
+            <ul className="space-y-2 text-gray-700">
+              <li>• A voluntary mortgage review for individual apartment owners</li>
+              <li>
+                • A way to check whether a lender rebate could offset part of
+                your levy
+              </li>
+              <li>• Owner-initiated and optional</li>
+              <li>• Separate from the Owners Corporation budget and administration</li>
+            </ul>
+          </div>
 
-    <details>
-      <summary className="cursor-pointer font-medium">
-        Why is Sold giving up commission?
-      </summary>
-      <p className="mt-2 text-gray-700">
-        The intent is alignment. Buildings that are easier to maintain and
-        easier to own tend to perform better over time. Levy Offset is designed
-        to support that outcome rather than maximise broker revenue.
-      </p>
-    </details>
+          <div>
+            <h2 className="text-lg font-semibold mb-3 text-gray-900">
+              What this isn’t
+            </h2>
+            <ul className="space-y-2 text-gray-700">
+              <li>• Not a requirement to refinance</li>
+              <li>• Not guaranteed</li>
+              <li>• Not tied to the building or other owners</li>
+              <li>• Not something you’re automatically opting into</li>
+            </ul>
+          </div>
+        </section>
 
-    <details>
-      <summary className="cursor-pointer font-medium">
-        Does this affect other owners?
-      </summary>
-      <p className="mt-2 text-gray-700">
-        No. Non-participating owners continue exactly as before. No funds are
-        pooled or redistributed.
-      </p>
-    </details>
+        {/* WHY NOW */}
+        <section className="max-w-3xl space-y-4">
+          <h2 className="text-2xl font-semibold text-gray-900">
+            Why are levy offsets being discussed now?
+          </h2>
+          <p className="text-gray-700">
+            Apartment levies have risen as buildings age and maintenance costs
+            increase. At the same time, many owners haven’t reviewed their
+            mortgage in several years.
+          </p>
+          <p className="text-gray-700">
+            In some cases, lender rebates attached to a mortgage can be
+            redirected to offset part of an owner’s levy{" "}
+            <span className="font-medium">
+              but only if a genuinely better loan exists
+            </span>
+            .
+          </p>
+          <p className="text-gray-700">
+            This page exists to help owners understand whether it’s worth
+            exploring, or whether it’s not relevant in their case.
+          </p>
+        </section>
 
-    <details>
-      <summary className="cursor-pointer font-medium">
-        Is there any cost or obligation?
-      </summary>
-      <p className="mt-2 text-gray-700">
-        No cost to review and no obligation to proceed. If you refinance,
-        standard lender fees may apply and are disclosed upfront.
-      </p>
-    </details>
-  </div>
-</section>
+        {/* CHOICE ARCHITECTURE */}
+        <section className="space-y-10">
+          <header className="space-y-2">
+            <h2 className="text-2xl font-semibold text-gray-900">
+              Choose how you’d like to explore this
+            </h2>
+            <p className="text-gray-700">
+              Different owners want different levels of detail. All of the
+              options below are optional.
+            </p>
+          </header>
 
+          {/* OPTION A — ESTIMATE */}
+          <section className="space-y-4">
+            <h3 className="text-xl font-semibold text-gray-900">
+              Get a quick estimate
+            </h3>
+            <p className="text-gray-700">
+              Use the tool below to get a rough indication of what a levy offset{" "}
+              <em>might</em> look like in your case.
+            </p>
+
+            <div className="border border-gray-200 rounded-2xl p-6 bg-gray-50">
+              <OwnersEstimatePage />
+            </div>
+
+            <p className="text-sm text-gray-500">
+              Indicative only. No credit checks. Nothing changes unless you
+              choose to proceed.
+            </p>
+          </section>
+
+          {/* OPTION B — PDF (EMAIL CAPTURE VIA COMPONENT) */}
+          <section className="border border-gray-200 rounded-2xl p-6 space-y-3">
+            <PdfExplainerCta />
+          </section>
+
+          {/* OPTION C — WEBINAR (placeholder link for now) */}
+          <section className="border border-gray-200 rounded-2xl p-6 space-y-3">
+            <h3 className="text-xl font-semibold text-gray-900">
+              Join a short information session
+            </h3>
+            <p className="text-gray-700">
+              We run small, no-pressure sessions explaining how levy offsets work
+              and answering common questions from apartment owners.
+            </p>
+            <p className="text-gray-700">20–25 minutes. No obligation.</p>
+
+            <a
+              href="/buildings/levy-offsets/for-owners/webinar"
+              className="inline-flex items-center justify-center px-5 py-3 rounded-full border border-gray-300 text-sm font-medium hover:border-gray-400"
+            >
+              Register for a session
+            </a>
+
+            <p className="text-sm text-gray-500">
+              You can just listen. There’s no requirement to participate.
+            </p>
+          </section>
+
+          {/* OPTION D — 1:1 */}
+          <section className="border border-dashed border-gray-300 rounded-2xl p-6 space-y-3">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Prefer to sanity-check this for your situation?
+            </h3>
+            <p className="text-gray-700">
+              If you’re already confident this might be relevant, you can book a
+              short, no-obligation conversation.
+            </p>
+
+            <a
+              href="/book"
+              className="inline-flex items-center justify-center px-5 py-3 rounded-full border border-gray-300 text-sm font-medium hover:border-gray-400"
+            >
+              Book a short chat
+            </a>
+
+            <p className="text-sm text-gray-500">
+              A 15-minute sanity check. No applications, no pressure.
+            </p>
+          </section>
+        </section>
+
+        {/* WHO IT'S FOR */}
+        <section className="max-w-3xl space-y-4">
+          <h2 className="text-2xl font-semibold text-gray-900">
+            Who this tends to be most relevant for
+          </h2>
+          <ul className="space-y-2 text-gray-700">
+            <li>• Owners with a mortgage</li>
+            <li>• Loans taken out or last reviewed 2+ years ago</li>
+            <li>• Variable or expired fixed rates</li>
+            <li>• Meaningful quarterly levies</li>
+          </ul>
+          <p className="text-gray-700">
+            If your loan is very new or already highly optimised, this may not
+            stack up, and we’ll say so.
+          </p>
+        </section>
+
+        {/* FOOTER */}
+        <footer className="pt-8 border-t border-gray-200">
+          <p className="text-xs text-gray-500 max-w-3xl">
+            Sold Financial will only contact owners who choose to provide their
+            details. Indicative information only. Outcomes depend on lender
+            eligibility and market conditions at the time of review.
+          </p>
+        </footer>
+      </section>
     </main>
   );
 }

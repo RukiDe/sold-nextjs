@@ -367,39 +367,46 @@ export type LevyOffsetEstimateLead = {
   loanAmount: number;
   annualOffset: number;
   trailRate: number;
-  source: string; // e.g. "OFFSETESTIMATE"
-  page?: string; // e.g. "/buildings/levy-offsets/for-owners/estimate"
+  source: string;
+  page?: string;
 };
+
+const AIRTABLE_LEVY_BASE_ID =
+  process.env.AIRTABLE_LEVY_BASE_ID ||
+  process.env.AIRTABLE_REFI_BASE_ID ||
+  process.env.AIRTABLE_BASE_ID;
+
+const AIRTABLE_LEVY_TABLE_NAME =
+  process.env.AIRTABLE_LEVY_TABLE_NAME || "Levy Offsets";
+
+function levyConfigured(): boolean {
+  const ok = !!AIRTABLE_API_TOKEN && !!AIRTABLE_LEVY_BASE_ID && !!AIRTABLE_LEVY_TABLE_NAME;
+  if (!ok) {
+    console.warn("[Airtable] Missing Levy Offset config", {
+      hasToken: !!AIRTABLE_API_TOKEN,
+      baseId: AIRTABLE_LEVY_BASE_ID,
+      table: AIRTABLE_LEVY_TABLE_NAME,
+    });
+  }
+  return ok;
+}
 
 export async function createLevyOffsetEstimateLead(
   payload: LevyOffsetEstimateLead
 ): Promise<void> {
-  if (!airtableConfigured()) {
-    console.warn("[Airtable] Not configured — skipping createLevyOffsetEstimateLead");
-    return;
-  }
+  if (!levyConfigured()) return;
 
   const fields: Record<string, any> = {
     Email: payload.email.trim().toLowerCase(),
-
-    // Keep this aligned with how you're grouping leads in Refinance
-    Goal: ["Offset my body corporate fees"],
-
-    // Use an existing numeric column if you have it.
-    // If your table already uses "Current Loan Balance", reuse it:
-    "Current Loan Balance": Number(payload.loanAmount),
-
-    // You told me this column exists ✅
-    "Offset Estimate": Number(payload.annualOffset),
-
-    // Optional extra tracking (only works if these columns exist)
-    "Trail Rate": payload.trailRate,
-    Source: payload.source,
+    "Loan Amount": Number(payload.loanAmount) || 0,
+    "Offset Estimate": Number(payload.annualOffset) || 0,
+    "Trail Rate": Number(payload.trailRate) || 0.0015,
+    Source: payload.source || "OFFSETESTIMATE",
     "Landing Page": payload.page ?? null,
   };
 
-  const url = `https://api.airtable.com/v0/${AIRTABLE_REFI_BASE_ID}/${encodeURIComponent(
-    AIRTABLE_REFI_TABLE_NAME!
+  const url = `https://api.airtable.com/v0/${AIRTABLE_LEVY_BASE_ID}/${encodeURIComponent(
+    AIRTABLE_LEVY_TABLE_NAME
   )}`;
 
   const res = await fetch(url, {
@@ -414,7 +421,9 @@ export async function createLevyOffsetEstimateLead(
   const data = await res.json().catch(() => ({}));
 
   if (!res.ok) {
-    console.error("[Airtable] createLevyOffsetEstimateLead error:", res.status, data);
+    console.error("[Airtable] Levy Offset create error:", res.status, data);
+  } else {
+    console.log("[Airtable] Levy Offset lead created:", data?.id);
   }
 }
 
