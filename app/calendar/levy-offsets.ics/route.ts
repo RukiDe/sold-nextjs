@@ -6,7 +6,7 @@ const DURATION_MINUTES = 30;
 
 // Put your real meet/join URL here (or fetch it from env)
 const MEET_URL =
-  process.env.LEVY_OFFSETS_MEET_URL || "https://meet.google.com/your-link";
+  process.env.LEVY_OFFSETS_MEET_URL || "meet.google.com/yor-cyet-dvq";
 
 function pad(n: number) {
   return String(n).padStart(2, "0");

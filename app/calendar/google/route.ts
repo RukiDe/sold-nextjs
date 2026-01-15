@@ -4,7 +4,7 @@ const TZ = "Australia/Melbourne";
 const TITLE = "Levy Offsets information session";
 const DURATION_MINUTES = 30;
 const MEET_URL =
-  process.env.LEVY_OFFSETS_MEET_URL || "https://meet.google.com/your-link";
+  process.env.LEVY_OFFSETS_MEET_URL || "https://meet.google.com/yor-cyet-dvq";
 
 function computeNextSessionUtc(now = new Date()) {
   // keep it consistent with the .ics endpoint by simply calling it server-side later if you want
