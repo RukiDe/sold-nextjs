@@ -63,7 +63,7 @@ export function PdfExplainerCta() {
   return (
     <div className="border border-gray-200 rounded-2xl p-8 bg-white shadow-sm">
       <h2 className="text-2xl font-semibold text-gray-900 mb-3">
-        Prefer to read this properly?
+        Prefer to read this through?
       </h2>
 
       <p className="text-gray-700 mb-5">
