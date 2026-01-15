@@ -16,27 +16,40 @@ export function PdfExplainerCta() {
     if (!validEmail(email)) return setErr("Please enter a valid email.");
 
     setSubmitting(true);
+
     try {
       const payload = {
         email: email.trim(),
+        // flow is optional, but harmless if you want it for debugging/segmentation
         flow: "pdf_explainer",
         attributes: {
           LEVYOFFSETS_PDF_REQUESTED: true,
           LEVYOFFSETS_SOURCE: "for-owners page",
           LEVYOFFSETS_PAGE: "/buildings/levy-offsets/for-owners",
+
+          // Optional convenience attributes for Brevo templates
+          PDF_EXPLAINER: true,
+          PDF_EXPLAINER_URL: "/pdfs/levy-offset-explainer.pdf",
         },
       };
 
-      const r = await fetch("/api/brevo/levy-offset", {
+      // IMPORTANT: hit the PDF-specific route (list 15)
+      const r = await fetch("/api/brevo/levy-offset/pdf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
       const ct = r.headers.get("content-type") || "";
-      const data = ct.includes("application/json") ? await r.json() : { error: await r.text() };
+      const data = ct.includes("application/json")
+        ? await r.json()
+        : { error: await r.text() };
 
-      if (!r.ok) throw new Error(data?.error || "Couldn’t send right now. Please try again.");
+      if (!r.ok) {
+        throw new Error(
+          data?.error || "Couldn’t send right now. Please try again."
+        );
+      }
 
       setSent(true);
     } catch (e: any) {

@@ -1,5 +1,6 @@
 import OwnersEstimatePage from "./estimate/OwnersEstimate";
 import { PdfExplainerCta } from "@/components/PdfExplainerCta";
+import { WebinarSignupCta } from "@/components/WebinarSignupCta";
 
 export default function LevyOffsetsForOwnersPage() {
   return (
@@ -25,9 +26,9 @@ export default function LevyOffsetsForOwnersPage() {
         <section className="space-y-3">
           <div className="border border-gray-200 rounded-2xl overflow-hidden bg-gray-50">
             <img
-              src="/images/levy-bill-inc-offsets.png"
-              alt="Illustrative levy notice showing levy offset"
-              className="w-full h-auto"
+            src="/levy-offset-notice.png"
+            alt="Illustrative levy notice showing levy offset"
+            className="w-full h-auto"
             />
           </div>
           <p className="text-sm text-gray-500">
@@ -45,10 +46,7 @@ export default function LevyOffsetsForOwnersPage() {
             </h2>
             <ul className="space-y-2 text-gray-700">
               <li>• A voluntary mortgage review for individual apartment owners</li>
-              <li>
-                • A way to check whether a lender rebate could offset part of
-                your levy
-              </li>
+              <li>• A way to check whether a lender rebate could offset part of your levy</li>
               <li>• Owner-initiated and optional</li>
               <li>• Separate from the Owners Corporation budget and administration</li>
             </ul>
@@ -123,32 +121,14 @@ export default function LevyOffsetsForOwnersPage() {
             </p>
           </section>
 
-          {/* OPTION B — PDF (EMAIL CAPTURE VIA COMPONENT) */}
+          {/* OPTION B — PDF */}
           <section className="border border-gray-200 rounded-2xl p-6 space-y-3">
             <PdfExplainerCta />
           </section>
 
-          {/* OPTION C — WEBINAR (placeholder link for now) */}
+          {/* OPTION C — WEBINAR */}
           <section className="border border-gray-200 rounded-2xl p-6 space-y-3">
-            <h3 className="text-xl font-semibold text-gray-900">
-              Join a short information session
-            </h3>
-            <p className="text-gray-700">
-              We run small, no-pressure sessions explaining how levy offsets work
-              and answering common questions from apartment owners.
-            </p>
-            <p className="text-gray-700">20–25 minutes. No obligation.</p>
-
-            <a
-              href="/buildings/levy-offsets/for-owners/webinar"
-              className="inline-flex items-center justify-center px-5 py-3 rounded-full border border-gray-300 text-sm font-medium hover:border-gray-400"
-            >
-              Register for a session
-            </a>
-
-            <p className="text-sm text-gray-500">
-              You can just listen. There’s no requirement to participate.
-            </p>
+            <WebinarSignupCta pagePath="/buildings/levy-offsets/for-owners" />
           </section>
 
           {/* OPTION D — 1:1 */}
@@ -162,7 +142,7 @@ export default function LevyOffsetsForOwnersPage() {
             </p>
 
             <a
-              href="/book"
+              href="https://calendly.com/rukid-sold/30min"
               className="inline-flex items-center justify-center px-5 py-3 rounded-full border border-gray-300 text-sm font-medium hover:border-gray-400"
             >
               Book a short chat
