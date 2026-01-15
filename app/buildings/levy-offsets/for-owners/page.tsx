@@ -275,15 +275,6 @@ export default function LevyOffsetsForOwnersPage() {
             stack up, and we’ll say so.
           </p>
         </section>
-
-        {/* FOOTER */}
-        <footer className="pt-8 border-t border-gray-200 space-y-3">
-          <p className="text-xs text-gray-500 max-w-3xl">
-            Sold Financial will only contact owners who choose to provide their
-            details. Indicative information only. Outcomes depend on lender
-            eligibility and market conditions at the time of review.
-          </p>
-        </footer>
       </section>
     </main>
   );
