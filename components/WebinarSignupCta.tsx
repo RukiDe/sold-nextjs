@@ -93,12 +93,30 @@ function computeNextTuesdayWebinar(now = new Date()) {
     if (passed) daysUntil = 7;
   }
 
-  const targetYMD = addDaysToYMD_UTC(nowTz.year, nowTz.month, nowTz.day, daysUntil);
-  const tzAbbrev = getTzAbbrevForDate(targetYMD.year, targetYMD.month, targetYMD.day, TZ);
-  const dateLabel = formatWebinarDate(targetYMD.year, targetYMD.month, targetYMD.day, TZ);
+  const targetYMD = addDaysToYMD_UTC(
+    nowTz.year,
+    nowTz.month,
+    nowTz.day,
+    daysUntil
+  );
+  const tzAbbrev = getTzAbbrevForDate(
+    targetYMD.year,
+    targetYMD.month,
+    targetYMD.day,
+    TZ
+  );
+  const dateLabel = formatWebinarDate(
+    targetYMD.year,
+    targetYMD.month,
+    targetYMD.day,
+    TZ
+  );
 
   // What you show on the page
-  const display = `${dateLabel} · 12:${String(WEBINAR_MINUTE).padStart(2, "0")}pm (${tzAbbrev})`;
+  const display = `${dateLabel} · 12:${String(WEBINAR_MINUTE).padStart(
+    2,
+    "0"
+  )}pm (${tzAbbrev})`;
 
   // What you store in Brevo (handy for segmentation / future reminders)
   const slotLabel = `Webinar: ${display}`;
@@ -146,7 +164,10 @@ export function WebinarSignupCta({
       if (ct.includes("application/json")) data = await r.json();
       else data = { error: await r.text() };
 
-      if (!r.ok) throw new Error(data?.error || "Couldn’t submit right now. Please try again.");
+      if (!r.ok)
+        throw new Error(
+          data?.error || "Couldn’t submit right now. Please try again."
+        );
 
       setSent(true);
     } catch (e: any) {
@@ -160,12 +181,18 @@ export function WebinarSignupCta({
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <h3 className="text-xl font-semibold text-gray-900">Join a short information session</h3>
-        <p className="text-gray-700">A 30-minute, no-pressure walkthrough for apartment owners.</p>
+        <h3 className="text-xl font-semibold text-gray-900">
+          Join a short information session
+        </h3>
+        <p className="text-gray-700">
+          A 30-minute, no-pressure walkthrough for apartment owners.
+        </p>
       </div>
 
       <div className="border border-gray-200 rounded-2xl p-5 bg-gray-50">
-        <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">Next available webinar</p>
+        <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">
+          Next available webinar
+        </p>
         <p className="text-base font-semibold text-gray-900">{next.display}</p>
       </div>
 
@@ -177,10 +204,35 @@ export function WebinarSignupCta({
 
       <div className="space-y-3">
         {sent ? (
-          <div className="border border-gray-200 rounded-2xl p-4 bg-white">
-            <p className="text-sm text-gray-700">You’re in. Check your inbox for the link and details.</p>
-            <p className="text-xs text-gray-500 mt-2">
-              If you can’t see it, check Promotions or Spam (sorry, inboxes are chaotic).
+          <div className="border border-gray-200 rounded-2xl p-4 bg-white space-y-3">
+            <p className="text-sm text-gray-700">
+              You’re in. Check your inbox for the link and details.
+            </p>
+            <p className="text-xs text-gray-500">
+              If you can’t see it, check Promotions or Spam (sorry, inboxes are
+              chaotic).
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-3">
+              {/* Universal (Apple/Outlook/Google import) */}
+              <a
+                href="/calendar/levy-offsets.ics"
+                className="inline-flex items-center justify-center px-6 py-3 rounded-full border text-sm font-medium bg-black text-white border-black hover:opacity-95 transition"
+              >
+                Add to calendar
+              </a>
+
+              {/* Optional convenience button */}
+              <a
+                href="/calendar/levy-offsets/google"
+                className="inline-flex items-center justify-center px-6 py-3 rounded-full border text-sm font-medium bg-white text-gray-900 border-gray-200 hover:border-gray-300 transition"
+              >
+                Add to Google Calendar
+              </a>
+            </div>
+
+            <p className="text-xs text-gray-500">
+              The calendar link always uses the next available session.
             </p>
           </div>
         ) : (
@@ -211,7 +263,9 @@ export function WebinarSignupCta({
             </button>
 
             {err && <p className="text-xs text-red-600">{err}</p>}
-            <p className="text-xs text-gray-500">We’ll only email you about this session. Unsubscribe anytime.</p>
+            <p className="text-xs text-gray-500">
+              We’ll only email you about this session. Unsubscribe anytime.
+            </p>
           </>
         )}
       </div>
