@@ -33,8 +33,8 @@ export default function HomePage() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3">
-              <ButtonPill href="/owners/apartments">Apartment owners</ButtonPill>
-              <ButtonPill href="/owners/houses">House owners</ButtonPill>
+              <ButtonPill href="/apartments">Apartment owners</ButtonPill>
+              <ButtonPill href="/houses">House owners</ButtonPill>
             </div>
 
             <p className="text-sm text-gray-500 mt-6">
