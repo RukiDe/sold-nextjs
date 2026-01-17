@@ -191,7 +191,7 @@ export function WebinarSignupCta({
               Check your inbox — we’ve emailed you a link to choose a session time.
             </p>
             <p className="text-xs text-gray-500 mt-2">
-              You’re not booked yet until you pick a time. It takes ~10 seconds.
+              You’re not booked yet until you confirm the time. It takes ~10 seconds.
             </p>
             <p className="text-xs text-gray-500 mt-2">
               If you can’t see it, check Promotions or Spam (sorry, inboxes are chaotic).
