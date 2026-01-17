@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import OwnersEstimatePage from "./estimate/OwnersEstimate";
+import OwnersEstimatePage from "./OwnersEstimate";
 import { PdfExplainerCta } from "@/components/PdfExplainerCta";
 import { WebinarSignupCta } from "@/components/WebinarSignupCta";
 

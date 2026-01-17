@@ -179,7 +179,7 @@ export function WebinarSignupCta({
       </div>
 
       <ul className="list-disc list-inside text-gray-700 space-y-1">
-        <li>You won’t be on camera or audio</li>
+        <li>You can turn off your camera</li>
         <li>Questions via chat only (optional)</li>
         <li>You can just listen</li>
       </ul>

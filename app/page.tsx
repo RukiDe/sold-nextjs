@@ -9,32 +9,38 @@ export default function HomePage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
           <div>
             <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight mb-3">
-              Making apartment costs easier to live with
+              Making the ongoing cost of owning property easier to live with
             </h1>
 
             <p className="text-lg text-gray-700 max-w-xl mb-6">
-              Creating shared upside for owners, residents and local businesses
-              over time.
+              Helping homeowners reduce, rebalance, and better understand the
+              fixed costs that come with property ownership.
             </p>
 
             <p className="text-gray-700 mb-4">
-              Sold works across two worlds: helping individuals improve their
-              mortgage position, and helping buildings improve how ongoing costs
-              are funded and experienced.
+              Sold helps homeowners make sense of the long-term costs tied to
+              their property, from mortgages to rates, levies, and insurance.
+            </p>
+
+            <p className="text-gray-700 mb-4">
+              In some cases, that means improving a mortgage. In others, it
+              means finding smarter ways to offset or manage unavoidable costs
+              over time.
             </p>
 
             <p className="text-gray-700 mb-8">
-              Choose the path that matches your situation. We keep it simple and
-              only recommend options that make sense.
+              Choose the path that matches how you own your home. Everything is
+              voluntary, transparent, and designed to hold up over time.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3">
-              <ButtonPill href="/individuals">Individuals</ButtonPill>
-              <ButtonPill href="/buildings">Buildings</ButtonPill>
+              <ButtonPill href="/owners/apartments">Apartment owners</ButtonPill>
+              <ButtonPill href="/owners/houses">House owners</ButtonPill>
             </div>
 
             <p className="text-sm text-gray-500 mt-6">
-              Lower levies • Voluntary participation • Transparent outcomes  
+              Lower ongoing costs • Voluntary participation • Transparent
+              outcomes
             </p>
           </div>
 
@@ -47,7 +53,8 @@ export default function HomePage() {
               priority
             />
             <p className="mt-4 text-sm text-gray-600">
-              Reducing levy pressure for owners. Strengthening apartment living.
+              Reducing the long-term cost of owning property, one decision at a
+              time.
             </p>
           </div>
         </div>

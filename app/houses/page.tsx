@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import OwnersEstimatePage from "./estimate/OwnersEstimate";
+// TODO: replace this with a CouncilRatesEstimatePage when ready
+import OwnersEstimatePage from "./OwnersEstimate";
 import { PdfExplainerCta } from "@/components/PdfExplainerCta";
 import { WebinarSignupCta } from "@/components/WebinarSignupCta";
 
@@ -44,7 +45,7 @@ function Step({
   );
 }
 
-export default function LevyOffsetsForOwnersPage() {
+export default function CouncilRateOffsetsPage() {
   return (
     <main className="bg-white">
       <section className="max-w-4xl mx-auto px-4 py-12 space-y-16">
@@ -52,16 +53,17 @@ export default function LevyOffsetsForOwnersPage() {
         <header className="space-y-5">
           <div className="space-y-3 max-w-3xl">
             <p className="text-xs uppercase tracking-wide text-gray-500">
-              Levy offsets for apartment owners
+              Council rate offsets for homeowners
             </p>
             <h1 className="text-3xl md:text-4xl font-semibold text-gray-900">
-              A voluntary levy offset for apartment owners
+              A voluntary council rate offset for homeowners
             </h1>
             <p className="text-lg text-gray-700">
-              Some apartment owners with mortgages may be able to offset part of
-              their individual Owners Corporation levy. This page explains how
-              levy offsets work, when they don’t, and the optional ways you can
-              explore whether it’s relevant for you.
+              Some homeowners with mortgages may be able to reduce their net
+              household costs over time, in a way that can be applied against
+              council rates. This page explains how a council rate offset works,
+              when it doesn’t, and the optional ways you can explore whether
+              it’s relevant for you.
             </p>
           </div>
 
@@ -80,23 +82,22 @@ export default function LevyOffsetsForOwnersPage() {
           </p>
         </header>
 
-        {/* MONEY SHOT */}
+        {/* MONEY SHOT (optional) */}
         <section className="space-y-3">
           <div className="border border-gray-200 rounded-2xl overflow-hidden bg-gray-50">
             <div className="flex justify-center px-3 py-4">
               <img
-                src="/levy-offset-notice.png"
-                alt="Illustrative levy notice showing levy offset"
+                src="/Council-Rates-Offset-Sold Financial.png"
+                alt="Illustrative council rates notice showing how an offset could be applied"
                 className="w-full max-w-md md:max-w-lg h-auto"
               />
             </div>
           </div>
 
           <p className="text-sm text-gray-500 max-w-3xl">
-            Illustrative example only. If a refinance proceeds, your quarterly
-            notice can show a separate credit line. Here, a gross quarterly
-            amount of $1,348 (levy plus maintenance fund) is reduced by a $350
-            levy offset, lowering the net amount payable. Figures shown are
+            Illustrative example only. Council rates are set and collected by
+            councils as usual. If you proceed with an eligible option, any
+            offset will appear as a credit. Figures shown are
             indicative only.
           </p>
         </section>
@@ -108,14 +109,14 @@ export default function LevyOffsetsForOwnersPage() {
               What this is
             </h2>
             <ul className="list-disc pl-5 space-y-2 text-gray-700">
-              <li>A voluntary mortgage review for individual apartment owners</li>
+              <li>A voluntary mortgage review for individual homeowners</li>
               <li>
-                A way to check whether a lender rebate could offset part of your
-                levy
+                A way to check whether a lender rebate could reduce your net
+                household costs (and be applied against council rates)
               </li>
               <li>Owner-initiated and optional</li>
               <li>
-                Separate from the Owners Corporation budget and administration
+                Separate from council budgets, policy, and billing systems
               </li>
             </ul>
           </div>
@@ -125,9 +126,9 @@ export default function LevyOffsetsForOwnersPage() {
               What this isn’t
             </h2>
             <ul className="list-disc pl-5 space-y-2 text-gray-700">
+              <li>Not a council rebate, concession, or discount scheme</li>
               <li>Not a requirement to refinance</li>
               <li>Not guaranteed</li>
-              <li>Not tied to the building or other owners</li>
               <li>Not something you’re automatically opting into</li>
             </ul>
           </div>
@@ -136,23 +137,24 @@ export default function LevyOffsetsForOwnersPage() {
         {/* WHY NOW */}
         <section className="max-w-3xl space-y-4">
           <h2 className="text-2xl font-semibold text-gray-900">
-            Why are levy offsets being discussed now?
+            Why are council rate offsets being discussed now?
           </h2>
           <p className="text-gray-700">
-            Apartment levies have risen as buildings age and maintenance costs
-            increase. At the same time, many owners haven’t reviewed their
-            mortgage in several years.
+            Council rates are one of the most “mortgage-like” household charges:
+            they’re unavoidable, tied to the property, and tend to rise over
+            time.
           </p>
           <p className="text-gray-700">
-            In some cases, lender rebates attached to a mortgage can be
-            redirected to offset part of an owner’s levy{" "}
+            At the same time, many homeowners haven’t reviewed their mortgage in
+            several years. In some cases, lender rebates attached to a mortgage
+            can be redirected back to the owner{" "}
             <span className="font-medium">
               but only if a genuinely better loan exists
             </span>
             .
           </p>
           <p className="text-gray-700">
-            This page exists to help owners understand whether it’s worth
+            This page exists to help homeowners understand whether it’s worth
             exploring, or whether it’s not relevant in their case.
           </p>
         </section>
@@ -173,8 +175,8 @@ export default function LevyOffsetsForOwnersPage() {
             />
             <Step
               n="3"
-              title="If you proceed, credits can appear on levies"
-              desc="Shown as a separate credit line against your individual levy."
+              title="If you proceed, you receive an offset payment"
+              desc="A separate credit you control, which you can apply against rates or other property costs."
             />
           </div>
         </section>
@@ -186,7 +188,7 @@ export default function LevyOffsetsForOwnersPage() {
               Choose how you’d like to explore this
             </h2>
             <p className="text-gray-700">
-              Different owners want different levels of detail. All of the
+              Different homeowners want different levels of detail. All of the
               options below are optional.
             </p>
           </header>
@@ -203,11 +205,12 @@ export default function LevyOffsetsForOwnersPage() {
             </div>
 
             <p className="text-gray-700 max-w-3xl">
-              Use the tool below to get a rough indication of what a levy offset{" "}
-              <em>might</em> look like in your case.
+              Use the tool below to get a rough indication of what a council
+              rate offset <em>might</em> look like in your case.
             </p>
 
             <div className="border border-gray-300 rounded-2xl p-6 bg-gray-50">
+              {/* TODO: swap component when ready */}
               <OwnersEstimatePage />
             </div>
 
@@ -227,7 +230,7 @@ export default function LevyOffsetsForOwnersPage() {
           {/* OPTION C — WEBINAR */}
           <section id="webinar" className="scroll-mt-24">
             <div className="border border-gray-200 rounded-2xl p-6 md:p-8 bg-white space-y-3">
-              <WebinarSignupCta pagePath="/buildings/levy-offsets/for-owners" />
+              <WebinarSignupCta pagePath="/rates/council/offsets" />
             </div>
           </section>
 
@@ -265,13 +268,20 @@ export default function LevyOffsetsForOwnersPage() {
             Who this tends to be most relevant for
           </h2>
           <ul className="list-disc pl-5 space-y-2 text-gray-700">
-            <li>Owners with a mortgage</li>
+            <li>Homeowners with a mortgage</li>
             <li>Loans taken out or last reviewed 2+ years ago</li>
             <li>Variable or expiring fixed rates</li>
+            <li>People who prefer predictable, low-effort savings</li>
           </ul>
           <p className="text-gray-700">
             If your loan is very new or already highly optimised, this may not
             stack up, and we’ll say so.
+          </p>
+
+          <p className="text-sm text-gray-500">
+            Council rates are set and collected independently by local
+            government. This page describes an optional, privately-funded
+            approach to reducing net household costs.
           </p>
         </section>
       </section>
