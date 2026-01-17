@@ -8,29 +8,28 @@ export default function HomePage() {
       <section className="max-w-5xl mx-auto px-4 pt-12 pb-14">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
           <div>
+            <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">
+              Sold
+            </p>
+
             <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight mb-3">
-              Making the ongoing cost of owning property easier to live with
+              Helping homeowners manage the cost of ownership.
             </h1>
 
             <p className="text-lg text-gray-700 max-w-xl mb-6">
-              Helping homeowners reduce, rebalance, and better understand the
-              fixed costs that come with property ownership.
+              Mortgages, rates, levies, insurance. The unavoidable stuff that
+              adds up over time.
             </p>
 
             <p className="text-gray-700 mb-4">
-              Sold helps homeowners make sense of the long-term costs tied to
-              their property, from mortgages to rates, levies, and insurance.
-            </p>
-
-            <p className="text-gray-700 mb-4">
-              In some cases, that means improving a mortgage. In others, it
-              means finding smarter ways to offset or manage unavoidable costs
-              over time.
+              Sold helps you understand what you’re paying, what’s normal, and
+              what (if anything) is worth changing.
             </p>
 
             <p className="text-gray-700 mb-8">
-              Choose the path that matches how you own your home. Everything is
-              voluntary, transparent, and designed to hold up over time.
+              Sometimes that’s a mortgage improvement. Sometimes it’s an offset
+              or a better structure for ongoing costs. And sometimes the right
+              answer is: you’re already in a good spot.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3">
@@ -39,8 +38,8 @@ export default function HomePage() {
             </div>
 
             <p className="text-sm text-gray-500 mt-6">
-              Lower ongoing costs • Voluntary participation • Transparent
-              outcomes
+              No credit checks • Voluntary participation •
+              Transparent outcomes
             </p>
           </div>
 
@@ -53,8 +52,7 @@ export default function HomePage() {
               priority
             />
             <p className="mt-4 text-sm text-gray-600">
-              Reducing the long-term cost of owning property, one decision at a
-              time.
+              Reducing the long-term cost of ownership, one decision at a time.
             </p>
           </div>
         </div>

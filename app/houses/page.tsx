@@ -53,7 +53,7 @@ export default function CouncilRateOffsetsPage() {
         <header className="space-y-5">
           <div className="space-y-3 max-w-3xl">
             <p className="text-xs uppercase tracking-wide text-gray-500">
-              Council rate offsets for homeowners
+              Managing the cost of ownership • Houses
             </p>
             <h1 className="text-3xl md:text-4xl font-semibold text-gray-900">
               A voluntary council rate offset for homeowners
@@ -65,6 +65,9 @@ export default function CouncilRateOffsetsPage() {
               when it doesn’t, and the optional ways you can explore whether
               it’s relevant for you.
             </p>
+            <p className="text-lg text-gray-700">
+              In some cases, the right outcome is simply confirmation that your setup already makes sense.
+            </p>  
           </div>
 
           {/* Jump bar */}
@@ -87,7 +90,7 @@ export default function CouncilRateOffsetsPage() {
           <div className="border border-gray-200 rounded-2xl overflow-hidden bg-gray-50">
             <div className="flex justify-center px-3 py-4">
               <img
-                src="/Council-Rates-Offset-Sold Financial.png"
+                src="/Council-Rates-Offset-Sold Financial.jpg"
                 alt="Illustrative council rates notice showing how an offset could be applied"
                 className="w-full max-w-md md:max-w-lg h-auto"
               />
@@ -106,7 +109,7 @@ export default function CouncilRateOffsetsPage() {
         <section className="grid md:grid-cols-2 gap-6">
           <div className="border border-gray-200 rounded-2xl p-6 bg-white">
             <h2 className="text-lg font-semibold mb-3 text-gray-900">
-              What this is
+              What this helps with
             </h2>
             <ul className="list-disc pl-5 space-y-2 text-gray-700">
               <li>A voluntary mortgage review for individual homeowners</li>
@@ -123,7 +126,7 @@ export default function CouncilRateOffsetsPage() {
 
           <div className="border border-gray-200 rounded-2xl p-6 bg-white">
             <h2 className="text-lg font-semibold mb-3 text-gray-900">
-              What this isn’t
+              What this doesn’t require
             </h2>
             <ul className="list-disc pl-5 space-y-2 text-gray-700">
               <li>Not a council rebate, concession, or discount scheme</li>
@@ -155,7 +158,7 @@ export default function CouncilRateOffsetsPage() {
           </p>
           <p className="text-gray-700">
             This page exists to help homeowners understand whether it’s worth
-            exploring, or whether it’s not relevant in their case.
+            exploring, or whether it’s not relevant in their case. For house owners, council rates are often the most visible ongoing cost, which makes them a practical place to start.
           </p>
         </section>
 

@@ -52,7 +52,7 @@ export default function LevyOffsetsForOwnersPage() {
         <header className="space-y-5">
           <div className="space-y-3 max-w-3xl">
             <p className="text-xs uppercase tracking-wide text-gray-500">
-              Levy offsets for apartment owners
+              Managing the cost of ownership • Apartments
             </p>
             <h1 className="text-3xl md:text-4xl font-semibold text-gray-900">
               A voluntary levy offset for apartment owners
@@ -61,8 +61,11 @@ export default function LevyOffsetsForOwnersPage() {
               Some apartment owners with mortgages may be able to offset part of
               their individual Owners Corporation levy. This page explains how
               levy offsets work, when they don’t, and the optional ways you can
-              explore whether it’s relevant for you.
+              explore whether it’s relevant for you. 
             </p>
+            <p className="text-lg text-gray-700">
+              In some cases, the right outcome is simply confirmation that your setup already makes sense.
+            </p>  
           </div>
 
           {/* Jump bar */}
@@ -105,7 +108,7 @@ export default function LevyOffsetsForOwnersPage() {
         <section className="grid md:grid-cols-2 gap-6">
           <div className="border border-gray-200 rounded-2xl p-6 bg-white">
             <h2 className="text-lg font-semibold mb-3 text-gray-900">
-              What this is
+              What helps with
             </h2>
             <ul className="list-disc pl-5 space-y-2 text-gray-700">
               <li>A voluntary mortgage review for individual apartment owners</li>
@@ -122,7 +125,7 @@ export default function LevyOffsetsForOwnersPage() {
 
           <div className="border border-gray-200 rounded-2xl p-6 bg-white">
             <h2 className="text-lg font-semibold mb-3 text-gray-900">
-              What this isn’t
+              What this doesn’t require
             </h2>
             <ul className="list-disc pl-5 space-y-2 text-gray-700">
               <li>Not a requirement to refinance</li>
@@ -153,7 +156,7 @@ export default function LevyOffsetsForOwnersPage() {
           </p>
           <p className="text-gray-700">
             This page exists to help owners understand whether it’s worth
-            exploring, or whether it’s not relevant in their case.
+            exploring, or whether it’s not relevant in their case. For apartment owners, levies are often the most visible ongoing cost, which is why this is a natural place to start.
           </p>
         </section>
 
@@ -173,7 +176,7 @@ export default function LevyOffsetsForOwnersPage() {
             />
             <Step
               n="3"
-              title="If you proceed, credits can appear on levies"
+              title="If you proceed, credits can be applied against your levy"
               desc="Shown as a separate credit line against your individual levy."
             />
           </div>
@@ -271,7 +274,7 @@ export default function LevyOffsetsForOwnersPage() {
           </ul>
           <p className="text-gray-700">
             If your loan is very new or already highly optimised, this may not
-            stack up, and we’ll say so.
+            stack up, and we’ll say so. If you also own a house, or want to explore other ownership costs, Sold looks at those too.
           </p>
         </section>
       </section>
