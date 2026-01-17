@@ -6,13 +6,15 @@ import { Analytics } from "@vercel/analytics/react";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://sold.financial"),
-  title: "✨ Sold — Make Loans Easy",
+
+  title: "Sold — Helping homeowners manage the cost of ownership",
   description:
-    "Sold connects homeowners to mortgage offers after analysing your money via Open Banking.",
+    "Sold helps homeowners understand, reduce, and manage the ongoing costs of owning property — from mortgages to rates, levies, and insurance.",
+
   openGraph: {
-    title: "✨ Sold — Make Loans Easy",
+    title: "Sold — Helping homeowners manage the cost of ownership",
     description:
-      "Sold connects homeowners to mortgage offers after analysing your money via Open Banking.",
+      "Understand, reduce, and manage the ongoing costs of owning property. Mortgages, rates, levies, and insurance — with clear, no-pressure guidance.",
     url: "https://sold.financial",
     siteName: "Sold",
     images: [
@@ -20,16 +22,17 @@ export const metadata: Metadata = {
         url: "/og_1200x630.png",
         width: 1200,
         height: 630,
-        alt: "Sold — Make Loans Easy",
+        alt: "Sold — Helping homeowners manage the cost of ownership",
       },
     ],
     type: "website",
   },
+
   twitter: {
     card: "summary_large_image",
-    title: "✨ Sold — Make Loans Easy",
+    title: "Sold — Helping homeowners manage the cost of ownership",
     description:
-      "Sold connects homeowners to mortgage offers after analysing your money via Open Banking.",
+      "Clear guidance for homeowners on mortgages, rates, levies, and other unavoidable property costs.",
     images: ["/og_1200x630.png"],
   },
 };
