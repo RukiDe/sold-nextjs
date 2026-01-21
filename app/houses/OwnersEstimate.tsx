@@ -95,7 +95,7 @@ export default function OwnersEstimate() {
     <main>
       <section className="max-w-3xl mx-auto px-4 py-12">
         <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">
-          Levy offsets for apartment owners
+          Levy offsets for homeowners
         </p>
 
         <h1 className="text-3xl font-semibold mb-4">

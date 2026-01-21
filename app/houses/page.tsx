@@ -1,8 +1,9 @@
+"use client";
+
 import type { ReactNode } from "react";
-// TODO: replace this with a CouncilRatesEstimatePage when ready
+// TODO: swap this to a HousesEstimatePage when you have it
 import OwnersEstimatePage from "./OwnersEstimate";
 import { PdfExplainerCta } from "@/components/PdfExplainerCta";
-import { WebinarSignupCta } from "@/components/WebinarSignupCta";
 
 function JumpPill({
   href,
@@ -21,271 +22,264 @@ function JumpPill({
   );
 }
 
-function Step({
-  n,
-  title,
-  desc,
+function ShellCard({
+  children,
+  className = "",
 }: {
-  n: string;
-  title: string;
-  desc: string;
+  children: ReactNode;
+  className?: string;
 }) {
   return (
-    <div className="border border-gray-200 rounded-2xl p-5 bg-white">
-      <div className="flex items-start gap-3">
-        <div className="h-7 w-7 rounded-full border border-gray-300 flex items-center justify-center text-xs font-semibold text-gray-900">
-          {n}
-        </div>
-        <div className="space-y-1">
-          <p className="text-sm font-semibold text-gray-900">{title}</p>
-          <p className="text-sm text-gray-700">{desc}</p>
-        </div>
-      </div>
+    <div
+      className={[
+        "border border-gray-200 rounded-3xl bg-white shadow-sm",
+        className,
+      ].join(" ")}
+    >
+      {children}
     </div>
   );
 }
 
-export default function CouncilRateOffsetsPage() {
+export default function HousesPage() {
   return (
     <main className="bg-white">
-      <section className="max-w-4xl mx-auto px-4 py-12 space-y-16">
+      <section className="max-w-6xl mx-auto px-4 pt-12 pb-16 space-y-14">
         {/* HERO */}
-        <header className="space-y-5">
-          <div className="space-y-3 max-w-3xl">
-            <p className="text-xs uppercase tracking-wide text-gray-500">
-              Managing the cost of ownership • Houses
-            </p>
-            <h1 className="text-3xl md:text-4xl font-semibold text-gray-900">
-              A voluntary council rate offset for homeowners
-            </h1>
-            <p className="text-lg text-gray-700">
-              Some homeowners with mortgages may be able to reduce their net
-              household costs over time, in a way that can be applied against
-              council rates. This page explains how a council rate offset works,
-              when it doesn’t, and the optional ways you can explore whether
-              it’s relevant for you.
-            </p>
-            <p className="text-lg text-gray-700">
-              In some cases, the right outcome is simply confirmation that your setup already makes sense.
-            </p>  
-          </div>
+        <header className="space-y-6">
+          {/* subtle editorial frame */}
+          <div className="border-t border-gray-100 pt-6">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+              {/* Left: hero copy */}
+              <div className="lg:col-span-7 space-y-6">
+                <div className="space-y-3 max-w-3xl">
+                  <p className="text-xs uppercase tracking-wide text-gray-500">
+                    Houses • Mortgage rebates to rates
+                  </p>
 
-          {/* Jump bar */}
-          <div className="flex flex-wrap gap-2 pt-2">
-            <JumpPill href="#estimate">Get an estimate</JumpPill>
-            <JumpPill href="#pdf">Read the explainer</JumpPill>
-            <JumpPill href="#webinar">Join the webinar</JumpPill>
-            <JumpPill href="#chat">Book a chat</JumpPill>
-          </div>
+                  <h1 className="text-3xl md:text-5xl font-semibold tracking-tight text-gray-900">
+                    Rebate your mortgage commission into relief
+                  </h1>
 
-          {/* Trust strip */}
-          <p className="text-xs text-gray-500">
-            No credit checks • No obligation • You stay in control • Unsubscribe
-            anytime
-          </p>
-        </header>
+                  <p className="text-lg md:text-xl text-gray-700">
+                    If you refinance through Sold, any ongoing trail commissions
+                    are returned to you over time.
+                  </p>
 
-        {/* MONEY SHOT (optional) */}
-        <section className="space-y-3">
-          <div className="border border-gray-200 rounded-2xl overflow-hidden bg-gray-50">
-            <div className="flex justify-center px-3 py-4">
-              <img
-                src="/Council-Rates-Offset-Sold Financial.jpg"
-                alt="Illustrative council rates notice showing how an offset could be applied"
-                className="w-full max-w-md md:max-w-lg h-auto"
-              />
+                  <p className="text-lg md:text-xl text-gray-700">
+                    For houses, that relief can be applied to your council rates (via
+                    BPAY) or paid straight to your bank account. Your choice.
+                  </p>
+                </div>
+
+                <p className="text-xs text-gray-500">
+                  No credit checks • Voluntary • You stay in control
+                </p>
+
+                {/* Flow line as a “system label” */}
+                <div className="inline-flex rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3">
+                  <p className="mt-4 text-sm font-medium text-gray-700">
+                    Mortgage → Refinance → Ongoing rebate → Automatically directed to levies, cash, or investments
+                  </p>
+                </div>
+              </div>
+
+              {/* Right: destination rail */}
+              <div className="lg:col-span-5">
+                <ShellCard className="p-6 md:p-7 relative overflow-hidden">
+                  {/* micro-ornament (dot grid) */}
+                  <div
+                    className="absolute -top-10 -right-10 h-40 w-40 opacity-[0.18]"
+                    style={{
+                      backgroundImage:
+                        "radial-gradient(circle at 1px 1px, rgba(0,0,0,0.25) 1px, transparent 0)",
+                      backgroundSize: "10px 10px",
+                    }}
+                  />
+
+                  <div className="relative space-y-4">
+                    <div className="text-sm font-semibold text-gray-900">
+                      Where the rebate can go
+                    </div>
+
+                    <div className="relative space-y-3">
+                      {/* connector line */}
+                      <div className="absolute left-3 top-2 bottom-2 w-px bg-gray-200" />
+
+                      <div className="pl-6">
+                        <div className="flex items-center justify-between rounded-2xl border border-gray-200 px-4 py-3 bg-white">
+                          <span className="text-sm text-gray-800">
+                            Council rates BPAY reference
+                          </span>
+                          <span className="text-xs text-gray-500 rounded-full border border-gray-200 px-2 py-1">
+                            automatic
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="pl-6">
+                        <div className="flex items-center justify-between rounded-2xl border border-gray-200 px-4 py-3 bg-white">
+                          <span className="text-sm text-gray-800">Bank account</span>
+                          <span className="text-xs text-gray-500 rounded-full border border-gray-200 px-2 py-1">
+                            automatic
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="pl-6">
+                        <div className="flex items-center justify-between rounded-2xl border border-gray-200 px-4 py-3 bg-white">
+                          <span className="text-sm text-gray-800">
+                            Investment account
+                          </span>
+                          <span className="text-xs text-gray-500 rounded-full border border-gray-200 px-2 py-1">
+                            automatic
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Jump bar (kept near hero visually) */}
+                    <div className="pt-3 border-t border-gray-100">
+                      <div className="flex flex-wrap gap-2">
+                        <JumpPill href="#preview">Check my options</JumpPill>
+                        <JumpPill href="#timeline">See the pattern</JumpPill>
+                        <JumpPill href="#pdf">Read the explainer</JumpPill>
+                        <JumpPill href="#chat">Talk it through</JumpPill>
+                      </div>
+                    </div>
+                  </div>
+                </ShellCard>
+              </div>
             </div>
           </div>
+        </header>
 
-          <p className="text-sm text-gray-500 max-w-3xl">
-            Illustrative example only. Council rates are set and collected by
-            councils as usual. If you proceed with an eligible option, any
-            offset will appear as a credit. Figures shown are
-            indicative only.
-          </p>
+        {/* HOW IT WORKS */}
+        <section className="max-w-5xl">
+          <ShellCard className="p-6 md:p-8 bg-gray-50">
+            <div className="space-y-4">
+              <h2 className="text-2xl font-semibold text-gray-900">
+                How it works (houses)
+              </h2>
+
+              <ol className="space-y-3 text-gray-700 list-decimal pl-5">
+                <li>
+                  We check whether refinancing your mortgage produces a genuinely
+                  better outcome (rate, structure, offsets, total cost).
+                </li>
+                <li>
+                  If you choose to proceed, Sold receives an ongoing trail
+                  commission from the lender.
+                </li>
+                <li>
+                  We rebate that commission back to you over time, as either:
+                  <ul className="list-disc pl-5 mt-1">
+                    <li>credits to your council rates BPAY reference, or</li>
+                    <li>direct payments to your bank account.</li>
+                    <li>direct payments to your investment account.</li>
+                  </ul>
+                </li>
+              </ol>
+            </div>
+          </ShellCard>
         </section>
 
         {/* WHAT THIS IS / ISN'T */}
-        <section className="grid md:grid-cols-2 gap-6">
-          <div className="border border-gray-200 rounded-2xl p-6 bg-white">
-            <h2 className="text-lg font-semibold mb-3 text-gray-900">
-              What this helps with
-            </h2>
-            <ul className="list-disc pl-5 space-y-2 text-gray-700">
-              <li>A voluntary mortgage review for individual homeowners</li>
-              <li>
-                A way to check whether a lender rebate could reduce your net
-                household costs (and be applied against council rates)
-              </li>
-              <li>Owner-initiated and optional</li>
-              <li>
-                Separate from council budgets, policy, and billing systems
-              </li>
-            </ul>
-          </div>
+        <section className="max-w-5xl">
+          <ShellCard className="p-6 md:p-8">
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="space-y-3">
+                <h3 className="text-lg font-semibold mb-3 text-gray-900">
+                  What this helps with
+                </h3>
+                <ul className="list-disc pl-5 space-y-2 text-gray-700">
+                  <li>Reducing your net household costs over time</li>
+                  <li>Directing bill relief to rates or cash (your choice)</li>
+                  <li>Getting a clear, plain-English refinance recommendation</li>
+                </ul>
+              </div>
 
-          <div className="border border-gray-200 rounded-2xl p-6 bg-white">
-            <h2 className="text-lg font-semibold mb-3 text-gray-900">
-              What this doesn’t require
-            </h2>
-            <ul className="list-disc pl-5 space-y-2 text-gray-700">
-              <li>Not a council rebate, concession, or discount scheme</li>
-              <li>Not a requirement to refinance</li>
-              <li>Not guaranteed</li>
-              <li>Not something you’re automatically opting into</li>
-            </ul>
-          </div>
+              <div className="space-y-3">
+                <h3 className="text-lg font-semibold mb-3 text-gray-900">
+                  What this isn’t
+                </h3>
+                <ul className="list-disc pl-5 space-y-2 text-gray-700">
+                  <li>Not a council discount, concession, or government rebate</li>
+                  <li>Not a requirement to refinance</li>
+                  <li>Not guaranteed</li>
+                  <li>Not something you’re automatically opting into</li>
+                </ul>
+              </div>
+            </div>
+          </ShellCard>
         </section>
 
-        {/* WHY NOW */}
-        <section className="max-w-3xl space-y-4">
-          <h2 className="text-2xl font-semibold text-gray-900">
-            Why are council rate offsets being discussed now?
-          </h2>
-          <p className="text-gray-700">
-            Council rates are one of the most “mortgage-like” household charges:
-            they’re unavoidable, tied to the property, and tend to rise over
-            time.
-          </p>
-          <p className="text-gray-700">
-            At the same time, many homeowners haven’t reviewed their mortgage in
-            several years. In some cases, lender rebates attached to a mortgage
-            can be redirected back to the owner{" "}
-            <span className="font-medium">
-              but only if a genuinely better loan exists
-            </span>
-            .
-          </p>
-          <p className="text-gray-700">
-            This page exists to help homeowners understand whether it’s worth
-            exploring, or whether it’s not relevant in their case. For house owners, council rates are often the most visible ongoing cost, which makes them a practical place to start.
-          </p>
-        </section>
-
-        {/* HOW IT WORKS STRIP */}
-        <section className="space-y-4">
-          <h2 className="text-2xl font-semibold text-gray-900">How it works</h2>
-          <div className="grid md:grid-cols-3 gap-4">
-            <Step
-              n="1"
-              title="Check your estimate"
-              desc="A quick indication of what an offset might look like. No credit checks."
-            />
-            <Step
-              n="2"
-              title="If it stacks up, we review options"
-              desc="A voluntary mortgage review to see if a genuinely better loan exists."
-            />
-            <Step
-              n="3"
-              title="If you proceed, you receive an offset payment"
-              desc="A separate credit you control, which you can apply against rates or other property costs."
-            />
-          </div>
-        </section>
-
-        {/* CHOICE ARCHITECTURE */}
-        <section className="space-y-10">
-          <header className="space-y-2 max-w-3xl">
-            <h2 className="text-2xl font-semibold text-gray-900">
-              Choose how you’d like to explore this
-            </h2>
-            <p className="text-gray-700">
-              Different homeowners want different levels of detail. All of the
-              options below are optional.
-            </p>
-          </header>
-
-          {/* OPTION A — ESTIMATE (recommended) */}
-          <section id="estimate" className="space-y-4 scroll-mt-24">
-            <div className="flex items-center gap-2">
-              <h3 className="text-xl font-semibold text-gray-900">
-                Get a quick estimate
-              </h3>
-              <span className="text-xs font-medium px-2 py-1 rounded-full border border-gray-300 text-gray-700 bg-white">
-                Recommended
-              </span>
-            </div>
-
-            <p className="text-gray-700 max-w-3xl">
-              Use the tool below to get a rough indication of what a council
-              rate offset <em>might</em> look like in your case.
-            </p>
-
-            <div className="border border-gray-300 rounded-2xl p-6 bg-gray-50">
-              {/* TODO: swap component when ready */}
-              <OwnersEstimatePage />
-            </div>
-
-            <p className="text-sm text-gray-500 max-w-3xl">
-              Indicative only. No credit checks. Nothing changes unless you
-              choose to proceed.
-            </p>
-          </section>
-
-          {/* OPTION B — PDF */}
-          <section id="pdf" className="scroll-mt-24">
-            <div className="border border-gray-200 rounded-2xl p-6 md:p-8 bg-white space-y-3">
-              <PdfExplainerCta />
-            </div>
-          </section>
-
-          {/* OPTION C — WEBINAR */}
-          <section id="webinar" className="scroll-mt-24">
-            <div className="border border-gray-200 rounded-2xl p-6 md:p-8 bg-white space-y-3">
-              <WebinarSignupCta pagePath="/rates/council/offsets" />
-            </div>
-          </section>
-
-          {/* OPTION D — 1:1 */}
-          <section
-            id="chat"
-            className="border border-dashed border-gray-300 rounded-2xl p-6 md:p-8 space-y-3 scroll-mt-24 bg-white"
-          >
-            <div className="space-y-2 max-w-3xl">
-              <h3 className="text-lg font-semibold text-gray-900">
-                Prefer to sanity-check this for your situation?
-              </h3>
-              <p className="text-gray-700">
-                If you’re already confident this might be relevant, you can book
-                a short, no-obligation conversation.
-              </p>
-            </div>
-
-            <a
-              href="https://calendly.com/rukid-sold/30min"
-              className="inline-flex items-center justify-center px-5 py-3 rounded-full border border-gray-300 text-sm font-medium hover:border-gray-400 transition"
+        {/* CTA LADDER */}
+        <section className="space-y-6">
+          <div className="grid lg:grid-cols-12 gap-6 items-start">
+            {/* Primary */}
+            <section
+              id="preview"
+              className="lg:col-span-7 space-y-4 scroll-mt-24"
             >
-              Book a short chat
-            </a>
+              <ShellCard className="p-6 md:p-8 border-gray-300 shadow-md">
+                <div className="space-y-4">
+                  <h3 className="text-xl font-semibold text-gray-900">
+                    Check if my mortgage can create rates relief
+                  </h3>
 
-            <p className="text-sm text-gray-500 max-w-3xl">
-              A 15-minute sanity check. No applications, no pressure.
-            </p>
-          </section>
-        </section>
+                  <p className="text-gray-700 max-w-3xl">
+                    Connect securely and we’ll assess whether a refinance is worthwhile,
+                    and what ongoing bill relief could look like for you.
+                  </p>
 
-        {/* WHO IT'S FOR */}
-        <section className="max-w-3xl space-y-4">
-          <h2 className="text-2xl font-semibold text-gray-900">
-            Who this tends to be most relevant for
-          </h2>
-          <ul className="list-disc pl-5 space-y-2 text-gray-700">
-            <li>Homeowners with a mortgage</li>
-            <li>Loans taken out or last reviewed 2+ years ago</li>
-            <li>Variable or expiring fixed rates</li>
-            <li>People who prefer predictable, low-effort savings</li>
-          </ul>
-          <p className="text-gray-700">
-            If your loan is very new or already highly optimised, this may not
-            stack up, and we’ll say so.
-          </p>
+                  <div className="border border-gray-300 rounded-2xl p-6 bg-gray-50">
+                    <OwnersEstimatePage />
+                  </div>
 
-          <p className="text-sm text-gray-500">
-            Council rates are set and collected independently by local
-            government. This page describes an optional, privately-funded
-            approach to reducing net household costs.
-          </p>
+                  <p className="text-sm text-gray-500">
+                    Indicative only. Read-only. No credit checks. Nothing changes unless
+                    you choose to proceed.
+                  </p>
+                </div>
+              </ShellCard>
+            </section>
+
+            {/* Secondary stack */}
+            <div className="lg:col-span-5 space-y-6">
+              <section id="pdf" className="scroll-mt-24">
+                <ShellCard className="p-6 md:p-8">
+                  <div className="space-y-3">
+                    <PdfExplainerCta />
+                  </div>
+                </ShellCard>
+              </section>
+
+              <section id="chat" className="scroll-mt-24">
+                <ShellCard className="p-6 md:p-8">
+                  <div className="space-y-3">
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      Prefer to talk it through?
+                    </h3>
+                    <p className="text-gray-700">
+                      If you want a quick sanity check first, book a short, no-pressure chat.
+                    </p>
+
+                    <a
+                      href="https://calendly.com/rukid-sold/30min"
+                      className="inline-flex items-center justify-center px-5 py-3 rounded-full border border-gray-300 text-sm font-medium hover:border-gray-400 transition"
+                    >
+                      Book a short chat
+                    </a>
+
+                    <p className="text-sm text-gray-500">
+                      15 minutes. No applications, no obligation.
+                    </p>
+                  </div>
+                </ShellCard>
+              </section>
+            </div>
+          </div>
         </section>
       </section>
     </main>

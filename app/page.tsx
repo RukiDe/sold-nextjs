@@ -1,61 +1,47 @@
-import Image from "next/image";
 import { ButtonPill } from "@/components/ButtonPill";
 
 export default function HomePage() {
   return (
     <main>
-      {/* HERO */}
-      <section className="max-w-5xl mx-auto px-4 pt-12 pb-14">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-          <div>
-            <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">
-              Sold
-            </p>
+      <section className="max-w-5xl mx-auto px-4 pt-14 pb-10">
+        <p className="text-xs uppercase tracking-wide text-gray-500 mb-3">
+          Sold
+        </p>
 
-            <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight mb-3">
-              Helping homeowners manage the cost of ownership.
-            </h1>
+        <h1 className="text-3xl sm:text-5xl font-semibold tracking-tight text-gray-900">
+          We're building a financial operating system for homeowners.
+        </h1>
 
-            <p className="text-lg text-gray-700 max-w-xl mb-6">
-              Mortgages, rates, levies, insurance. The unavoidable stuff that
-              adds up over time.
-            </p>
+        <p className="mt-4 text-lg sm:text-xl text-gray-700 max-w-3xl">
+          For now, Sold turns mortgage commissions into relief.
+        </p>
 
-            <p className="text-gray-700 mb-4">
-              Sold helps you understand what you’re paying, what’s normal, and
-              what (if anything) is worth changing.
-            </p>
+        <div className="mt-5 max-w-3xl text-gray-700 leading-relaxed space-y-3">
+          <p>
+            This is because for most households, the mortgage is the largest recurring cost.
+            It’s also the only one that quietly generates an ongoing commission for brokers.
+          </p>
 
-            <p className="text-gray-700 mb-8">
-              Sometimes that’s a mortgage improvement. Sometimes it’s an offset
-              or a better structure for ongoing costs. And sometimes the right
-              answer is: you’re already in a good spot.
-            </p>
+          <p>
+            If you choose to refinance through Sold, we rebate that ongoing commission
+            back to you. You choose how it’s paid: applied to household bills, credited
+            directly to your bank account or into your investment fund.
+          </p>
+        </div>
 
-            <div className="flex flex-col sm:flex-row gap-3">
-              <ButtonPill href="/apartments">Apartment owners</ButtonPill>
-              <ButtonPill href="/houses">House owners</ButtonPill>
-            </div>
-
-            <p className="text-sm text-gray-500 mt-6">
-              No credit checks • Voluntary participation •
-              Transparent outcomes
-            </p>
-          </div>
-
-          <div className="border border-gray-200 rounded-2xl p-6 shadow-sm bg-white">
-            <Image
-              src="/stencils/owners-corporation-stencil.svg"
-              alt="A calm, well-run building"
-              width={820}
-              height={520}
-              priority
-            />
-            <p className="mt-4 text-sm text-gray-600">
-              Reducing the long-term cost of ownership, one decision at a time.
-            </p>
+        <div className="mt-7">
+          <p className="text-sm text-gray-600 mb-3">
+            Start with your ownership type:
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <ButtonPill href="/apartments">Apartments</ButtonPill>
+            <ButtonPill href="/houses">Houses</ButtonPill>
           </div>
         </div>
+
+        <p className="mt-5 text-sm text-gray-500">
+          No credit checks • Clear recommendations • You’re always in control
+        </p>
       </section>
     </main>
   );
