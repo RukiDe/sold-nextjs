@@ -9,7 +9,7 @@ export default function HomePage() {
         </p>
 
         <h1 className="text-3xl sm:text-5xl font-semibold tracking-tight text-gray-900">
-          We're building a financial operating system for homeowners.
+          We’re building a financial operating system for homeowners.
         </h1>
 
         <p className="mt-4 text-lg sm:text-xl text-gray-700 max-w-3xl">
