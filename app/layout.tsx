@@ -7,12 +7,12 @@ import { Analytics } from "@vercel/analytics/react";
 export const metadata: Metadata = {
   metadataBase: new URL("https://sold.financial"),
 
-  title: "Sold — Helping homeowners manage the cost of ownership",
+  title: "Sold — Helping homeowners manage money",
   description:
     "Sold helps homeowners understand, reduce, and manage the ongoing costs of owning property — from mortgages to rates, levies, and insurance.",
 
   openGraph: {
-    title: "Sold — Helping homeowners manage the cost of ownership",
+    title: "Sold — Helping homeowners manage money",
     description:
       "Understand, reduce, and manage the ongoing costs of owning property. Mortgages, rates, levies, and insurance — with clear, no-pressure guidance.",
     url: "https://sold.financial",
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
         url: "/og_1200x630.png",
         width: 1200,
         height: 630,
-        alt: "Sold — Helping homeowners manage the cost of ownership",
+        alt: "Sold — Helping homeowners manage money",
       },
     ],
     type: "website",
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
 
   twitter: {
     card: "summary_large_image",
-    title: "Sold — Helping homeowners manage the cost of ownership",
+    title: "Sold — Helping homeowners manage money",
     description:
       "Clear guidance for homeowners on mortgages, rates, levies, and other unavoidable property costs.",
     images: ["/og_1200x630.png"],
