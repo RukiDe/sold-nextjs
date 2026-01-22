@@ -58,7 +58,7 @@ export default function HousesPage() {
                   </p>
 
                   <h1 className="text-3xl md:text-5xl font-semibold tracking-tight text-gray-900">
-                    Rebate your mortgage commission into relief
+                    Turn your mortgage commission into relief
                   </h1>
 
                   <p className="text-lg md:text-xl text-gray-700">
