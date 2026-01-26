@@ -14,7 +14,7 @@ function JumpPill({
   return (
     <a
       href={href}
-      className="inline-flex items-center justify-center px-4 py-2 rounded-full border border-gray-200 bg-white text-sm font-medium text-gray-900 hover:border-gray-300 transition"
+      className="inline-flex items-center justify-center px-4 py-2 rounded-full border border-gray-200 bg-white text-sm font-medium text-gray-900 hover:border-gray-300 hover:bg-gray-50 transition"
     >
       {children}
     </a>
@@ -46,8 +46,8 @@ export default function ApartmentsPage() {
       <section className="max-w-6xl mx-auto px-4 pt-12 pb-16 space-y-14">
         {/* HERO */}
         <header className="space-y-6">
-          {/* subtle editorial frame */}
-          <div className="border-t border-gray-100 pt-6">
+          {/* framed hero */}
+          <div className="rounded-3xl border border-gray-200 bg-gray-50 p-6 md:p-10">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
               {/* Left: hero copy */}
               <div className="lg:col-span-7 space-y-6">
@@ -67,7 +67,7 @@ export default function ApartmentsPage() {
 
                   <p className="text-lg md:text-xl text-gray-700">
                     For apartments, that relief can be credited to your levy BPAY
-                    reference, paid straight to your bank account or into an investment fund so it grows over time. Your choice.
+                    reference, paid straight to your bank account or elsewhere. Your choice.
                   </p>
                 </div>
 
@@ -75,20 +75,20 @@ export default function ApartmentsPage() {
                   No credit checks • Voluntary • You stay in control
                 </p>
 
-                {/* Flow line as a “system label” */}
-                <div className="inline-flex rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3">
+                {/* Flow line as a featured artefact */}
+                <div className="rounded-2xl border border-gray-300 bg-white px-5 py-4">
                   <p className="text-[13px] font-semibold text-gray-800 tracking-tight">
-                    Mortgage → Refinance → Ongoing rebate → Automatically directed to levies, cash, or investments
+                    Mortgage → Refinance → Ongoing rebate → Automatically directed to levies, cash or elsewhere
                   </p>
                 </div>
               </div>
 
               {/* Right: destination rail */}
               <div className="lg:col-span-5">
-                <ShellCard className="p-6 md:p-7 relative overflow-hidden">
+                <ShellCard className="p-6 md:p-7 relative overflow-hidden lg:sticky lg:top-24">
                   {/* micro-ornament (dot grid) */}
                   <div
-                    className="absolute -top-10 -right-10 h-40 w-40 opacity-[0.18]"
+                    className="absolute -top-10 -right-10 h-40 w-40 opacity-[0.16]"
                     style={{
                       backgroundImage:
                         "radial-gradient(circle at 1px 1px, rgba(0,0,0,0.25) 1px, transparent 0)",
@@ -107,9 +107,7 @@ export default function ApartmentsPage() {
 
                       <div className="pl-6">
                         <div className="flex items-center justify-between rounded-2xl border border-gray-200 px-4 py-3 bg-white">
-                          <span className="text-sm text-gray-800">
-                            Levy BPAY reference
-                          </span>
+                          <span className="text-sm text-gray-800">Strata levy</span>
                           <span className="text-xs text-gray-500 rounded-full border border-gray-200 px-2 py-1">
                             automatic
                           </span>
@@ -118,9 +116,7 @@ export default function ApartmentsPage() {
 
                       <div className="pl-6">
                         <div className="flex items-center justify-between rounded-2xl border border-gray-200 px-4 py-3 bg-white">
-                          <span className="text-sm text-gray-800">
-                            Bank account
-                          </span>
+                          <span className="text-sm text-gray-800">Bank account</span>
                           <span className="text-xs text-gray-500 rounded-full border border-gray-200 px-2 py-1">
                             automatic
                           </span>
@@ -129,9 +125,7 @@ export default function ApartmentsPage() {
 
                       <div className="pl-6">
                         <div className="flex items-center justify-between rounded-2xl border border-gray-200 px-4 py-3 bg-white">
-                          <span className="text-sm text-gray-800">
-                            Investment account
-                          </span>
+                          <span className="text-sm text-gray-800">or elsewhere</span>
                           <span className="text-xs text-gray-500 rounded-full border border-gray-200 px-2 py-1">
                             automatic
                           </span>
@@ -139,8 +133,8 @@ export default function ApartmentsPage() {
                       </div>
                     </div>
 
-                    {/* Jump bar (kept near hero visually) */}
-                    <div className="pt-3 border-t border-gray-100">
+                    {/* Jump bar */}
+                    <div className="pt-4 border-t border-gray-100">
                       <div className="flex flex-wrap gap-2">
                         <JumpPill href="#preview">Check my options</JumpPill>
                         <JumpPill href="#pdf">Read the explainer</JumpPill>
@@ -154,9 +148,12 @@ export default function ApartmentsPage() {
           </div>
         </header>
 
+        {/* SECTION DIVIDER */}
+        <div className="border-t border-gray-100" />
+
         {/* HOW IT WORKS */}
         <section className="max-w-5xl">
-          <ShellCard className="p-6 md:p-8 bg-gray-50">
+          <ShellCard className="p-6 md:p-10 bg-white">
             <div className="space-y-4">
               <h2 className="text-2xl font-semibold text-gray-900">
                 How it works (apartments)
@@ -176,7 +173,7 @@ export default function ApartmentsPage() {
                   <ul className="list-disc pl-5 mt-1">
                     <li>credits to your levy BPAY reference, or</li>
                     <li>direct payments to your bank account.</li>
-                    <li>direct payments to your investment account.</li>
+                    <li>direct payments elsewhere.</li>
                   </ul>
                 </li>
               </ol>
@@ -188,7 +185,7 @@ export default function ApartmentsPage() {
         <section className="max-w-5xl">
           <ShellCard className="p-6 md:p-8">
             <div className="grid md:grid-cols-2 gap-6">
-              <div className="space-y-3">
+              <div className="rounded-2xl bg-gray-50 p-6">
                 <h3 className="text-lg font-semibold mb-3 text-gray-900">
                   What this doesn’t change
                 </h3>
@@ -200,7 +197,7 @@ export default function ApartmentsPage() {
                 </ul>
               </div>
 
-              <div className="space-y-3">
+              <div className="rounded-2xl bg-gray-50 p-6">
                 <h3 className="text-lg font-semibold mb-3 text-gray-900">
                   What it requires
                 </h3>
@@ -222,15 +219,20 @@ export default function ApartmentsPage() {
               id="preview"
               className="lg:col-span-7 space-y-4 scroll-mt-24"
             >
-              <ShellCard className="p-6 md:p-8 border-gray-300 shadow-md">
+              <ShellCard className="p-6 md:p-10 border-gray-300 shadow-md">
                 <div className="space-y-4">
                   <h3 className="text-xl font-semibold text-gray-900">
                     Check if my mortgage can create levy relief
                   </h3>
 
                   <p className="text-gray-700 max-w-3xl">
-                    Connect securely and we’ll assess whether a refinance is worthwhile,
-                    and what ongoing bill relief could look like for you.
+                    Connect securely and we’ll assess whether a refinance is
+                    worthwhile, and what ongoing bill relief could look like for
+                    you.
+                  </p>
+
+                  <p className="text-sm text-gray-500">
+                    Individual owners only. No Owners Corporation involvement required.
                   </p>
 
                   <div className="border border-gray-300 rounded-2xl p-6 bg-gray-50">
@@ -262,12 +264,13 @@ export default function ApartmentsPage() {
                       Prefer to talk it through?
                     </h3>
                     <p className="text-gray-700">
-                      If you want a quick sanity check first, book a short, no-pressure chat.
+                      If you want a quick sanity check first, book a short,
+                      no-pressure chat.
                     </p>
 
                     <a
                       href="https://calendly.com/rukid-sold/30min"
-                      className="inline-flex items-center justify-center px-5 py-3 rounded-full border border-gray-300 text-sm font-medium hover:border-gray-400 transition"
+                      className="inline-flex items-center justify-center px-5 py-3 rounded-full border border-gray-300 text-sm font-medium hover:border-gray-400 hover:bg-gray-50 transition"
                     >
                       Book a short chat
                     </a>
