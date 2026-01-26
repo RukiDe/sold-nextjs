@@ -222,7 +222,7 @@ export default function ApartmentsPage() {
         </h3>
 
         <p className="text-gray-700 max-w-3xl">
-           Let's see what ongoing levy offsets could look like for you.
+           See what ongoing levy offsets could look like for you.
         </p>
 
         <div className="border border-gray-300 rounded-2xl p-6 bg-gray-50 overflow-hidden">
