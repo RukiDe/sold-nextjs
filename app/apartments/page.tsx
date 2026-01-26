@@ -211,79 +211,71 @@ export default function ApartmentsPage() {
           </ShellCard>
         </section>
 
-        {/* CTA LADDER */}
-        <section className="space-y-6">
-          <div className="grid lg:grid-cols-12 gap-6 items-start">
-            {/* Primary */}
-            <section
-              id="preview"
-              className="lg:col-span-7 space-y-4 scroll-mt-24"
-            >
-              <ShellCard className="p-6 md:p-10 border-gray-300 shadow-md">
-                <div className="space-y-4">
-                  <h3 className="text-xl font-semibold text-gray-900">
-                    Check if my mortgage can create levy relief
-                  </h3>
+{/* CTA LADDER */}
+<section className="space-y-6">
+  {/* Primary: full width */}
+  <section id="preview" className="space-y-4 scroll-mt-24">
+    <ShellCard className="p-6 md:p-10 border-gray-300 shadow-md">
+      <div className="space-y-4">
+        <h3 className="text-xl font-semibold text-gray-900">
+          Check if my mortgage can create rates relief
+        </h3>
 
-                  <p className="text-gray-700 max-w-3xl">
-                    Connect securely and we’ll assess whether a refinance is
-                    worthwhile, and what ongoing bill relief could look like for
-                    you.
-                  </p>
+        <p className="text-gray-700 max-w-3xl">
+          Connect securely and we’ll assess whether a refinance is worthwhile,
+          and what ongoing bill relief could look like for you.
+        </p>
 
-                  <p className="text-sm text-gray-500">
-                    Individual owners only. No Owners Corporation involvement required.
-                  </p>
+        <div className="border border-gray-300 rounded-2xl p-6 bg-gray-50 overflow-hidden">
+          <OwnersEstimatePage />
+        </div>
 
-                  <div className="border border-gray-300 rounded-2xl p-6 bg-gray-50">
-                    <OwnersEstimatePage />
-                  </div>
+        <p className="text-sm text-gray-500">
+          Indicative only. Read-only. No credit checks. Nothing changes unless
+          you choose to proceed.
+        </p>
+      </div>
+    </ShellCard>
+  </section>
 
-                  <p className="text-sm text-gray-500">
-                    Indicative only. Read-only. No credit checks. Nothing changes unless
-                    you choose to proceed.
-                  </p>
-                </div>
-              </ShellCard>
-            </section>
+  {/* Secondary: 2-up on desktop, stacked on mobile */}
+  <div className="grid gap-6 lg:grid-cols-2">
+    <section id="pdf" className="scroll-mt-24">
+      <ShellCard className="p-6 md:p-8 h-full">
+        <div className="space-y-3">
+          {/* prevents funky overflow from inner components */}
+ <div className="[&_*]:max-w-full">
+  <PdfExplainerCta />
+</div>
+        </div>
+      </ShellCard>
+    </section>
 
-            {/* Secondary stack */}
-            <div className="lg:col-span-5 space-y-6">
-              <section id="pdf" className="scroll-mt-24">
-                <ShellCard className="p-6 md:p-8">
-                  <div className="space-y-3">
-                    <PdfExplainerCta />
-                  </div>
-                </ShellCard>
-              </section>
+    <section id="chat" className="scroll-mt-24">
+      <ShellCard className="p-6 md:p-8 h-full">
+        <div className="space-y-3">
+          <h3 className="text-lg font-semibold text-gray-900">
+            Prefer to talk it through?
+          </h3>
+          <p className="text-gray-700">
+            If you want a quick sanity check first, book a short, no-pressure chat.
+          </p>
 
-              <section id="chat" className="scroll-mt-24">
-                <ShellCard className="p-6 md:p-8">
-                  <div className="space-y-3">
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      Prefer to talk it through?
-                    </h3>
-                    <p className="text-gray-700">
-                      If you want a quick sanity check first, book a short,
-                      no-pressure chat.
-                    </p>
+          <a
+            href="https://calendly.com/rukid-sold/30min"
+            className="inline-flex items-center justify-center px-5 py-3 rounded-full border border-gray-300 text-sm font-medium hover:border-gray-400 hover:bg-gray-50 transition"
+          >
+            Book a short chat
+          </a>
 
-                    <a
-                      href="https://calendly.com/rukid-sold/30min"
-                      className="inline-flex items-center justify-center px-5 py-3 rounded-full border border-gray-300 text-sm font-medium hover:border-gray-400 hover:bg-gray-50 transition"
-                    >
-                      Book a short chat
-                    </a>
-
-                    <p className="text-sm text-gray-500">
-                      15 minutes. No applications, no obligation.
-                    </p>
-                  </div>
-                </ShellCard>
-              </section>
-            </div>
-          </div>
-        </section>
+          <p className="text-sm text-gray-500">
+            15 minutes. No applications, no obligation.
+          </p>
+        </div>
+      </ShellCard>
+    </section>
+  </div>
+</section>
       </section>
     </main>
   );
