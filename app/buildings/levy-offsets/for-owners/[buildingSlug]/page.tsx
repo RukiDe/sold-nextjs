@@ -1,7 +1,9 @@
+// app/buildings/levy-offsets/for-owners/[buildingSlug]/page.tsx
 "use client";
 
 import type { ReactNode } from "react";
-import OwnersEstimatePage from "./OwnersEstimate";
+import Image from "next/image";
+import OwnersEstimatePage from "@/app/apartments/OwnersEstimate";
 import { PdfExplainerCta } from "@/components/PdfExplainerCta";
 
 function JumpPill({
@@ -40,24 +42,52 @@ function ShellCard({
   );
 }
 
-export default function ApartmentsPage() {
+/**
+ * Small helper to make a friendly building name from the URL slug.
+ * Example: "250-Gore-Street" -> "250 Gore Street"
+ */
+function humanizeBuildingSlug(slug: string) {
+  return decodeURIComponent(slug)
+    .replace(/[-_]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+export default function ForOwnersLevyOffsetsBuildingPage({
+  params,
+}: {
+  params: { buildingSlug: string };
+}) {
+const rawSlug = params?.buildingSlug;
+const buildingName = rawSlug
+  ? humanizeBuildingSlug(rawSlug)
+  : "your building";
+
   return (
     <main className="bg-white">
       <section className="max-w-6xl mx-auto px-4 pt-12 pb-16 space-y-14">
         {/* HERO */}
         <header className="space-y-6">
-          {/* framed hero */}
           <div className="rounded-3xl border border-gray-200 bg-gray-50 p-6 md:p-10">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
               {/* Left: hero copy */}
               <div className="lg:col-span-7 space-y-6">
                 <div className="space-y-3 max-w-3xl">
                   <p className="text-xs uppercase tracking-wide text-gray-500">
-                    Apartments • Mortgage rebates to levies
+                    Buildings • Levy offsets • For owners
+                  </p>
+
+                  {/* Building-specific acknowledgement */}
+                  <p className="text-xs text-gray-500">
+                    This page is for owners at{" "}
+                    <span className="font-medium text-gray-900">
+                      {buildingName}
+                    </span>
+                    .
                   </p>
 
                   <h1 className="text-3xl md:text-5xl font-semibold tracking-tight text-gray-900">
-                    Turn your mortgage commission into relief
+                    See what a levy credit looks like in real life
                   </h1>
 
                   <p className="text-lg md:text-xl text-gray-700">
@@ -66,8 +96,15 @@ export default function ApartmentsPage() {
                   </p>
 
                   <p className="text-lg md:text-xl text-gray-700">
-                    For apartments, that relief can be credited to your levy BPAY
-                    reference, paid straight to your bank account or elsewhere. Your choice.
+                    For owners in participating buildings like{" "}
+                    <span className="font-medium text-gray-900">
+                      {buildingName}
+                    </span>
+                    , that relief can be credited directly to{" "}
+                    <span className="font-medium text-gray-900">
+                      your individual levy BPAY reference or paid straight to
+                      your bank account
+                    </span>
                   </p>
                 </div>
 
@@ -75,18 +112,19 @@ export default function ApartmentsPage() {
                   No credit checks • Voluntary • You stay in control
                 </p>
 
-                {/* Flow line as a featured artefact */}
+                {/* Flow line */}
                 <div className="rounded-2xl border border-gray-300 bg-white px-5 py-4">
                   <p className="text-[13px] font-semibold text-gray-800 tracking-tight">
-                    Mortgage → Refinance → Ongoing rebate → Automatically directed to levies, cash or elsewhere
+                    Mortgage → Refinance → Ongoing rebate → Automatically
+                    credited (quarterly)
                   </p>
                 </div>
               </div>
 
-              {/* Right: destination rail */}
+              {/* Right: image rail */}
               <div className="lg:col-span-5">
                 <ShellCard className="p-6 md:p-7 relative overflow-hidden lg:sticky lg:top-24">
-                  {/* micro-ornament (dot grid) */}
+                  {/* dot grid ornament */}
                   <div
                     className="absolute -top-10 -right-10 h-40 w-40 opacity-[0.16]"
                     style={{
@@ -98,45 +136,34 @@ export default function ApartmentsPage() {
 
                   <div className="relative space-y-4">
                     <div className="text-sm font-semibold text-gray-900">
-                      Where the rebate can go
+                      Example: levy notice with a credit
                     </div>
 
-                    <div className="relative space-y-3">
-                      {/* connector line */}
-                      <div className="absolute left-3 top-2 bottom-2 w-px bg-gray-200" />
+                    <p className="text-sm text-gray-700">
+                      Levies don’t change. This is simply a credit applied to{" "}
+                      <span className="font-medium text-gray-900">your</span>{" "}
+                      levy account reference.
+                    </p>
 
-                      <div className="pl-6">
-                        <div className="flex items-center justify-between rounded-2xl border border-gray-200 px-4 py-3 bg-white">
-                          <span className="text-sm text-gray-800">Strata levy</span>
-                          <span className="text-xs text-gray-500 rounded-full border border-gray-200 px-2 py-1">
-                            automatic
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="pl-6">
-                        <div className="flex items-center justify-between rounded-2xl border border-gray-200 px-4 py-3 bg-white">
-                          <span className="text-sm text-gray-800">Bank account</span>
-                          <span className="text-xs text-gray-500 rounded-full border border-gray-200 px-2 py-1">
-                            automatic
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="pl-6">
-                        <div className="flex items-center justify-between rounded-2xl border border-gray-200 px-4 py-3 bg-white">
-                          <span className="text-sm text-gray-800">or elsewhere</span>
-                          <span className="text-xs text-gray-500 rounded-full border border-gray-200 px-2 py-1">
-                            automatic
-                          </span>
-                        </div>
+                    <div className="rounded-2xl border border-gray-200 bg-white overflow-hidden">
+                      <div className="relative w-full aspect-[4/5] bg-white">
+                        <Image
+                          src="/strata-levy-offset-example.png"
+                          alt="Example levy notice showing a broker rebate levy offset"
+                          fill
+                          className="object-contain"
+                          sizes="(max-width: 1024px) 100vw, 420px"
+                          priority
+                        />
                       </div>
                     </div>
 
                     {/* Jump bar */}
                     <div className="pt-4 border-t border-gray-100">
                       <div className="flex flex-wrap gap-2">
-                        <JumpPill href="#preview">Check my options</JumpPill>
+                        <JumpPill href="#preview">
+                          Check my options at {buildingName}
+                        </JumpPill>
                         <JumpPill href="#pdf">Read the explainer</JumpPill>
                         <JumpPill href="#chat">Talk it through</JumpPill>
                       </div>
@@ -156,7 +183,7 @@ export default function ApartmentsPage() {
           <ShellCard className="p-6 md:p-10 bg-white">
             <div className="space-y-4">
               <h2 className="text-2xl font-semibold text-gray-900">
-                How it works (apartments)
+                How it works (for owners)
               </h2>
 
               <ol className="space-y-3 text-gray-700 list-decimal pl-5">
@@ -168,15 +195,12 @@ export default function ApartmentsPage() {
                   If you choose to proceed, Sold receives an ongoing trail
                   commission from the lender.
                 </li>
-                <li>
-                  We rebate that commission back to you over time, as either:
-                  <ul className="list-disc pl-5 mt-1">
-                    <li>credits to your levy BPAY reference, or</li>
-                    <li>direct payments to your bank account.</li>
-                    <li>direct payments elsewhere.</li>
-                  </ul>
-                </li>
+                <li>We rebate that commission back to you.</li>
               </ol>
+
+              <p className="text-sm text-gray-600">
+                Note: This is an individual decision.
+              </p>
             </div>
           </ShellCard>
         </section>
@@ -193,7 +217,6 @@ export default function ApartmentsPage() {
                   <li>Owners Corporation budgets or decisions</li>
                   <li>Levy amounts or schedules</li>
                   <li>Other owners’ outcomes</li>
-                  <li>Any need for OC endorsement</li>
                 </ul>
               </div>
 
@@ -211,70 +234,59 @@ export default function ApartmentsPage() {
           </ShellCard>
         </section>
 
-{/* CTA LADDER */}
-<section className="space-y-6">
-  {/* Primary: full width */}
-  <section id="preview" className="space-y-4 scroll-mt-24">
-    <ShellCard className="p-6 md:p-10 border-gray-300 shadow-md">
-      <div className="space-y-4">
-        <h3 className="text-xl font-semibold text-gray-900">
-          Check if my mortgage can create rates relief
-        </h3>
+        {/* ESTIMATOR + CTAs */}
+        <section className="space-y-10 max-w-5xl">
+          {/* Estimator */}
+          <section id="preview" className="space-y-4 scroll-mt-24">
+            <p className="text-sm text-gray-600">
+              Any estimate you see here applies to{" "}
+              <span className="font-medium text-gray-900">your lot only</span>,
+              not the building as a whole.
+            </p>
 
-        <p className="text-gray-700 max-w-3xl">
-           Let's see what ongoing levy offsets could look like for you.
-        </p>
+            <div className="border border-gray-300 rounded-2xl p-6 bg-gray-50 overflow-hidden">
+              <OwnersEstimatePage />
+            </div>
+          </section>
 
-        <div className="border border-gray-300 rounded-2xl p-6 bg-gray-50 overflow-hidden">
-          <OwnersEstimatePage />
-        </div>
+          {/* Secondary CTAs */}
+          <div className="grid gap-6 lg:grid-cols-2">
+            <section id="pdf" className="scroll-mt-24">
+              <ShellCard className="p-6 md:p-8 h-full">
+                <div className="space-y-3">
+                  <div className="[&_*]:max-w-full">
+                    <PdfExplainerCta />
+                  </div>
+                </div>
+              </ShellCard>
+            </section>
 
-        <p className="text-sm text-gray-500">
-          Indicative only. Read-only. No credit checks. Nothing changes unless
-          you choose to proceed.
-        </p>
-      </div>
-    </ShellCard>
-  </section>
+            <section id="chat" className="scroll-mt-24">
+              <ShellCard className="p-6 md:p-8 h-full">
+                <div className="space-y-3">
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Prefer to talk it through?
+                  </h3>
+                  <p className="text-gray-700">
+                    If you want a quick sanity check first, book a short,
+                    no-pressure chat.
+                  </p>
 
-  {/* Secondary: 2-up on desktop, stacked on mobile */}
-  <div className="grid gap-6 lg:grid-cols-2">
-    <section id="pdf" className="scroll-mt-24">
-      <ShellCard className="p-6 md:p-8 h-full">
-        <div className="space-y-3">
-          {/* prevents funky overflow from inner components */}
- <div className="[&_*]:max-w-full">
-  <PdfExplainerCta />
-</div>
-        </div>
-      </ShellCard>
-    </section>
+                  <a
+                    href="https://calendly.com/rukid-sold/30min"
+                    className="inline-flex items-center justify-center px-5 py-3 rounded-full border border-gray-300 text-sm font-medium hover:border-gray-400 hover:bg-gray-50 transition"
+                  >
+                    Book a short chat
+                  </a>
 
-    <section id="chat" className="scroll-mt-24">
-      <ShellCard className="p-6 md:p-8 h-full">
-        <div className="space-y-3">
-          <h3 className="text-lg font-semibold text-gray-900">
-            Prefer to talk it through?
-          </h3>
-          <p className="text-gray-700">
-            If you want a quick sanity check first, book a short, no-pressure chat.
-          </p>
-
-          <a
-            href="https://calendly.com/rukid-sold/30min"
-            className="inline-flex items-center justify-center px-5 py-3 rounded-full border border-gray-300 text-sm font-medium hover:border-gray-400 hover:bg-gray-50 transition"
-          >
-            Book a short chat
-          </a>
-
-          <p className="text-sm text-gray-500">
-            15 minutes. No applications, no obligation.
-          </p>
-        </div>
-      </ShellCard>
-    </section>
-  </div>
-</section>
+                  <p className="text-sm text-gray-500">
+                    15 minutes. No applications, no obligation.
+                  </p>
+                </div>
+              </ShellCard>
+            </section>
+          </div>
+        </section>
       </section>
     </main>
   );

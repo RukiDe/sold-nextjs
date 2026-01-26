@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { ButtonPill } from "@/components/ButtonPill";
 
-const TRAIL_RATE = 0.0015; // 0.15% p.a.
+const TRAIL_RATE = 0.0020; // 0.20% p.a.
 const MIN = 100_000;
 const MAX = 2_000_000;
 const STEP = 25_000;
@@ -93,7 +93,7 @@ export default function OwnersEstimate() {
 
   return (
     <main>
-      <section className="max-w-3xl mx-auto px-4 py-12">
+      <section className="px-0 py-0 text-left">
         <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">
           Levy offsets for homeowners
         </p>

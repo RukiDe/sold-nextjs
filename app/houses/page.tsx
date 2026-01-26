@@ -146,7 +146,6 @@ export default function HousesPage() {
                     <div className="pt-4 border-t border-gray-100">
                       <div className="flex flex-wrap gap-2">
                         <JumpPill href="#preview">Check my options</JumpPill>
-                        <JumpPill href="#timeline">See the pattern</JumpPill>
                         <JumpPill href="#pdf">Read the explainer</JumpPill>
                         <JumpPill href="#chat">Talk it through</JumpPill>
                       </div>

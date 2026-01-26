@@ -25,7 +25,7 @@ export default function HomePage() {
           <p>
             If you choose to refinance through Sold, we rebate that ongoing commission
             back to you. You choose how it’s paid: applied to household bills, credited
-            directly to your bank account or into your investment fund.
+            directly to your bank account or elsewhere.
           </p>
         </div>
 
