@@ -240,8 +240,7 @@ const buildingName = rawSlug
           <section id="preview" className="space-y-4 scroll-mt-24">
             <p className="text-sm text-gray-600">
               Any estimate you see here applies to{" "}
-              <span className="font-medium text-gray-900">your lot only</span>,
-              not the building as a whole.
+              <span className="font-medium text-gray-900">your lot only.</span>
             </p>
 
             <div className="border border-gray-300 rounded-2xl p-6 bg-gray-50 overflow-hidden">

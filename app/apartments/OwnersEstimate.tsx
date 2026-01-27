@@ -267,7 +267,7 @@ export default function OwnersEstimate() {
                               Book a quick call
                             </a>
                             <p className="text-xs text-gray-500">
-                              Optional. If you’d rather not chat, just reply to
+                              Optional - or reply to
                               the email with any questions.
                             </p>
                           </div>
